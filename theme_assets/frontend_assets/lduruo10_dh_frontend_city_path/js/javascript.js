@@ -21092,24 +21092,32 @@
     /*-------------------
 		Quantity change
 	--------------------- */
-    $(".nice-scroll").niceScroll({
-        cursorcolor: "#a8a8a8",
-        cursorwidth: "8px",
-        background: "rgba(168, 168, 168, 0.3)",
-        cursorborder: "",
-        autohidemode: false,
-        horizrailenabled: false
-    });
+    var screen_width = $(window).width();
 
-    $(".filter.nice-scroll").niceScroll({
-        cursorcolor: "#a8a8a8",
-        cursorwidth: "8px",
-        background: "rgba(168, 168, 168, 0.3)",
-        cursorborder: "",
-        autohidemode: true,
-        horizrailenabled: false
-    });
+    if(screen_width > 767)
+    {
+        $(".nice-scroll").niceScroll({
+            cursorcolor: "#a8a8a8",
+            cursorwidth: "8px",
+            background: "rgba(168, 168, 168, 0.3)",
+            cursorborder: "",
+            autohidemode: false,
+            horizrailenabled: false
+        });
 
+        $(".filter.nice-scroll").niceScroll({
+            cursorcolor: "#a8a8a8",
+            cursorwidth: "8px",
+            background: "rgba(168, 168, 168, 0.3)",
+            cursorborder: "",
+            autohidemode: true,
+            horizrailenabled: false
+        });
+
+        $(window).resize(function() {
+            $(".nice-scroll").getNiceScroll().resize();
+        });
+    }
 
     /**
      * Start form submit event
