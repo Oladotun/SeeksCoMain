@@ -42,6 +42,7 @@ class ItemController extends Controller
         /**
          * Start SEO
          */
+        
         SEOMeta::setTitle(__('seo.backend.user.item.items', ['site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
         SEOMeta::setDescription('');
         SEOMeta::setCanonical(URL::current());
