@@ -16,10 +16,10 @@ return array (
   'remember-me' => 'Remember Me',
   'reset-password' => 'Reset Password',
   'send-password-reset-link' => 'Send Password Reset Link',
-  'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+  'throttle' => 'Too many login attempts Please try again in :seconds seconds.',
   'verify-email' => 'Verify Your Email Address',
-  'verify-email-check' => 'Before proceeding, please check your email for a verification link.',
+  'verify-email-check' => 'Before proceeding, please check your email or spam folder for a verification link.',
   'verify-email-not-receive' => 'If you did not receive the email',
   'verify-email-request' => 'click here to request another',
-  'verify-email-sent' => 'A fresh verification link has been sent to your email address.',
+  'verify-email-sent' => 'A fresh verification link has been sent to your email address. Please check your spam folder as well',
 );

@@ -27,7 +27,6 @@
 
         <!-- Start hero section desktop view-->
         <div class="row align-items-center justify-content-center text-center d-none d-md-flex">
-
             <div class="col-md-12">
                 <div class="row justify-content-center mb-1">
                     <div class="col-md-12 text-center">
@@ -66,10 +65,10 @@
 
 <div class="site-section bg-light">
     <div class="container">
-
         <!-- Start categories section desktop view-->
         <div class="overlap-category mb-5 d-none d-md-block">
             <div class="row align-items-stretch no-gutters">
+
 
                 @if($categories->count() > 0)
                     @foreach($categories as $categories_key => $category)
@@ -368,6 +367,7 @@
                                 @endif
 
                                 <h3 class="pt-2"><a href="{{ route('page.item', $item->item_slug) }}">{{ $item->item_title }}</a></h3>
+
 
                                 @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
                                 <address>
