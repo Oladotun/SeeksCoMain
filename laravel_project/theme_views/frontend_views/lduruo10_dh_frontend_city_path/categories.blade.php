@@ -295,10 +295,12 @@
 
         <div class="row mt-4">
             @foreach($all_states as $all_states_key => $state)
-                <div class="col-6 col-lg-4 mb-3">
-                    <a href="{{ route('page.state', ['state_slug' => $state->state_slug]) }}">{{ $state->state_name }}</a>
-                    ({{ $state->items_count }})
-                </div>
+                @if($state->items_count > 0 ) <!-- Only show states with items_count -->
+                    <div class="col-6 col-lg-4 mb-3">
+                        <a href="{{ route('page.state', ['state_slug' => $state->state_slug]) }}">{{ $state->state_name }}</a>
+                        ({{ $state->items_count }})
+                    </div>
+                @endif
             @endforeach
         </div>
         @endif
