@@ -1110,6 +1110,7 @@ class PagesController extends Controller
 
         $all_states = Country::find($site_prefer_country_id)
             ->states()
+            ->withCount(['items'])
             ->orderBy('state_name')
             ->get();
 
