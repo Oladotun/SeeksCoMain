@@ -1726,7 +1726,8 @@ class ItemController extends Controller
                 $friendly_rating = $request->friendly_rating;
                 $pricing_rating = $request->pricing_rating;
                 $recommend = $request->recommend == 1 ? Item::ITEM_REVIEW_RECOMMEND_YES : Item::ITEM_REVIEW_RECOMMEND_NO;
-                $approved = $login_user->isAdmin() ? true : false;
+                // $approved = $login_user->isAdmin() ? true : false;
+                $approved = true;
 
                 $new_rating = $item->rating([
                     'title' => $rating_title,
@@ -1871,7 +1872,8 @@ class ItemController extends Controller
                 $friendly_rating = $request->friendly_rating;
                 $pricing_rating = $request->pricing_rating;
                 $recommend = $request->recommend == 1 ? Item::ITEM_REVIEW_RECOMMEND_YES : Item::ITEM_REVIEW_RECOMMEND_NO;
-                $approved = $login_user->isAdmin() ? true : false;
+                // $approved = $login_user->isAdmin() ? true : false;
+                $approved = true;
 
                 $updated_rating = $item->updateRating($review, [
                     'title' => $rating_title,
