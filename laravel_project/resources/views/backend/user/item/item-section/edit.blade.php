@@ -395,6 +395,8 @@
     <script>
         $(document).ready(function() {
 
+            "use strict";
+
             /**
              * Start add product modal form submit
              */

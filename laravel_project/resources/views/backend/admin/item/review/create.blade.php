@@ -258,6 +258,8 @@
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
 
+            "use strict";
+
             /**
              * Start image gallery uplaod
              */

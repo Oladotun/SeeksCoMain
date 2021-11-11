@@ -156,11 +156,13 @@
 
                                 <div class="row form-group">
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="text-black" for="setting_site_location_country_id">{{ __('theme_directory_hub.setting.default-country') }}</label>
                                         <select class="custom-select @error('setting_site_location_country_id') is-invalid @enderror" name="setting_site_location_country_id" id="setting_site_location_country_id">
-                                            @foreach($all_countries as $key => $country)
+                                            @foreach($all_countries as $all_countries_key => $country)
+                                                @if($country->country_status == \App\Country::COUNTRY_STATUS_ENABLE)
                                                 <option {{ (old('setting_site_location_country_id') ? old('setting_site_location_country_id') : $settings->setting_site_location_country_id) == $country->id ? 'selected' : '' }} value="{{ $country->id }}">{{ $country->country_name }}</option>
+                                                @endif
                                             @endforeach
                                         </select>
                                         <small id="setting_site_location_country_idHelpBlock" class="form-text text-muted">
@@ -173,7 +175,7 @@
                                         @enderror
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="text-black" for="setting_site_location_lat">{{ __('theme_directory_hub.setting.default-latitude') }}</label>
                                         <input id="setting_site_location_lat" type="text" class="form-control @error('setting_site_location_lat') is-invalid @enderror" name="setting_site_location_lat" value="{{ old('setting_site_location_lat') ? old('setting_site_location_lat') : $settings->setting_site_location_lat }}">
                                         <small id="latHelpBlock" class="form-text text-muted">
@@ -187,7 +189,7 @@
                                         @enderror
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="text-black" for="setting_site_location_lng">{{ __('theme_directory_hub.setting.default-longitude') }}</label>
                                         <input id="setting_site_location_lng" type="text" class="form-control @error('setting_site_location_lng') is-invalid @enderror" name="setting_site_location_lng" value="{{ old('setting_site_location_lng') ? old('setting_site_location_lng') : $settings->setting_site_location_lng }}">
                                         <small id="lngHelpBlock" class="form-text text-muted">
@@ -200,32 +202,8 @@
                                         </span>
                                         @enderror
                                     </div>
-                                </div>
 
-                                <div class="row form-group">
-                                    <div class="col-md-6">
-                                        <label class="text-black" for="setting_site_language">{{ __('theme_directory_hub.setting.default-language') }}</label>
-                                        <select class="custom-select @error('setting_site_language') is-invalid @enderror" name="setting_site_language">
-                                            <option value="">{{ __('backend.setting.language.select-language') }}</option>
-
-                                            @foreach(\App\Setting::LANGUAGES as $setting_languages_key => $language)
-                                                <option value="{{ $language }}" {{ $settings->setting_site_language == $language ? 'selected' : '' }}>
-                                                    {{ __('prefer_languages.' . $language) }}
-                                                </option>
-                                            @endforeach
-
-                                        </select>
-                                        <small id="setting_site_languageHelpBlock" class="form-text text-muted">
-                                            {{ __('theme_directory_hub.setting.default-language-help') }}
-                                        </small>
-                                        @error('setting_site_language')
-                                        <span class="invalid-tooltip">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                        @enderror
-                                    </div>
-
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <label for="setting_product_currency_symbol" class="text-black">{{ __('theme_directory_hub.setting.display-currency-symbol') }}</label>
                                         <select id="setting_product_currency_symbol" class="custom-select" name="setting_product_currency_symbol">
                                             <option value="$" {{ $settings->setting_product_currency_symbol == '$' ? 'selected' : '' }}>$</option>
@@ -245,8 +223,11 @@
                                             <option value="د.إ" {{ $settings->setting_product_currency_symbol == 'د.إ' ? 'selected' : '' }}>د.إ</option>
                                             <option value="RM" {{ $settings->setting_product_currency_symbol == 'RM' ? 'selected' : '' }}>RM</option>
                                             <option value="₺" {{ $settings->setting_product_currency_symbol == '₺' ? 'selected' : '' }}>₺</option>
-                                            <option value=”XOF” {{ $settings->setting_product_currency_symbol == 'XOF' ? 'selected' : '' }}>XOF</option>
-                                            <option value=”₱” {{ $settings->setting_product_currency_symbol == '₱' ? 'selected' : '' }}>₱</option>
+                                            <option value="XOF" {{ $settings->setting_product_currency_symbol == 'XOF' ? 'selected' : '' }}>XOF</option>
+                                            <option value="₱" {{ $settings->setting_product_currency_symbol == '₱' ? 'selected' : '' }}>₱</option>
+                                            <option value="COL$" {{ $settings->setting_product_currency_symbol == 'COL$' ? 'selected' : '' }}>COL$</option>
+                                            <option value="₲" {{ $settings->setting_product_currency_symbol == '₲' ? 'selected' : '' }}>₲</option>
+                                            <option value="฿" {{ $settings->setting_product_currency_symbol == '฿' ? 'selected' : '' }}>฿</option>
                                         </select>
                                         <small id="setting_product_currency_symbolHelpBlock" class="form-text text-muted">
                                             {{ __('theme_directory_hub.setting.display-currency-symbol-help') }}
@@ -433,6 +414,15 @@
                                             <strong>{{ $message }}</strong>
                                         </span>
                                         @enderror
+                                    </div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="col-12">
+                                        <a class="text-info" href="#" data-toggle="modal" data-target="#testSmtpModal">
+                                            <i class="far fa-paper-plane"></i>
+                                            {{ __('category_index.test-smtp.send-a-test-email-link') }}
+                                        </a>
                                     </div>
                                 </div>
 
@@ -756,6 +746,52 @@
             </div>
         </div>
     </div>
+
+
+    <!-- test SMTP modal -->
+    <div class="modal fade" id="testSmtpModal" tabindex="-1" role="dialog" aria-labelledby="testSmtpModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">{{ __('category_index.test-smtp.modal.modal-title') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('admin.settings.general.smtp.test') }}" method="POST">
+                    @csrf
+                <div class="modal-body">
+
+                    <div class="row form-group">
+                        <div class="col-12">
+                            <div class="alert alert-info" role="alert">
+                                <i class="fas fa-info-circle"></i>
+                                {{ __('category_index.test-smtp.modal.modal-description') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-12">
+                            <label for="smtp_receiver_email" class="text-black">{{ __('category_index.test-smtp.receiver-email') }}</label>
+                            <input required id="smtp_receiver_email" type="email" class="form-control @error('smtp_receiver_email') is-invalid @enderror" name="smtp_receiver_email" value="{{ old('smtp_receiver_email') }}">
+                            @error('smtp_receiver_email')
+                            <span class="invalid-tooltip">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('backend.shared.cancel') }}</button>
+                    <button type="submit" class="btn btn-info">{{ __('category_index.test-smtp.modal.modal-send') }}</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
@@ -773,6 +809,8 @@
     <script>
 
         $(document).ready(function() {
+
+            "use strict";
 
             /**
              * Start initial HTML code textarea markdown
@@ -819,7 +857,7 @@
             /**
              * Start the croppie image plugin
              */
-            $image_crop = null;
+            var image_crop = null;
 
             $('#upload_image').on('click', function(){
 
@@ -829,15 +867,15 @@
 
             $('#upload_image_input').on('change', function(){
 
-                if(!$image_crop)
+                if(!image_crop)
                 {
-                    $image_crop = $('#image_demo').croppie({
+                    image_crop = $('#image_demo').croppie({
                         enableExif: true,
                         mouseWheelZoom: false,
                         viewport: {
-                            width:300,
-                            height:300,
-                            type:'circle'
+                            width:200,
+                            height:50,
+                            type:'square'
                         },
                         boundary:{
                             width:500,
@@ -854,19 +892,19 @@
 
                 reader.onload = function (event) {
 
-                    $image_crop.croppie('bind', {
+                    image_crop.croppie('bind', {
                         url: event.target.result
                     }).then(function(){
                         console.log('jQuery bind complete');
                     });
 
-                }
+                };
                 reader.readAsDataURL(this.files[0]);
             });
 
             $('#crop_image').on("click", function(event){
 
-                $image_crop.croppie('result', {
+                image_crop.croppie('result', {
                     type: 'base64',
                     size: 'viewport'
                 }).then(function(response){
@@ -884,7 +922,7 @@
             /**
              * Start the croppie image plugin for favicon
              */
-            $favicon_image_crop = null;
+            var favicon_image_crop = null;
 
             $('#favicon_upload_image').on('click', function(){
 
@@ -894,9 +932,9 @@
 
             $('#favicon_upload_image_input').on('change', function(){
 
-                if(!$favicon_image_crop)
+                if(!favicon_image_crop)
                 {
-                    $favicon_image_crop = $('#favicon_image_demo').croppie({
+                    favicon_image_crop = $('#favicon_image_demo').croppie({
                         enableExif: true,
                         mouseWheelZoom: false,
                         viewport: {
@@ -919,19 +957,19 @@
 
                 reader.onload = function (event) {
 
-                    $favicon_image_crop.croppie('bind', {
+                    favicon_image_crop.croppie('bind', {
                         url: event.target.result
                     }).then(function(){
                         console.log('jQuery bind complete');
                     });
 
-                }
+                };
                 reader.readAsDataURL(this.files[0]);
             });
 
             $('#favicon_crop_image').on("click", function(event){
 
-                $favicon_image_crop.croppie('result', {
+                favicon_image_crop.croppie('result', {
                     type: 'base64',
                     size: 'viewport'
                 }).then(function(response){

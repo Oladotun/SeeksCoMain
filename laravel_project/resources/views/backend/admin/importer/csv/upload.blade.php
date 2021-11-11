@@ -27,7 +27,9 @@
                             </strong>
                         </p>
                         <ul>
-                            <li>{{ __('importer_csv.csv-file-upload-listing-instruction-columns') }}</li>
+                            <li>{{ __('sitemap_import.csv-file-upload-listing-instruction-columns') }}</li>
+                            <li>{{ __('sitemap_import.csv-file-upload-listing-instruction-image-urls') }}</li>
+                            <li>{{ __('sitemap_import.csv-file-upload-listing-instruction-gallery-images-urls') }}</li>
                             <li>{{ __('importer_csv.csv-file-upload-listing-instruction-tip-1') }}</li>
                             <li>{{ __('importer_csv.csv-file-upload-listing-instruction-tip-2') }}</li>
                             <li>{{ __('importer_csv.csv-file-upload-listing-instruction-tip-3') }}</li>
@@ -110,8 +112,4 @@
 @endsection
 
 @section('scripts')
-    <script>
-        $(document).ready(function() {
-        });
-    </script>
 @endsection

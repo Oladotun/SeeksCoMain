@@ -21,7 +21,7 @@ class MediaController extends Controller
         $file = reset($payload);
 
         if ($file instanceof UploadedFile) {
-            $path = $file->storePublicly($this->getBaseStoragePath(), [
+            $path = $file->store($this->getBaseStoragePath(), [
                 'disk' => config('canvas.storage_disk'),
             ]);
 

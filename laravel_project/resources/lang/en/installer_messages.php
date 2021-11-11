@@ -48,7 +48,10 @@ return array (
         'app_name_label' => 'App Name',
         'app_name_placeholder' => 'App Name',
         'app_purchase_code_label' => 'Purchase Code',
-        'app_purchase_code_placeholder' => 'Purchase Code',
+        'app_purchase_code_placeholder' => 'Purchase code on codecanyon.net',
+        'to_verify_codecanyon_username_label' => 'Username',
+        'to_verify_codecanyon_username_placeholder' => 'Username on codecanyon.net',
+        'update_message' => 'Please enter the purchase code and username to proceed update.',
         'app_tabs' =>
         array (
           'broadcasting_label' => 'Broadcast Driver',

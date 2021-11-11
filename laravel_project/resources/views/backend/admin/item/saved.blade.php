@@ -110,6 +110,9 @@
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
+
+            "use strict";
+
             $('#dataTable').DataTable();
 
             $('.saved-item-remove-button').on('click', function(){

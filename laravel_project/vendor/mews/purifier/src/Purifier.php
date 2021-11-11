@@ -132,6 +132,19 @@ class Purifier
             $attrName = $required ? $attribute[1] . '*' : $attribute[1];
             $validValues = $attribute[2];
 
+            if ($onElement === '*') {
+                $def = $validValues;
+                if (is_string($validValues)) {
+                    $def = new $validValues();
+                }
+
+                if ($def instanceof \HTMLPurifier_AttrDef) {
+                    $definition->info_global_attr[$attrName] = $def;
+                }
+
+                continue;
+            }
+
             $definition->addAttribute($onElement, $attrName, $validValues);
         }
 
@@ -258,6 +271,13 @@ class Purifier
             if ($postCreateConfigHook !== null) {
                 $postCreateConfigHook->call($this, $configObject);
             }
+        }
+
+        //If $dirty is not an explicit string, bypass purification assuming configuration allows this
+        $ignoreNonStrings = $this->config->get('purifier.ignoreNonStrings', false);
+        $stringTest = is_string($dirty);
+        if($stringTest === false && $ignoreNonStrings === true) {
+            return $dirty;
         }
 
         return $this->purifier->purify($dirty, $configObject);

@@ -7,16 +7,16 @@
 @section('content')
 
     @if($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_DEFAULT)
-        <div class="site-blocks-cover overlay" style="background-image: url( {{ asset('frontend/images/placeholder/header-1.webp') }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover overlay" style="background-image: url( {{ asset('frontend/images/placeholder/header-1.webp') }});" data-stellar-background-ratio="0.5">
 
     @elseif($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_COLOR)
-        <div class="site-blocks-cover overlay" style="background-color: {{ $site_homepage_header_background_color }};" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover overlay" style="background-color: {{ $site_homepage_header_background_color }};" data-stellar-background-ratio="0.5">
 
     @elseif($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_IMAGE)
-        <div class="site-blocks-cover overlay" style="background-image: url( {{ Storage::disk('public')->url('customization/' . $site_homepage_header_background_image) }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover overlay" style="background-image: url( {{ Storage::disk('public')->url('customization/' . $site_homepage_header_background_image) }});" data-stellar-background-ratio="0.5">
 
     @elseif($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
-        <div class="site-blocks-cover overlay" style="background-color: #333333;" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover overlay" style="background-color: #333333;" data-stellar-background-ratio="0.5">
     @endif
 
             @if($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
@@ -27,6 +27,7 @@
 
         <!-- Start hero section desktop view-->
         <div class="row align-items-center justify-content-center text-center d-none d-md-flex">
+
             <div class="col-md-12">
                 <div class="row justify-content-center mb-1">
                     <div class="col-md-12 text-center">
@@ -65,10 +66,10 @@
 
 <div class="site-section bg-light">
     <div class="container">
+
         <!-- Start categories section desktop view-->
         <div class="overlap-category mb-5 d-none d-md-block">
             <div class="row align-items-stretch no-gutters">
-
 
                 @if($categories->count() > 0)
                     @foreach($categories as $categories_key => $category)
@@ -81,7 +82,6 @@
                                     <span class="icon"><span><i class="fas fa-heart"></i></span></span>
                                 @endif
                                 <span class="caption mb-2 d-block">{{ $category->category_name }}</span>
-                                <span class="number">{{ number_format($category->getItemsCount($site_prefer_country_id)) }}</span>
                             </a>
                         </div>
                     @endforeach
@@ -90,7 +90,6 @@
 
                                 <span class="icon"><span><i class="fas fa-th"></i></span></span>
                                 <span class="caption mb-2 d-block">{{ __('frontend.homepage.all-categories') }}</span>
-                                <span class="number">{{ $total_items_count }}</span>
                             </a>
                         </div>
                 @else
@@ -117,7 +116,6 @@
                                     <span class="icon"><span><i class="fas fa-heart"></i></span></span>
                                 @endif
                                 <span class="caption mb-2 d-block">{{ $category->category_name }}</span>
-                                <span class="number">{{ number_format($category->getItemsCount($site_prefer_country_id)) }}</span>
                             </a>
                         </div>
                     @endforeach
@@ -126,7 +124,6 @@
 
                             <span class="icon"><span><i class="fas fa-th"></i></span></span>
                             <span class="caption mb-2 d-block">{{ __('frontend.homepage.all-categories') }}</span>
-                            <span class="number">{{ $total_items_count }}</span>
                         </a>
                     </div>
                 @else
@@ -148,12 +145,12 @@
                 <div class="owl-carousel nonloop-block-13">
 
                     @if($paid_items->count() > 0)
-                        @foreach($paid_items as $key => $item)
+                        @foreach($paid_items as $paid_items_key => $item)
                             <div class="d-block d-md-flex listing vertical">
                                 <a href="{{ route('page.item', $item->item_slug) }}" class="img d-block" style="background-image: url({{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : (!empty($item->item_image) ? Storage::disk('public')->url('item/' . $item->item_image) : asset('frontend/images/placeholder/full_item_feature_image_medium.webp')) }})"></a>
                                 <div class="lh-content">
 
-                                    @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE) as $key => $category)
+                                    @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE) as $item_all_categories_key => $category)
                                         <a href="{{ route('page.category', $category->category_slug) }}">
                                             <span class="category">
                                                 @if(!empty($category->category_icon))
@@ -192,34 +189,46 @@
                                         </div>
                                     @endif
 
-                                    <div class="row align-items-center">
-                                        <div class="col-3 pr-1">
-                                            @if(empty($item->user->user_image))
-                                                <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
-                                            @else
+                                    <hr class="item-box-hr">
 
-                                                <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+                                    <div class="row align-items-center">
+
+                                        <div class="col-5 col-md-7 pr-0">
+                                            <div class="row align-items-center item-box-user-div">
+                                                <div class="col-3 item-box-user-img-div">
+                                                    @if(empty($item->user->user_image))
+                                                        <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
+                                                    @else
+                                                        <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+                                                    @endif
+                                                </div>
+                                                <div class="col-9 line-height-1-2 item-box-user-name-div">
+                                                    <div class="row pb-1">
+                                                        <div class="col-12">
+                                                            <span class="font-size-13">{{ str_limit($item->user->name, 12, '.') }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row line-height-1-0">
+                                                        <div class="col-12">
+                                                            <span class="review">{{ $item->created_at->diffForHumans() }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-7 col-md-5 pl-0 text-right">
+                                            @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                                @if($item->hasOpened())
+                                                    <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                                                @else
+                                                    <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                                                @endif
                                             @endif
                                         </div>
-                                        <div class="col-9 line-height-1-2">
 
-                                            <div class="row pb-1">
-                                                <div class="col-12">
-                                                    <span class="font-size-13">{{ $item->user->name }}</span>
-                                                </div>
-                                            </div>
-                                            <div class="row line-height-1-0">
-                                                <div class="col-12">
-                                                    @if($item->totalComments() > 1)
-                                                        <span class="review">{{ $item->totalComments() . ' comments' }}</span>
-                                                    @elseif($item->totalComments() == 1)
-                                                        <span class="review">{{ $item->totalComments() . ' comment' }}</span>
-                                                    @endif
-                                                    <span class="review">{{ $item->created_at->diffForHumans() }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                         @endforeach
@@ -236,7 +245,7 @@
     </div>
 </div>
 
-<div class="site-section" data-aos="fade">
+<div class="site-section">
     <div class="container">
         <div class="row justify-content-center mb-5">
             <div class="col-md-7 text-center border-primary">
@@ -248,7 +257,7 @@
         <div class="row">
 
             @if($popular_items->count() > 0)
-                @foreach($popular_items as $key => $item)
+                @foreach($popular_items as $popular_items_key => $item)
                     <div class="col-md-6 mb-4 mb-lg-4 col-lg-4">
 
                         <div class="listing-item listing">
@@ -257,7 +266,7 @@
                             </div>
                             <div class="listing-item-content">
 
-                                @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE) as $key => $category)
+                                @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE) as $item_all_categories_key => $category)
                                     <a class="px-3 mb-3 category" href="{{ route('page.category', $category->category_slug) }}">
                                         @if(!empty($category->category_icon))
                                             <i class="{{ $category->category_icon }}"></i>
@@ -294,33 +303,44 @@
                                     </div>
                                 @endif
 
-                                <div class="row mt-1 align-items-center">
-                                    <div class="col-2 pr-0">
-                                        @if(empty($item->user->user_image))
-                                            <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
-                                        @else
+                                <hr class="item-box-hr item-box-index-nearby-hr">
 
-                                            <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+                                <div class="row mt-1 align-items-center">
+
+                                    <div class="col-5 col-md-7 pr-0">
+                                        <div class="row align-items-center item-box-user-div">
+                                            <div class="col-3 item-box-user-img-div">
+                                                @if(empty($item->user->user_image))
+                                                    <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
+                                                @else
+                                                    <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+                                                @endif
+                                            </div>
+                                            <div class="col-9 line-height-1-2 item-box-user-name-div">
+                                                <div class="row pb-1">
+                                                    <div class="col-12">
+                                                        <span class="font-size-13">{{ str_limit($item->user->name, 14, '.') }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row line-height-1-0">
+                                                    <div class="col-12">
+                                                        <span class="review">{{ $item->created_at->diffForHumans() }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-7 col-md-5 pl-0 text-right">
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <span class="item-box-index-nearby-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                                            @else
+                                                <span class="item-box-index-nearby-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                                            @endif
                                         @endif
                                     </div>
-                                    <div class="col-10 line-height-1-2">
 
-                                        <div class="row pb-1">
-                                            <div class="col-12">
-                                                <span class="font-size-13">{{ $item->user->name }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row line-height-1-0">
-                                            <div class="col-12">
-                                                @if($item->totalComments() > 1)
-                                                    <span class="review">{{ $item->totalComments() . ' comments' }}</span>
-                                                @elseif($item->totalComments() == 1)
-                                                    <span class="review">{{ $item->totalComments() . ' comment' }}</span>
-                                                @endif
-                                                <span class="review">{{ $item->created_at->diffForHumans() }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
                             </div>
@@ -345,13 +365,13 @@
         <div class="row mt-5">
 
             @if($latest_items->count() > 0)
-                @foreach($latest_items as $key => $item)
+                @foreach($latest_items as $latest_items_key => $item)
                     <div class="col-lg-6">
                         <div class="d-block d-md-flex listing">
                             <a href="{{ route('page.item', $item->item_slug) }}" class="img d-block" style="background-image: url({{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : (!empty($item->item_image) ? Storage::disk('public')->url('item/' . $item->item_image) : asset('frontend/images/placeholder/full_item_feature_image_medium.webp')) }})"></a>
                             <div class="lh-content">
 
-                                @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE) as $key => $category)
+                                @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE) as $item_all_categories_key => $category)
                                     <a href="{{ route('page.category', $category->category_slug) }}">
                                         <span class="category">
                                              @if(!empty($category->category_icon))
@@ -367,7 +387,6 @@
                                 @endif
 
                                 <h3 class="pt-2"><a href="{{ route('page.item', $item->item_slug) }}">{{ $item->item_title }}</a></h3>
-
 
                                 @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
                                 <address>
@@ -391,33 +410,44 @@
                                     </div>
                                 @endif
 
-                                <div class="row align-items-center">
-                                    <div class="col-2 pr-0">
-                                        @if(empty($item->user->user_image))
-                                            <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
-                                        @else
+                                <hr class="item-box-hr">
 
-                                            <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+                                <div class="row align-items-center">
+
+                                    <div class="col-5 col-md-7 pr-0">
+                                        <div class="row align-items-center item-box-user-div">
+                                            <div class="col-3 item-box-user-img-div">
+                                                @if(empty($item->user->user_image))
+                                                    <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
+                                                @else
+                                                    <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+                                                @endif
+                                            </div>
+                                            <div class="col-9 line-height-1-2 item-box-user-name-div">
+                                                <div class="row pb-1">
+                                                    <div class="col-12">
+                                                        <span class="font-size-13">{{ str_limit($item->user->name, 14, '.') }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row line-height-1-0">
+                                                    <div class="col-12">
+                                                        <span class="review">{{ $item->created_at->diffForHumans() }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-7 col-md-5 pl-0 text-right">
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                                            @else
+                                                <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                                            @endif
                                         @endif
                                     </div>
-                                    <div class="col-10 line-height-1-2">
 
-                                        <div class="row pb-1">
-                                            <div class="col-12">
-                                                <span class="font-size-13">{{ $item->user->name }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row line-height-1-0">
-                                            <div class="col-12">
-                                                @if($item->totalComments() > 1)
-                                                    <span class="review">{{ $item->totalComments() . ' comments' }}</span>
-                                                @elseif($item->totalComments() == 1)
-                                                    <span class="review">{{ $item->totalComments() . ' comment' }}</span>
-                                                @endif
-                                                <span class="review">{{ $item->created_at->diffForHumans() }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -531,6 +561,8 @@
 
     <script>
         $(document).ready(function(){
+
+            "use strict";
 
             /**
              * Start get user lat & lng location

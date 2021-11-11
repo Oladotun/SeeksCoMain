@@ -39,7 +39,7 @@ class LangController extends Controller
         if (function_exists("ini_set"))
         {
             // we need to increase the execution time
-            ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+            ini_set('max_execution_time', 3600); //3600 seconds = 60 minutes
         }
 
         $lang_in_db = DB::table('translations')->count();

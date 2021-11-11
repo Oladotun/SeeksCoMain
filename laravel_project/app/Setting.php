@@ -24,68 +24,68 @@ class Setting extends Model
     const LANGUAGE_EN = 'en';
 
     const LANGUAGES = array(
-        'af',
-        'sq',
-        'ar',
-        'hy',
-        'az',
-        'be',
-        'bn',
-        'bs',
-        'bg',
-        'ca',
-        'zh-CN',
-        'zh-TW',
-        'hr',
-        'cs',
-        'da',
-        'nl',
-        'en',
-        'et',
-        'fi',
-        'fr',
-        'gl',
-        'ka',
-        'de',
-        'el',
-        'ht',
-        'he',
-        'hi',
-        'hu',
-        'is',
-        'id',
-        'ga',
-        'it',
-        'ja',
-        'ko',
-        'ky',
-        'lv',
-        'lt',
-        'lb',
-        'mk',
-        'ms',
-        'mn',
-        'my',
-        'ne',
-        'no',
-        'fa',
-        'pl',
-        'pt-br',
-        'ro',
-        'ru',
-        'sr',
-        'sk',
-        'sl',
-        'so',
-        'es',
-        'su',
-        'sv',
-        'th',
-        'tr',
-        'tk',
-        'uk',
-        'uz',
-        'vi',
+        'af' => 'setting_language_af_language',
+        'sq' => 'setting_language_sq_language',
+        'ar' => 'setting_language_ar_language',
+        'hy' => 'setting_language_hy_language',
+        'az' => 'setting_language_az_language',
+        'be' => 'setting_language_be_language',
+        'bn' => 'setting_language_bn_language',
+        'bs' => 'setting_language_bs_language',
+        'bg' => 'setting_language_bg_language',
+        'ca' => 'setting_language_ca_language',
+        'zh-CN' => 'setting_language_zh_cn_language',
+        'zh-TW' => 'setting_language_zh_tw_language',
+        'hr' => 'setting_language_hr_language',
+        'cs' => 'setting_language_cs_language',
+        'da' => 'setting_language_da_language',
+        'nl' => 'setting_language_nl_language',
+        'en' => 'setting_language_en_language',
+        'et' => 'setting_language_et_language',
+        'fi' => 'setting_language_fi_language',
+        'fr' => 'setting_language_fr_language',
+        'gl' => 'setting_language_gl_language',
+        'ka' => 'setting_language_ka_language',
+        'de' => 'setting_language_de_language',
+        'el' => 'setting_language_el_language',
+        'ht' => 'setting_language_ht_language',
+        'he' => 'setting_language_he_language',
+        'hi' => 'setting_language_hi_language',
+        'hu' => 'setting_language_hu_language',
+        'is' => 'setting_language_is_language',
+        'id' => 'setting_language_id_language',
+        'ga' => 'setting_language_ga_language',
+        'it' => 'setting_language_it_language',
+        'ja' => 'setting_language_ja_language',
+        'ko' => 'setting_language_ko_language',
+        'ky' => 'setting_language_ky_language',
+        'lv' => 'setting_language_lv_language',
+        'lt' => 'setting_language_lt_language',
+        'lb' => 'setting_language_lb_language',
+        'mk' => 'setting_language_mk_language',
+        'ms' => 'setting_language_ms_language',
+        'mn' => 'setting_language_mn_language',
+        'my' => 'setting_language_my_language',
+        'ne' => 'setting_language_ne_language',
+        'no' => 'setting_language_no_language',
+        'fa' => 'setting_language_fa_language',
+        'pl' => 'setting_language_pl_language',
+        'pt-br' => 'setting_language_pt_br_language',
+        'ro' => 'setting_language_ro_language',
+        'ru' => 'setting_language_ru_language',
+        'sr' => 'setting_language_sr_language',
+        'sk' => 'setting_language_sk_language',
+        'sl' => 'setting_language_sl_language',
+        'so' => 'setting_language_so_language',
+        'es' => 'setting_language_es_language',
+        'su' => 'setting_language_su_language',
+        'sv' => 'setting_language_sv_language',
+        'th' => 'setting_language_th_language',
+        'tr' => 'setting_language_tr_language',
+        'tk' => 'setting_language_tk_language',
+        'uk' => 'setting_language_uk_language',
+        'uz' => 'setting_language_uz_language',
+        'vi' => 'setting_language_vi_language',
     );
 
     const SITE_HEADER_ENABLED = 1;
@@ -156,6 +156,12 @@ class Setting extends Model
     const SITE_SITEMAP_TOPIC_ENABLE = 1;
     const SITE_SITEMAP_TOPIC_DISABLE = 0;
 
+    const SITE_SITEMAP_STATE_ENABLE = 1;
+    const SITE_SITEMAP_STATE_DISABLE = 0;
+
+    const SITE_SITEMAP_CITY_ENABLE = 1;
+    const SITE_SITEMAP_CITY_DISABLE = 0;
+
     const SITE_SITEMAP_INCLUDE_TO_INDEX = 1;
     const SITE_SITEMAP_NOT_INCLUDE_TO_INDEX = 0;
 
@@ -175,6 +181,8 @@ class Setting extends Model
 
     const SITE_SITEMAP_SHOW_IN_FOOTER = 1;
     const SITE_SITEMAP_NOT_SHOW_IN_FOOTER = 0;
+
+    const SITE_SITEMAP_MAXIMUM_URLS = 5000;
 
     const SITE_PRODUCT_AUTO_APPROVAL_ENABLED = 1;
     const SITE_PRODUCT_AUTO_APPROVAL_DISABLED = 0;
@@ -223,12 +231,20 @@ class Setting extends Model
         'setting_site_stripe_enable', 'setting_site_stripe_publishable_key', 'setting_site_stripe_secret_key', 'setting_site_stripe_webhook_signing_secret',
         'setting_site_stripe_currency', 'setting_site_sitemap_show_in_footer', 'setting_site_sitemap_topic_enable',
         'setting_product_currency_symbol', 'setting_site_last_cached_at', 'setting_site_payumoney_enable', 'setting_site_payumoney_mode',
-        'setting_site_payumoney_merchant_key', 'setting_site_payumoney_salt',
+        'setting_site_payumoney_merchant_key', 'setting_site_payumoney_salt', 'setting_site_sitemap_state_enable',
+        'setting_site_sitemap_state_frequency', 'setting_site_sitemap_state_format', 'setting_site_sitemap_state_include_to_index',
+        'setting_site_sitemap_city_enable', 'setting_site_sitemap_city_frequency', 'setting_site_sitemap_city_format',
+        'setting_site_sitemap_city_include_to_index',
     ];
 
     public function settingItem()
     {
         return $this->hasOne('App\SettingItem');
+    }
+
+    public function settingLanguage()
+    {
+        return $this->hasOne('App\SettingLanguage');
     }
 
     public function deleteLogoImage()

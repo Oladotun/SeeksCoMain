@@ -138,9 +138,15 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
     Route::get('/sitemap/page', 'SitemapController@page')->name('page.sitemap.page');
     Route::get('/sitemap/category', 'SitemapController@category')->name('page.sitemap.category');
     Route::get('/sitemap/listing', 'SitemapController@listing')->name('page.sitemap.listing');
+    Route::get('/sitemap/listing/{page_number}', 'SitemapController@listingPagination')->name('page.sitemap.listing.pagination');
     Route::get('/sitemap/post', 'SitemapController@post')->name('page.sitemap.post');
     Route::get('/sitemap/tag', 'SitemapController@tag')->name('page.sitemap.tag');
     Route::get('/sitemap/topic', 'SitemapController@topic')->name('page.sitemap.topic');
+    Route::get('/sitemap/state', 'SitemapController@state')->name('page.sitemap.state');
+    Route::get('/sitemap/state/{page_number}', 'SitemapController@statePagination')->name('page.sitemap.state.pagination');
+    Route::get('/sitemap/city', 'SitemapController@city')->name('page.sitemap.city');
+    Route::get('/sitemap/city/{page_number}', 'SitemapController@cityPagination')->name('page.sitemap.city.pagination');
+
     /**
      * End site map routes
      */
@@ -230,6 +236,14 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
         Route::put('/items/reviews/update/{review_id}/disapprove', 'ItemController@itemReviewsDisapprove')->name('items.reviews.disapprove');
         Route::delete('/items/reviews/destroy/{review_id}', 'ItemController@itemReviewsDelete')->name('items.reviews.delete');
 
+        // item hours routes
+        Route::put('/items/hours/update/{item_hour}', 'ItemController@updateItemHour')->name('items.hours.update');
+        Route::delete('/items/hours/destroy/{item_hour}', 'ItemController@destroyItemHour')->name('items.hours.destroy');
+
+        // item hour exceptions routes
+        Route::put('/items/hour-exceptions/update/{item_hour_exception}', 'ItemController@updateItemHourException')->name('items.hour-exceptions.update');
+        Route::delete('/items/hour-exceptions/destroy/{item_hour_exception}', 'ItemController@destroyItemHourException')->name('items.hour-exceptions.destroy');
+
         // message routes
         Route::resource('/messages', 'MessageController');
 
@@ -279,6 +293,8 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
         Route::get('/settings/general', 'SettingController@editGeneralSetting')->name('settings.general.edit');
         Route::post('/settings/general', 'SettingController@updateGeneralSetting')->name('settings.general.update');
 
+        Route::post('/settings/general/smtp/test', 'SettingController@testSmtpSetting')->name('settings.general.smtp.test');
+
         // setting about page
         Route::get('/settings/about', 'SettingController@editAboutPageSetting')->name('settings.page.about.edit');
         Route::post('/settings/about', 'SettingController@updateAboutPageSetting')->name('settings.page.about.update');
@@ -304,10 +320,15 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
         Route::post('/settings/cache', 'SettingController@updateCacheSetting')->name('settings.cache.update');
         Route::delete('/settings/cache/destroy', 'SettingController@deleteCacheSetting')->name('settings.cache.destroy');
 
-        // setting product
-//        Route::get('/settings/product', 'ProductController@editProductSetting')->name('product.setting.edit');
-//        Route::post('/settings/product', 'ProductController@updateProductSetting')->name('product.setting.update');
+        // setting session
+        Route::get('/settings/session', 'SettingController@editSessionSetting')->name('settings.session.edit');
+        Route::post('/settings/session', 'SettingController@updateSessionSetting')->name('settings.session.update');
 
+        // setting language
+        Route::get('/settings/language', 'SettingController@editLanguageSetting')->name('settings.language.edit');
+        Route::post('/settings/language', 'SettingController@updateLanguageSetting')->name('settings.language.update');
+
+        // setting product
         Route::get('/settings/product', 'SettingController@editProductSetting')->name('settings.product.edit');
         Route::post('/settings/product', 'SettingController@updateProductSetting')->name('settings.product.update');
 
@@ -468,6 +489,14 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
 
         // user manage reviews route
         Route::get('/items/reviews/index', 'ItemController@itemReviewsIndex')->name('items.reviews.index');
+
+        // user item hours routes
+        Route::put('/items/hours/update/{item_hour}', 'ItemController@updateItemHour')->name('items.hours.update');
+        Route::delete('/items/hours/destroy/{item_hour}', 'ItemController@destroyItemHour')->name('items.hours.destroy');
+
+        // user item hour exceptions routes
+        Route::put('/items/hour-exceptions/update/{item_hour_exception}', 'ItemController@updateItemHourException')->name('items.hour-exceptions.update');
+        Route::delete('/items/hour-exceptions/destroy/{item_hour_exception}', 'ItemController@destroyItemHourException')->name('items.hour-exceptions.destroy');
 
         // message routes
         Route::resource('/messages', 'MessageController');

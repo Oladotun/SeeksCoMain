@@ -12,16 +12,16 @@
 @section('content')
 
     @if($site_innerpage_header_background_type == \App\Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE_DEFAULT)
-        <div class="site-blocks-cover inner-page-cover overlay" style="background-image: url( {{ asset('frontend/images/placeholder/header-inner.webp') }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover inner-page-cover overlay" style="background-image: url( {{ asset('frontend/images/placeholder/header-inner.webp') }});" data-stellar-background-ratio="0.5">
 
     @elseif($site_innerpage_header_background_type == \App\Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE_COLOR)
-        <div class="site-blocks-cover inner-page-cover overlay" style="background-color: {{ $site_innerpage_header_background_color }};" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover inner-page-cover overlay" style="background-color: {{ $site_innerpage_header_background_color }};" data-stellar-background-ratio="0.5">
 
     @elseif($site_innerpage_header_background_type == \App\Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE_IMAGE)
-        <div class="site-blocks-cover inner-page-cover overlay" style="background-image: url( {{ Storage::disk('public')->url('customization/' . $site_innerpage_header_background_image) }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover inner-page-cover overlay" style="background-image: url( {{ Storage::disk('public')->url('customization/' . $site_innerpage_header_background_image) }});" data-stellar-background-ratio="0.5">
 
     @elseif($site_innerpage_header_background_type == \App\Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
-        <div class="site-blocks-cover inner-page-cover overlay" style="background-color: #333333;" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover inner-page-cover overlay" style="background-color: #333333;" data-stellar-background-ratio="0.5">
     @endif
 
         @if($site_innerpage_header_background_type == \App\Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
@@ -153,7 +153,7 @@
 
                         <div class="row form-group align-items-center">
                             <div class="col-12 col-md-2">
-                                <strong>{{ $total_results }}</strong>
+                                <strong>{{ number_format($total_results) }}</strong>
                                 {{ __('theme_directory_hub.filter-results') }}
                             </div>
                             <div class="col-12 col-md-7 text-right pl-0">
@@ -363,6 +363,8 @@
 
         $(document).ready(function(){
 
+            "use strict";
+
             @if($site_innerpage_header_background_type == \App\Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
             /**
              * Start Initial Youtube Background
@@ -419,7 +421,15 @@
                 @endif
             @endforeach
 
-            map.fitBounds(bounds);
+            if(bounds.length === 0)
+            {
+                // Destroy mapid-box DOM since no regular listings found
+                $("#mapid-box").remove();
+            }
+            else
+            {
+                map.fitBounds(bounds);
+            }
 
             @endif
 
@@ -498,47 +508,49 @@
 
                     @foreach($free_items as $key => $free_item)
                         @if($free_item->item_type == \App\Item::ITEM_TYPE_REGULAR)
-                    locations.push([ '{{ $free_item->item_title }}', {{ $free_item->item_lat }}, {{ $free_item->item_lng }} ]);
+                            locations.push([ '{{ $free_item->item_title }}', {{ $free_item->item_lat }}, {{ $free_item->item_lng }} ]);
                         @endif
                     @endforeach
 
-                    var map = new google.maps.Map(document.getElementById('mapid-box'), {
+                    if(locations.length === 0)
+                    {
+                        // Destroy mapid-box DOM since no regular listings found
+                        $("#mapid-box").remove();
+                    }
+                    else
+                    {
+                        var map = new google.maps.Map(document.getElementById('mapid-box'), {
                             zoom: 12,
                             //center: new google.maps.LatLng(-33.92, 151.25),
                             mapTypeId: google.maps.MapTypeId.ROADMAP
                         });
 
-                    //create empty LatLngBounds object
-                    var bounds = new google.maps.LatLngBounds();
-                    var infowindow = new google.maps.InfoWindow();
+                        //create empty LatLngBounds object
+                        var bounds = new google.maps.LatLngBounds();
+                        var infowindow = new google.maps.InfoWindow();
 
-                    var marker, i;
+                        var marker, i;
 
-                    for (i = 0; i < locations.length; i++) {
-                        marker = new google.maps.Marker({
-                            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-                            map: map
-                        });
+                        for (i = 0; i < locations.length; i++) {
+                            marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                                map: map
+                            });
 
-                        //extend the bounds to include each marker's position
-                        bounds.extend(marker.position);
+                            //extend the bounds to include each marker's position
+                            bounds.extend(marker.position);
 
-                        google.maps.event.addListener(marker, 'click', (function(marker, i) {
-                            return function() {
-                                infowindow.setContent(locations[i][0]);
-                                infowindow.open(map, marker);
-                            }
-                        })(marker, i));
+                            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                                return function() {
+                                    infowindow.setContent(locations[i][0]);
+                                    infowindow.open(map, marker);
+                                }
+                            })(marker, i));
+                        }
+
+                        //now fit the map to the newly inclusive bounds
+                        map.fitBounds(bounds);
                     }
-
-                    //now fit the map to the newly inclusive bounds
-                    map.fitBounds(bounds);
-
-                    //(optional) restore the zoom level after the map is done scaling
-                    // var listener = google.maps.event.addListener(map, "idle", function () {
-                    //     map.setZoom(5);
-                    //     google.maps.event.removeListener(listener);
-                    // });
 
                     @endif
                 }

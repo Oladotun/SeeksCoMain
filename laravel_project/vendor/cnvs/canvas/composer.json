@@ -1,12 +1,12 @@
 {
-    "name": "cnvs/canvas",
+    "name": "austintoddj/canvas",
     "description": "A Laravel publishing platform",
     "keywords": ["canvas", "laravel", "publishing", "platform"],
     "license": "MIT",
     "homepage": "https://cnvs.io",
     "support": {
-        "issues": "https://github.com/cnvs/canvas/issues",
-        "source": "https://github.com/cnvs/canvas"
+        "issues": "https://github.com/austintoddj/canvas/issues",
+        "source": "https://github.com/austintoddj/canvas"
     },
     "authors": [
         {

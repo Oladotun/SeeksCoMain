@@ -48,6 +48,21 @@
                         </div>
 
                         <div class="row form-group">
+                            <div class="col-md-12">
+                                <label for="city_slug" class="text-black">{{ __('setting_language.location.url-slug') }}</label>
+                                <input id="city_slug" type="text" class="form-control @error('city_slug') is-invalid @enderror" name="city_slug" value="{{ old('city_slug') ? old('city_slug') : $city->city_slug }}">
+                                <small class="form-text text-muted">
+                                    {{ __('setting_language.location.url-slug-help') }}
+                                </small>
+                                @error('city_slug')
+                                <span class="invalid-tooltip">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
 
                             <div class="col-md-12">
                                 <label class="text-black" for="city_lat">{{ __('backend.city.city-lat') }}</label>

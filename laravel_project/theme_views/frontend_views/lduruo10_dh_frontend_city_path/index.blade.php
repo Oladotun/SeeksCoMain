@@ -1,5 +1,4 @@
 @extends('frontend_views.lduruo10_dh_frontend_city_path.layouts.app')
-<script async data-uid="6d05ba7dcf" src="https://sunny-hustler-5578.ck.page/6d05ba7dcf/index.js"></script>
 
 @section('styles')
 @endsection
@@ -16,7 +15,6 @@
     @elseif($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
     <div class="set-bg" data-setbg="" style="background-color: #333333;">
     @endif
-
         <section class="hero hero-grey-bg-cover set-bg" data-setbg="">
 
             @if($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
@@ -61,7 +59,6 @@
                                 @endif
 
                                 <h5>{{ $category->category_name }}</h5>
-                                <span>{{ number_format($category->getItemsCount($site_prefer_country_id)) }}</span>
                                 </a>
                             </div>
                         @endforeach
@@ -72,7 +69,6 @@
                                     <i class="fas fa-th"></i>
                                 </span>
                                 <h5>{{ __('frontend.homepage.all-categories') }}</h5>
-                                <span>{{ $total_items_count }}</span>
                             </a>
                         </div>
                     </div>
@@ -110,11 +106,11 @@
                         <div class="listing__item">
                             <a href="{{ route('page.item', $item->item_slug) }}">
                             <div class="listing__item__pic set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
-                                <!-- @if(empty($item->user->user_image))
+                                @if(empty($item->user->user_image))
                                 <img src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="">
                                 @else
                                 <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}">
-                                @endif -->
+                                @endif
                                 <div class="listing__item__pic__tag">{{ __('frontend.item.featured') }}</div>
                             </div>
                             </a>
@@ -168,7 +164,13 @@
                                         @endforeach
                                     </div>
                                     <div class="listing__item__text__info__right">
-                                        {{ $item->created_at->diffForHumans() }}
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                                            @else
+                                                <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -194,83 +196,711 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                @foreach($popular_items as $popular_items_key => $item)
-                    <div class="col-lg-4 col-md-6">
-                        <div class="listing__item">
-                            <a href="{{ route('page.item', $item->item_slug) }}">
-                            <div class="listing__item__pic set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
-                                <!-- @if(empty($item->user->user_image))
-                                <img src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="">
-                                @else
-                                <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}">
-                                @endif -->
-                                <!-- <div class="listing__item__pic__tag">{{ __('frontend.item.featured') }}</div> -->
-                            </div>
-                            </a>
-                            <div class="listing__item__text">
-                                <div class="listing__item__text__inside">
-                                    <a href="{{ route('page.item', $item->item_slug) }}">
-                                    <h5>{{ str_limit($item->item_title, 44, '...') }}</h5>
-                                    </a>
 
-                                    @if($item->getCountRating() > 0)
+            <div class="row custom-nearby-section-small">
+
+                @foreach($popular_items as $popular_items_key => $item)
+                    <div class="col-12 col-md-6">
+                        <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
+                            <div class="feature__location__item__text custom-nearby-mobile-item">
+                                <h5>{{ $item->item_title }}</h5>
+                                @if($item->getCountRating() > 0)
                                     <div class="listing__item__text__rating">
                                         <div class="listing__item__rating__star">
-                                        <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                            <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
                                         </div>
-                                        <h6>
-                                            @if($item->getCountRating() == 1)
-                                                {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
-                                            @else
-                                                {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
-                                            @endif
-                                        </h6>
                                     </div>
-                                    @endif
-
+                                @endif
+                                <ul>
                                     @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
-                                    <ul>
                                         <li>
-                                            <span class="icon_pin_alt"></span>
-                                            {{ $item->item_address_hide == \App\Item::ITEM_ADDR_NOT_HIDE ? $item->item_address . ',' : '' }}
-                                            <a href="{{ route('page.city', ['state_slug'=>$item->state->state_slug, 'city_slug'=>$item->city->city_slug]) }}">{{ $item->city->city_name }}</a>,
-                                            <a href="{{ route('page.state', ['state_slug'=>$item->state->state_slug]) }}">{{ $item->state->state_name }}</a>
-                                            {{ $item->item_postal_code }}
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            {{ $item->city->city_name }}, {{ $item->state->state_name }}
                                         </li>
-                                    </ul>
                                     @endif
-                                </div>
-                                <div class="listing__item__text__info">
 
-                                    <div class="listing__item__text__info__left">
-                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
-                                            <a href="{{ route('page.category', $category->category_slug) }}">
-                                                <span class="custom-color-schema-{{ $paid_items_key%10 }}">
-                                                    @if(!empty($category->category_icon))
-                                                        <i class="{{ $category->category_icon }}"></i>
-                                                    @else
-                                                        <i class="fas fa-heart"></i>
-                                                    @endif
-                                                    {{ $category->category_name }}
-                                                </span>
-                                            </a>
-                                        @endforeach
-                                    </div>
-                                    <div class="listing__item__text__info__right">
-                                        {{ $item->created_at->diffForHumans() }}
-                                    </div>
-                                </div>
+                                    @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                        <li>
+                                            @if(!empty($category->category_icon))
+                                                <i class="{{ $category->category_icon }}"></i>
+                                            @else
+                                                <i class="fas fa-heart"></i>
+                                            @endif
+                                            {{ $category->category_name }}
+                                        </li>
+                                    @endforeach
+
+                                    @if($item->getCountRating() > 0)
+                                        @if($item->getCountRating() == 1)
+                                            <li>
+                                                <i class="fas fa-comment-dots"></i>
+                                                {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                            </li>
+                                        @else
+                                            <li>
+                                                <i class="fas fa-comment-dots"></i>
+                                                {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                            </li>
+                                        @endif
+                                    @endif
+
+                                    @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                        @if($item->hasOpened())
+                                            <li>
+                                                <i class="fas fa-door-open"></i>
+                                                {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                            </li>
+                                        @else
+                                            <li>
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                            </li>
+                                        @endif
+                                    @endif
+                                </ul>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 @endforeach
 
             </div>
+
+            <div class="row custom-nearby-section-large">
+                <div class="col-lg-6">
+
+                    @if($popular_items->count() > 0)
+                    <div class="row">
+                        <div class="col-12">
+                            @php
+                                $item = $popular_items->pull(0);
+                            @endphp
+                            <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item large-item set-bg" data-setbg="{{ !empty($item->item_image) ? Storage::disk('public')->url('item/' . $item->item_image) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image.webp') }}">
+                                <div class="feature__location__item__text custom-nearby-large-item">
+                                    <h5>{{ $item->item_title }}</h5>
+                                    @if($item->getCountRating() > 0)
+                                    <div class="listing__item__text__rating">
+                                        <div class="listing__item__rating__star">
+                                            <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                        </div>
+                                    </div>
+                                    @endif
+                                    <ul>
+                                        @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                                        <li>
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            {{ $item->city->city_name }}, {{ $item->state->state_name }}
+                                        </li>
+                                        @endif
+
+                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                            <li>
+                                                @if(!empty($category->category_icon))
+                                                    <i class="{{ $category->category_icon }}"></i>
+                                                @else
+                                                    <i class="fas fa-heart"></i>
+                                                @endif
+                                                {{ $category->category_name }}
+                                            </li>
+                                        @endforeach
+
+                                        @if($item->getCountRating() > 0)
+                                            @if($item->getCountRating() == 1)
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <li>
+                                                    <i class="fas fa-door-open"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    @endif
+
+                </div>
+                <div class="col-lg-6">
+
+                    @if($popular_items->count() > 0)
+                    <div class="row">
+                        <div class="col-12">
+                            @php
+                                $item = $popular_items->pull(1);
+                            @endphp
+                            <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item set-bg" data-setbg="{{ !empty($item->item_image) ? Storage::disk('public')->url('item/' . $item->item_image) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
+                                <div class="feature__location__item__text custom-nearby-medium-item">
+                                    <h5>{{ $item->item_title }}</h5>
+                                    <div class="listing__item__text__rating">
+                                        <div class="listing__item__rating__star">
+                                            <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                        </div>
+                                    </div>
+                                    <ul>
+                                        @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                {{ $item->city->city_name }}, {{ $item->state->state_name }}
+                                            </li>
+                                        @endif
+
+                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                            <li>
+                                                @if(!empty($category->category_icon))
+                                                    <i class="{{ $category->category_icon }}"></i>
+                                                @else
+                                                    <i class="fas fa-heart"></i>
+                                                @endif
+                                                {{ $category->category_name }}
+                                            </li>
+                                        @endforeach
+
+                                        @if($item->getCountRating() > 0)
+                                            @if($item->getCountRating() == 1)
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <li>
+                                                    <i class="fas fa-door-open"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                                </li>
+                                            @endif
+                                        @endif
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($popular_items->count() > 0)
+                    <div class="row">
+                        <div class="col-12">
+                            @php
+                                $item = $popular_items->pull(2);
+                            @endphp
+                            <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item set-bg" data-setbg="{{ !empty($item->item_image) ? Storage::disk('public')->url('item/' . $item->item_image) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
+                                <div class="feature__location__item__text custom-nearby-medium-item">
+                                    <h5>{{ $item->item_title }}</h5>
+                                    @if($item->getCountRating() > 0)
+                                        <div class="listing__item__text__rating">
+                                            <div class="listing__item__rating__star">
+                                                <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <ul>
+                                        @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                {{ $item->city->city_name }}, {{ $item->state->state_name }}
+                                            </li>
+                                        @endif
+
+                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                            <li>
+                                                @if(!empty($category->category_icon))
+                                                    <i class="{{ $category->category_icon }}"></i>
+                                                @else
+                                                    <i class="fas fa-heart"></i>
+                                                @endif
+                                                {{ $category->category_name }}
+                                            </li>
+                                        @endforeach
+
+                                        @if($item->getCountRating() > 0)
+                                            @if($item->getCountRating() == 1)
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <li>
+                                                    <i class="fas fa-door-open"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                                </li>
+                                            @endif
+                                        @endif
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    @endif
+
+                </div>
+
+                <div class="col-lg-6">
+
+                    @if($popular_items->count() > 0)
+                    <div class="row">
+                        <div class="col-12">
+                            @php
+                                $item = $popular_items->pull(3);
+                            @endphp
+                            <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item set-bg" data-setbg="{{ !empty($item->item_image) ? Storage::disk('public')->url('item/' . $item->item_image) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
+                                <div class="feature__location__item__text custom-nearby-medium-item">
+                                    <h5>{{ $item->item_title }}</h5>
+                                    @if($item->getCountRating() > 0)
+                                        <div class="listing__item__text__rating">
+                                            <div class="listing__item__rating__star">
+                                                <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <ul>
+                                        @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                {{ $item->city->city_name }}, {{ $item->state->state_name }}
+                                            </li>
+                                        @endif
+
+                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                            <li>
+                                                @if(!empty($category->category_icon))
+                                                    <i class="{{ $category->category_icon }}"></i>
+                                                @else
+                                                    <i class="fas fa-heart"></i>
+                                                @endif
+                                                {{ $category->category_name }}
+                                            </li>
+                                        @endforeach
+
+                                        @if($item->getCountRating() > 0)
+                                            @if($item->getCountRating() == 1)
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <li>
+                                                    <i class="fas fa-door-open"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                                </li>
+                                            @endif
+                                        @endif
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($popular_items->count() > 0)
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6">
+                            @php
+                                $item = $popular_items->pull(4);
+                            @endphp
+                            <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
+                                <div class="feature__location__item__text custom-nearby-small-item">
+                                    <h5>{{ $item->item_title }}</h5>
+                                    @if($item->getCountRating() > 0)
+                                        <div class="listing__item__text__rating">
+                                            <div class="listing__item__rating__star">
+                                                <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <ul>
+                                        @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                {{ $item->city->city_name }}, {{ $item->state->state_name }}
+                                            </li>
+                                        @endif
+
+                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                            <li>
+                                                @if(!empty($category->category_icon))
+                                                    <i class="{{ $category->category_icon }}"></i>
+                                                @else
+                                                    <i class="fas fa-heart"></i>
+                                                @endif
+                                                {{ $category->category_name }}
+                                            </li>
+                                        @endforeach
+
+                                        @if($item->getCountRating() > 0)
+                                            @if($item->getCountRating() == 1)
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <li>
+                                                    <i class="fas fa-door-open"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                                </li>
+                                            @endif
+                                        @endif
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+
+                        @if($popular_items->count() > 0)
+                        <div class="col-lg-6 col-md-6">
+                            @php
+                                $item = $popular_items->pull(5);
+                            @endphp
+                            <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
+                                <div class="feature__location__item__text custom-nearby-small-item">
+                                    <h5>{{ $item->item_title }}</h5>
+                                    @if($item->getCountRating() > 0)
+                                        <div class="listing__item__text__rating">
+                                            <div class="listing__item__rating__star">
+                                                <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <ul>
+                                        @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                {{ $item->city->city_name }}, {{ $item->state->state_name }}
+                                            </li>
+                                        @endif
+
+                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                            <li>
+                                                @if(!empty($category->category_icon))
+                                                    <i class="{{ $category->category_icon }}"></i>
+                                                @else
+                                                    <i class="fas fa-heart"></i>
+                                                @endif
+                                                {{ $category->category_name }}
+                                            </li>
+                                        @endforeach
+
+                                        @if($item->getCountRating() > 0)
+                                            @if($item->getCountRating() == 1)
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <li>
+                                                    <i class="fas fa-door-open"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                                </li>
+                                            @endif
+                                        @endif
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+                        @endif
+                    </div>
+                    @endif
+
+                </div>
+
+                <div class="col-lg-6">
+
+                    @if($popular_items->count() > 0)
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6">
+                            @php
+                                $item = $popular_items->pull(6);
+                            @endphp
+                            <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
+                                <div class="feature__location__item__text custom-nearby-small-item">
+                                    <h5>{{ $item->item_title }}</h5>
+                                    @if($item->getCountRating() > 0)
+                                        <div class="listing__item__text__rating">
+                                            <div class="listing__item__rating__star">
+                                                <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <ul>
+                                        @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                {{ $item->city->city_name }}, {{ $item->state->state_name }}
+                                            </li>
+                                        @endif
+
+                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                            <li>
+                                                @if(!empty($category->category_icon))
+                                                    <i class="{{ $category->category_icon }}"></i>
+                                                @else
+                                                    <i class="fas fa-heart"></i>
+                                                @endif
+                                                {{ $category->category_name }}
+                                            </li>
+                                        @endforeach
+
+                                        @if($item->getCountRating() > 0)
+                                            @if($item->getCountRating() == 1)
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <li>
+                                                    <i class="fas fa-door-open"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                                </li>
+                                            @endif
+                                        @endif
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+
+                        @if($popular_items->count() > 0)
+                        <div class="col-lg-6 col-md-6">
+                            @php
+                                $item = $popular_items->pull(7);
+                            @endphp
+                            <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
+                                <div class="feature__location__item__text custom-nearby-small-item">
+                                    <h5>{{ $item->item_title }}</h5>
+                                    @if($item->getCountRating() > 0)
+                                        <div class="listing__item__text__rating">
+                                            <div class="listing__item__rating__star">
+                                                <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <ul>
+                                        @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                {{ $item->city->city_name }}, {{ $item->state->state_name }}
+                                            </li>
+                                        @endif
+
+                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                            <li>
+                                                @if(!empty($category->category_icon))
+                                                    <i class="{{ $category->category_icon }}"></i>
+                                                @else
+                                                    <i class="fas fa-heart"></i>
+                                                @endif
+                                                {{ $category->category_name }}
+                                            </li>
+                                        @endforeach
+
+                                        @if($item->getCountRating() > 0)
+                                            @if($item->getCountRating() == 1)
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <li>
+                                                    <i class="fas fa-door-open"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                                </li>
+                                            @endif
+                                        @endif
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+                        @endif
+                    </div>
+                    @endif
+
+                    @if($popular_items->count() > 0)
+                    <div class="row">
+                        <div class="col-12">
+                            @php
+                                $item = $popular_items->pull(8);
+                            @endphp
+                            <a href="{{ route('page.item', $item->item_slug) }}" class="feature__location__item set-bg" data-setbg="{{ !empty($item->item_image) ? Storage::disk('public')->url('item/' . $item->item_image) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
+                                <div class="feature__location__item__text custom-nearby-medium-item">
+                                    <h5>{{ $item->item_title }}</h5>
+                                    @if($item->getCountRating() > 0)
+                                        <div class="listing__item__text__rating">
+                                            <div class="listing__item__rating__star">
+                                                <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <ul>
+                                        @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                {{ $item->city->city_name }}, {{ $item->state->state_name }}
+                                            </li>
+                                        @endif
+
+                                        @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
+                                            <li>
+                                                @if(!empty($category->category_icon))
+                                                    <i class="{{ $category->category_icon }}"></i>
+                                                @else
+                                                    <i class="fas fa-heart"></i>
+                                                @endif
+                                                {{ $category->category_name }}
+                                            </li>
+                                        @endforeach
+
+                                        @if($item->getCountRating() > 0)
+                                            @if($item->getCountRating() == 1)
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($item->hasOpened())
+                                                <li>
+                                                    <i class="fas fa-door-open"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-opened') }}
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('item_hour.frontend-item-box-hour-closed') }}
+                                                </li>
+                                            @endif
+                                        @endif
+                                    </ul>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    @endif
+
+                </div>
+            </div>
         </div>
     </section>
     @endif
-    <!-- Nearby Listing Section Ends -->
+    <!-- Nearby Listings Section End -->
 
     <!-- Latest Listings Section Begin -->
     @if($latest_items->count() > 0)
@@ -291,11 +921,11 @@
                             <div class="listing__item">
                                 <a href="{{ route('page.item', $item->item_slug) }}">
                                     <div class="listing__item__pic set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
-                                        <!-- @if(empty($item->user->user_image))
+                                        @if(empty($item->user->user_image))
                                             <img src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="">
                                         @else
                                             <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}">
-                                        @endif -->
+                                        @endif
                                     </div>
                                 </a>
                                 <div class="listing__item__text">
@@ -348,7 +978,13 @@
                                             @endforeach
                                         </div>
                                         <div class="listing__item__text__info__right">
-                                            {{ $item->created_at->diffForHumans() }}
+                                            @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                                @if($item->hasOpened())
+                                                    <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                                                @else
+                                                    <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                                                @endif
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

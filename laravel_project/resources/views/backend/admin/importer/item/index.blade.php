@@ -397,6 +397,8 @@
 
         $(document).ready(function() {
 
+            "use strict";
+
             /**
              * Start select all button
              */

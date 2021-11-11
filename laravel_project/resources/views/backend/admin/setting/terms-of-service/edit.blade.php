@@ -88,6 +88,9 @@
 
     <script>
         $(document).ready(function() {
+
+            "use strict";
+
             $('#setting_page_terms_of_service')
                 .trumbowyg({
                     plugins: {

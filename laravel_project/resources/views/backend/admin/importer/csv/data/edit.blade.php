@@ -91,6 +91,10 @@
                                                 {{ __('importer_csv.column-item-linkedin') }}
                                             @elseif($data_column_value == 'import_item_data_item_youtube_id')
                                                 {{ __('importer_csv.column-item-youtube-id') }}
+                                            @elseif($data_column_value == 'import_item_data_item_image')
+                                                {{ __('sitemap_import.column-item-feature-image') }}
+                                            @elseif($data_column_value == 'import_item_data_item_image_galleries')
+                                                {{ __('sitemap_import.column-item-gallery-images') }}
                                             @endif
                                         </option>
                                     @endforeach
@@ -169,6 +173,8 @@
     <script>
         $(document).ready(function() {
 
+            "use strict";
+
             $('#start_parse_button').on('click', function(){
 
                 /**
@@ -246,7 +252,7 @@
                             if(timeout_progress_continue)
                             {
                                 // Schedule the next request when the current one's complete
-                                timeout_progress = setTimeout(worker, 200);
+                                var timeout_progress = setTimeout(worker, 200);
                             }
                         }
                     });

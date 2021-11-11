@@ -88,6 +88,9 @@
 
     <script>
         $(document).ready(function() {
+
+            "use strict";
+
             $('#setting_page_privacy_policy')
                 .trumbowyg({
                     plugins: {

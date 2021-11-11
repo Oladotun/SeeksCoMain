@@ -10,6 +10,22 @@ use Illuminate\Support\Facades\DB;
 
 class Category extends Model
 {
+    const CATEGORIES_SORT_BY_NEWEST_CREATED = 1;
+    const CATEGORIES_SORT_BY_OLDEST_CREATED = 2;
+    const CATEGORIES_SORT_BY_NEWEST_UPDATED = 3;
+    const CATEGORIES_SORT_BY_OLDEST_UPDATED = 4;
+    const CATEGORIES_SORT_BY_CATEGORY_NAME_A_Z = 5;
+    const CATEGORIES_SORT_BY_CATEGORY_NAME_Z_A = 6;
+    const CATEGORIES_SORT_BY_MOST_RELEVANT = 7;
+
+    const COUNT_PER_PAGE_10 = 10;
+    const COUNT_PER_PAGE_25 = 25;
+    const COUNT_PER_PAGE_50 = 50;
+    const COUNT_PER_PAGE_100 = 100;
+    const COUNT_PER_PAGE_250 = 250;
+    const COUNT_PER_PAGE_500 = 500;
+    const COUNT_PER_PAGE_1000 = 1000;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -42,22 +58,13 @@ class Category extends Model
     {
         $item_ids = array();
 
-        foreach($category_ids as $category_ids_key => $category_id)
+        if(count($category_ids) > 0)
         {
-            $category = Category::find($category_id);
-
-            if($category)
-            {
-                $category_items = $category->allItems()->get();
-
-                foreach($category_items as $category_items_key => $category_item)
-                {
-                    if(!in_array($category_item->id, $item_ids))
-                    {
-                        $item_ids[] = $category_item->id;
-                    }
-                }
-            }
+            $item_ids = DB::table('category_item')
+                ->whereIn('category_id', $category_ids)
+                ->distinct('item_id')
+                ->pluck('item_id')
+                ->toArray();
         }
 
         return $item_ids;
@@ -126,33 +133,6 @@ class Category extends Model
                 self::allChildren($sub_category, $children_categories);
             }
         }
-    }
-
-    public function getItemsCount($setting_site_location_country_id)
-    {
-        $children_categories = collect();
-        $this->allChildren($this, $children_categories);
-
-        $children_categories_ids = array();
-        foreach($children_categories as $key => $children_category)
-        {
-            $children_categories_ids[] = $children_category->id;
-        }
-
-        return DB::table('category_item')
-            ->join('items as i', 'category_item.item_id', '=', 'i.id')
-            ->join('users as u', 'i.user_id', '=', 'u.id')
-            ->whereIn('category_item.category_id', $children_categories_ids)
-            //->where('i.country_id', $setting_site_location_country_id)
-            ->where(function ($query) use ($setting_site_location_country_id) {
-                $query->where('i.country_id', $setting_site_location_country_id)
-                    ->orWhereNull('i.country_id');
-            })
-            ->where('i.item_status', Item::ITEM_PUBLISHED)
-            ->where('u.email_verified_at', '!=', null)
-            ->where('u.user_suspended', User::USER_NOT_SUSPENDED)
-            ->distinct('item_id')
-            ->count();
     }
 
     public function getPrintableCategories()

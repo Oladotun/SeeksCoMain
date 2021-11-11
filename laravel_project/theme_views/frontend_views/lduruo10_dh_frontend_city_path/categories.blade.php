@@ -180,7 +180,6 @@
                                 @endif
 
                                 <h5>{{ $category->category_name }}</h5>
-                                <span>{{ number_format($category->getItemsCount($site_prefer_country_id)) }}</span>
                             </a>
                         </div>
                     </div>
@@ -191,7 +190,7 @@
         <div class="listing__text__top">
             <div class="listing__text__top__left">
                 <h5>{{ __('frontend.categories.sub-title-1') }}</h5>
-                <span>{{ $total_results }} {{ __('theme_directory_hub.filter-results') }}</span>
+                <span>{{ number_format($total_results) }} {{ __('theme_directory_hub.filter-results') }}</span>
             </div>
             <div class="listing__text__top__right">
                 @if($filter_sort_by == \App\Item::ITEMS_SORT_BY_NEWEST_CREATED)
@@ -295,12 +294,9 @@
 
         <div class="row mt-4">
             @foreach($all_states as $all_states_key => $state)
-                @if($state->items_count > 0 ) <!-- Only show states with items_count -->
-                    <div class="col-6 col-lg-4 mb-3">
-                        <a href="{{ route('page.state', ['state_slug' => $state->state_slug]) }}">{{ $state->state_name }}</a>
-                        ({{ $state->items_count }})
-                    </div>
-                @endif
+                <div class="col-6 col-lg-4 mb-3">
+                    <a href="{{ route('page.state', ['state_slug' => $state->state_slug]) }}">{{ $state->state_name }}</a>
+                </div>
             @endforeach
         </div>
         @endif

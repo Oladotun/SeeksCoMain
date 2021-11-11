@@ -40,7 +40,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ __('backend.homepage.categories') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $category_count }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($category_count) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-th-large fa-2x text-gray-300"></i>
@@ -56,7 +56,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ __('backend.homepage.listings') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $item_count }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($item_count) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-sign fa-2x text-gray-300"></i>
@@ -72,7 +72,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ __('backend.homepage.posts') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $post_count }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($post_count) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-rss fa-2x text-gray-300"></i>
@@ -88,7 +88,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ __('backend.homepage.users') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $user_count }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($user_count) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-user-cog fa-2x text-gray-300"></i>
@@ -107,8 +107,8 @@
                 </div>
                 <div class="card-body">
 
-                    @foreach($recent_threads as $key => $thread)
-                        <div class="row pt-2 pb-2 {{ $key%2 == 0 ? 'bg-light' : '' }}">
+                    @foreach($recent_threads as $recent_threads_key => $thread)
+                        <div class="row pt-2 pb-2 {{ $recent_threads_key%2 == 0 ? 'bg-light' : '' }}">
                             <div class="col-9">
                                 <span>{{ $thread->latestMessage->body }}</span>
                             </div>
@@ -134,8 +134,8 @@
                 </div>
                 <div class="card-body">
 
-                    @foreach($recent_comments as $key => $comment)
-                        <div class="row pt-2 pb-2 {{ $key%2 == 0 ? 'bg-light' : '' }}">
+                    @foreach($recent_comments as $recent_comments_key => $comment)
+                        <div class="row pt-2 pb-2 {{ $recent_comments_key%2 == 0 ? 'bg-light' : '' }}">
                             <div class="col-9">
                                 <span>{{ $comment->comment }}</span>
                             </div>

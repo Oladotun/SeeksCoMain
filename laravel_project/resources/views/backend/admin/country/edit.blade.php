@@ -53,6 +53,44 @@
                             </div>
                         </div>
 
+                        <div class="row form-group">
+
+                            <div class="col-md-12">
+                                <label class="text-black" for="country_slug">{{ __('setting_language.location.url-slug') }}</label>
+                                <input id="country_slug" type="text" class="form-control @error('country_slug') is-invalid @enderror" name="country_slug" value="{{ old('country_slug') ? old('country_slug') : $country->country_slug }}">
+                                <small class="form-text text-muted">
+                                    {{ __('setting_language.location.url-slug-help') }}
+                                </small>
+                                @error('country_slug')
+                                <span class="invalid-tooltip">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-md-12">
+                                <label for="country_status" class="text-black">{{ __('setting_language.country.country-status') }}</label>
+                                <select class="custom-select" name="country_status">
+                                    <option value="{{ \App\Country::COUNTRY_STATUS_ENABLE }}" {{ (old('country_status') ? old('country_status') : $country->country_status) == \App\Country::COUNTRY_STATUS_ENABLE ? 'selected' : '' }}>
+                                        {{ __('setting_language.country.country-status-enable') }}
+                                    </option>
+                                    <option value="{{ \App\Country::COUNTRY_STATUS_DISABLE }}" {{ (old('country_status') ? old('country_status') : $country->country_status) == \App\Country::COUNTRY_STATUS_DISABLE ? 'selected' : '' }}>
+                                        {{ __('setting_language.country.country-status-disable') }}
+                                    </option>
+                                </select>
+                                <small class="form-text text-muted">
+                                    {{ __('setting_language.country.country-status-help') }}
+                                </small>
+                                @error('country_status')
+                                <span class="invalid-tooltip">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class="row form-group justify-content-between">
                             <div class="col-8">
                                 <button type="submit" class="btn btn-success py-2 px-4 text-white">

@@ -364,6 +364,8 @@
     <script>
         $(document).ready(function() {
 
+            "use strict";
+
             $('#item_claim_additional_upload_download').on('click', function(){
                 $('#item_claim_additional_upload_download_form').submit();
                 $("form :submit").attr("disabled", false);

@@ -6,9 +6,9 @@ use App\Country;
 use App\Customization;
 use App\Setting;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
@@ -27,7 +27,7 @@ class GlobalVariablesMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param Closure $next
      * @return mixed
      */
@@ -47,7 +47,15 @@ class GlobalVariablesMiddleware
         $settings = app('site_global_settings');
 
         // initial the site language
-        App::setlocale(empty($settings->setting_site_language) ? Setting::LANGUAGE_EN : $settings->setting_site_language);
+        if(Schema::hasTable('settings_languages'))
+        {
+            App::setlocale($settings->settingLanguage->setting_language_default_language);
+        }
+        else
+        {
+            App::setlocale(empty($settings->setting_site_language) ? 'en' : $settings->setting_site_language);
+        }
+
 
         // check user profile prefer language
         if(Auth::check())

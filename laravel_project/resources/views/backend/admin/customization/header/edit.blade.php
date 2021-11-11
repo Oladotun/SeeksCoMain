@@ -304,6 +304,8 @@
     <script>
         $(document).ready(function(){
 
+            "use strict";
+
             /**
              * Start color picker
              */

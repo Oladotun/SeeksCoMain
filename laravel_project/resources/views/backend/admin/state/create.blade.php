@@ -32,7 +32,7 @@
                             <div class="col-md-12">
                                 <label for="country_id" class="text-black">{{ __('backend.state.select-country') }}</label>
                                 <select class="custom-select" name="country_id">
-                                    @foreach($all_countries as $key => $country)
+                                    @foreach($all_countries as $all_countries_key => $country)
                                         <option value="{{ $country->id }}" {{ $country->id == old('country_id') ? 'selected' : '' }}>{{ $country->country_name }}</option>
                                     @endforeach
                                 </select>
@@ -63,6 +63,22 @@
                                 <label class="text-black" for="state_abbr">{{ __('backend.state.state-abbr') }}</label>
                                 <input id="state_abbr" type="text" class="form-control @error('state_abbr') is-invalid @enderror" name="state_abbr" value="{{ old('state_abbr') }}">
                                 @error('state_abbr')
+                                <span class="invalid-tooltip">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+
+                            <div class="col-md-12">
+                                <label class="text-black" for="state_slug">{{ __('setting_language.location.url-slug') }}</label>
+                                <input id="state_slug" type="text" class="form-control @error('state_slug') is-invalid @enderror" name="state_slug" value="{{ old('state_slug') }}">
+                                <small class="form-text text-muted">
+                                    {{ __('setting_language.location.url-slug-help') }}
+                                </small>
+                                @error('state_slug')
                                 <span class="invalid-tooltip">
                                         <strong>{{ $message }}</strong>
                                     </span>

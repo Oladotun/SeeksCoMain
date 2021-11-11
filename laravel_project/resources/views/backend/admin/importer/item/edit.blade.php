@@ -234,6 +234,36 @@
 
                         <div class="row form-group">
                             <div class="col-12">
+                                <label for="import_item_data_item_image" class="text-black">{{ __('backend.item.feature-image') }}</label>
+                                <input id="import_item_data_item_image" type="text" class="form-control @error('import_item_data_item_image') is-invalid @enderror" name="import_item_data_item_image" value="{{ old('import_item_data_item_image') ? old('import_item_data_item_image') : $import_item_data->import_item_data_item_image }}" {{ $import_item_data->import_item_data_process_status == \App\ImportItemData::PROCESS_STATUS_PROCESSED_SUCCESS ? 'disabled' : '' }}>
+                                <small class="form-text text-muted">
+                                    {{ __('sitemap_import.item-feature-image-url-help') }}
+                                </small>
+                                @error('import_item_data_item_image')
+                                <span class="invalid-tooltip">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-12">
+                                <label for="import_item_data_item_image_galleries" class="text-black">{{ __('backend.item.gallery-images') }}</label>
+                                <textarea class="form-control @error('import_item_data_item_image_galleries') is-invalid @enderror" id="import_item_data_item_image_galleries" rows="5" name="import_item_data_item_image_galleries" {{ $import_item_data->import_item_data_process_status == \App\ImportItemData::PROCESS_STATUS_PROCESSED_SUCCESS ? 'disabled' : '' }}>{{ old('import_item_data_item_image_galleries') ? old('import_item_data_item_image_galleries') : $import_item_data->import_item_data_item_image_galleries }}</textarea>
+                                <small class="form-text text-muted">
+                                    {{ __('sitemap_import.item-gallery-images-url-help') }}
+                                </small>
+                                @error('import_item_data_item_image_galleries')
+                                <span class="invalid-tooltip">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-12">
                                 <span class="text-lg text-gray-800">{{ __('backend.item.custom-fields') }}</span>
                                 <small class="form-text text-muted">
                                     {{ __('theme_directory_hub.importer.import-custom-field-help') }}

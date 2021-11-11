@@ -255,8 +255,9 @@
     <script src="{{ asset('backend/vendor/bootstrap-fd/bootstrap.fd.js') }}"></script>
 
     <script>
-        // Call the dataTables jQuery plugin
         $(document).ready(function() {
+
+            "use strict";
 
             /**
              * Start image gallery uplaod

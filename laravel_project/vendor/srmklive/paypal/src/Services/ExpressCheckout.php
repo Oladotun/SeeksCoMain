@@ -15,6 +15,7 @@ class ExpressCheckout
     use PayPalAPIRequest;
     use PayPalTransactions;
     use RecurringProfiles;
+
     /**
      * ExpressCheckout constructor.
      *
@@ -175,9 +176,11 @@ class ExpressCheckout
      *
      * @return array|StreamInterface
      */
-    public function setExpressCheckout($data, $subscription = false)
+    public function setExpressCheckout($data, $subscription = false, $guest = false)
     {
         $this->setItemSubTotal($data);
+
+        $solutiontype = $guest ? 'Sole' : 'Mark';
 
         $this->post = $this->setCartItems($data['items'])->merge([
             'PAYMENTREQUEST_0_ITEMAMT'       => $this->subtotal,
@@ -190,6 +193,7 @@ class ExpressCheckout
             'RETURNURL'                      => $data['return_url'],
             'CANCELURL'                      => $data['cancel_url'],
             'LOCALE'                         => $this->locale,
+            'SOLUTIONTYPE'                   => $solutiontype,
         ]);
 
         $this->setTaxAmount($data);

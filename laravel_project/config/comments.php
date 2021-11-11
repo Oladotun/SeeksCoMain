@@ -49,8 +49,8 @@ return [
      *     ])
      *
      */
-   'approval_required' => false,
-    // 'approval_required' => true,
+//    'approval_required' => false,
+    'approval_required' => true,
 
     /**
      * Set this option to `true` to enable guest commenting.
@@ -58,6 +58,6 @@ return [
      * Visitors will be asked to provide their name and email
      * address in order to post a comment.
      */
-    'guest_commenting' => true
+    'guest_commenting' => false
 
 ];

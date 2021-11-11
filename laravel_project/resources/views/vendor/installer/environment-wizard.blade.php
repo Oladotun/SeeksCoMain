@@ -52,6 +52,19 @@
                     @endif
                 </div>
 
+                <div class="form-group {{ $errors->has('to_verify_codecanyon_username') ? ' has-error ' : '' }}">
+                    <label for="to_verify_codecanyon_username">
+                        {{ trans('installer_messages.environment.wizard.form.to_verify_codecanyon_username_label') }}
+                    </label>
+                    <input type="text" name="to_verify_codecanyon_username" id="to_verify_codecanyon_username" value="" placeholder="{{ trans('installer_messages.environment.wizard.form.to_verify_codecanyon_username_placeholder') }}" />
+                    @if ($errors->has('to_verify_codecanyon_username'))
+                        <span class="error-block">
+                            <i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                            {{ $errors->first('to_verify_codecanyon_username') }}
+                        </span>
+                    @endif
+                </div>
+
                 <div class="form-group {{ $errors->has('app_name') ? ' has-error ' : '' }}">
                     <label for="app_name">
                         {{ trans('installer_messages.environment.wizard.form.app_name_label') }}

@@ -290,6 +290,7 @@ class InstallSeeder extends Seeder
 
         DB::table('settings')->insert([
             [
+                'id' => 1,
                 'setting_site_name' => config('app.name', 'Directory Hub'),
                 'setting_site_email' => 'email@example.com',
                 'setting_site_phone' => '+1 232 3235 324',
@@ -607,14 +608,14 @@ class InstallSeeder extends Seeder
                 'custom_field_order' => 6,
                 'category_ids' => [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
             ],
-            [
-                'id' => 4,
-                'custom_field_type' => \App\CustomField::TYPE_TEXT,
-                'custom_field_name' => 'Hours',
-                'custom_field_seed_value' => null,
-                'custom_field_order' => 9,
-                'category_ids' => [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
-            ],
+//            [
+//                'id' => 4,
+//                'custom_field_type' => \App\CustomField::TYPE_TEXT,
+//                'custom_field_name' => 'Hours',
+//                'custom_field_seed_value' => null,
+//                'custom_field_order' => 9,
+//                'category_ids' => [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+//            ],
 
             // General feature except restaurants
             [
@@ -849,6 +850,9 @@ class InstallSeeder extends Seeder
 
                 'item_type' => \App\Item::ITEM_TYPE_REGULAR,
 
+                'item_hour_time_zone' => 'America/New_York',
+                'item_hour_show_hours' => \App\Item::ITEM_HOUR_SHOW,
+
                 'created_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
                 'updated_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
             ],
@@ -878,6 +882,59 @@ class InstallSeeder extends Seeder
         ]);
         /**
          * End attach categories for this item
+         */
+
+        /**
+         * Start insert hours
+         */
+        $random_item_hour_open_time_hour = strval(rand(5,11));
+        $random_item_hour_close_time_hour = strval(rand(18,23));
+
+        $random_item_hour_open_time_minute = rand(1, 10) > 5 ? '30' : '00';
+        $random_item_hour_close_time_minute = rand(1, 10) > 5 ? '30' : '00';
+
+        $random_day_of_week_close_all_day = rand(1,7);
+
+        for($day_of_week=1;$day_of_week<8;$day_of_week++)
+        {
+            if($day_of_week == $random_day_of_week_close_all_day)
+            {
+                continue;
+            }
+
+            $item_hour_open_time = $random_item_hour_open_time_hour . ':'. $random_item_hour_open_time_minute .':00';
+            $item_hour_close_time = $random_item_hour_close_time_hour . ':' . $random_item_hour_close_time_minute . ':00';
+
+            DB::table('item_hours')->insert([
+                [
+                    'item_id' => $new_item_id,
+                    'item_hour_day_of_week' => $day_of_week,
+                    'item_hour_open_time' => $item_hour_open_time,
+                    'item_hour_close_time' => $item_hour_close_time,
+                    'created_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
+                    'updated_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
+                ],
+            ]);
+        }
+        /**
+         * End insert hours
+         */
+
+        /**
+         * Start insert hour exceptions
+         */
+        DB::table('item_hour_exceptions')->insert([
+            [
+                'item_id' => $new_item_id,
+                'item_hour_exception_date' => date('Y') . '-12-25',
+                'item_hour_exception_open_time' => null,
+                'item_hour_exception_close_time' => null,
+                'created_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
+                'updated_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
+            ],
+        ]);
+        /**
+         * End insert hour exceptions
          */
 
         /**
@@ -984,21 +1041,21 @@ class InstallSeeder extends Seeder
                     ],
                 ]);
             }
-            elseif($custom_field_record->custom_field_type == \App\CustomField::TYPE_TEXT
-                && $custom_field_record->custom_field_name == 'Hours')
-            {
-                $item_feature_value = "Mon 11:00 am - 8:30 pm\r\nTue 11:00 am - 8:30 pm\r\nWed 11:00 am - 8:30 pm\r\nThu 11:00 am - 8:30 pm\r\nFri 11:00 am - 8:30 pm\r\nSat 11:00 am - 8:30 pm\r\nSun 11:00 am - 8:30 pm";
-
-                DB::table('item_features')->insert([
-                    [
-                        'item_id' => $new_item_id,
-                        'custom_field_id' => $custom_fields_id,
-                        'item_feature_value' => $item_feature_value,
-                        'created_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
-                        'updated_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
-                    ],
-                ]);
-            }
+//            elseif($custom_field_record->custom_field_type == \App\CustomField::TYPE_TEXT
+//                && $custom_field_record->custom_field_name == 'Hours')
+//            {
+//                $item_feature_value = "Mon 11:00 am - 8:30 pm\r\nTue 11:00 am - 8:30 pm\r\nWed 11:00 am - 8:30 pm\r\nThu 11:00 am - 8:30 pm\r\nFri 11:00 am - 8:30 pm\r\nSat 11:00 am - 8:30 pm\r\nSun 11:00 am - 8:30 pm";
+//
+//                DB::table('item_features')->insert([
+//                    [
+//                        'item_id' => $new_item_id,
+//                        'custom_field_id' => $custom_fields_id,
+//                        'item_feature_value' => $item_feature_value,
+//                        'created_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
+//                        'updated_at' => date("Y-m-d H:i:s", strtotime("-1 days")),
+//                    ],
+//                ]);
+//            }
 
             $item_features_string .= $item_feature_value . ' ';
         }

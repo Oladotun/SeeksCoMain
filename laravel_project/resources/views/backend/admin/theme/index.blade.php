@@ -169,14 +169,9 @@
 
 @section('scripts')
     <script>
-
         function deleteConfirm()
         {
             return confirm("{{ __('theme_directory_hub.alert.theme-delete-confirm') }}");
         }
-
-        // Call the dataTables jQuery plugin
-        $(document).ready(function() {
-        });
     </script>
 @endsection

@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.2",
+        "php": "^8.0",
         "ext-json": "*",
         "artesaos/seotools": "^0.17.2",
         "biscolab/laravel-recaptcha": "^4.2",
@@ -29,16 +29,18 @@
         "mews/purifier": "^3.2",
         "nicolaslopezj/searchable": "1.*",
         "rachidlaasri/laravel-installer": "^4.0",
+        "spatie/opening-hours": "^2.10",
         "srmklive/paypal": "^1.7",
         "stripe/stripe-php": "^7.53",
-        "sundarocs/laravel-review-rateable": "^1.2"
+        "sundarocs/laravel-review-rateable": "^1.2",
+        "razorpay/razorpay": "2.*"
     },
     "require-dev": {
         "facade/ignition": "^1.4",
         "fzaninotto/faker": "^1.9.1",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^8.0",
+        "phpunit/phpunit": "^9.3",
         "tanmuhittin/laravel-google-translate": "^1.0"
     },
     "config": {

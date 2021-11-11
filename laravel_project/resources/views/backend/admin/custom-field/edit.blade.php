@@ -139,7 +139,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    {{ __('backend.shared.delete-message', ['record_type' => __('backend.shared.custom-field'), 'record_name' => $customField->custom_field_name]) }}
+                    {{ __('delete_custom_field.delete-custom-field-warning') . ' ' . __('backend.shared.delete-message', ['record_type' => __('backend.shared.custom-field'), 'record_name' => $customField->custom_field_name]) }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('backend.shared.cancel') }}</button>

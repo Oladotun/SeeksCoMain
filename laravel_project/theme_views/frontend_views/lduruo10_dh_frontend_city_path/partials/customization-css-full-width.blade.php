@@ -18,8 +18,5 @@
     .header__menu ul li a {
         color: #323232;
     }
-    .custom-site-logo img { max-height: 150px; }
-    .footer__about__logo img {max-height: 100px;}
-
 </style>
 <!-- End page level nav style -->

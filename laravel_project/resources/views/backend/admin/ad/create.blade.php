@@ -455,6 +455,8 @@
     <script>
         $(document).ready(function() {
 
+            "use strict";
+
             /**
              * Start initial ad code textarea markdown
              */

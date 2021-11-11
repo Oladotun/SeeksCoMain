@@ -33,8 +33,8 @@ class PagesController extends Controller
 
         $admin_user = User::getAdmin();
 
-        $category_count = Category::all()->count();
-        $item_count = Item::all()->count();
+        $category_count = Category::count();
+        $item_count = Item::count();
         $post_count = \Canvas\Post::published()->count();
         $user_count = User::where('role_id', Role::USER_ROLE_ID)->count();
 

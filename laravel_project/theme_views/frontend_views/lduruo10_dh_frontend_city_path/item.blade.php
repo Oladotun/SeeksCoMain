@@ -1702,6 +1702,254 @@
                             </div>
                         </div>
 
+                        <!-- Start opening hours -->
+                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                        <div class="listing__sidebar__working__hours">
+                            <h4>{{ __('item_hour.item-hours') }}</h4>
+                            @if($item_hours->count() > 0)
+                            <div class="row">
+                                <div class="col-12 pl-0 pr-0">
+                                    @if($current_open_range)
+                                        <div class="alert alert-success" role="alert">
+                                            <i class="fas fa-door-open"></i>
+                                            {{ __('item_hour.item-open-since') . ' ' . $current_open_range->start() . '.' }}
+                                            {{ __('item_hour.item-will-close') . ' ' . $current_open_range->end() . '.' }}
+                                        </div>
+                                    @else
+                                        <div class="alert alert-warning" role="alert">
+                                            <i class="fas fa-exclamation-circle"></i>
+
+                                            @php
+                                                $previous_close_datetime = $opening_hours_obj->previousClose($datetime_now);
+                                                $next_open_datetime = $opening_hours_obj->nextOpen($datetime_now);
+
+                                                $previous_close_day_of_week = intval($previous_close_datetime->format('N'));
+                                                $next_open_day_of_week = intval($next_open_datetime->format('N'));
+                                            @endphp
+
+                                            {{ __('item_hour.item-closed-since') }}
+
+                                            @if($previous_close_day_of_week == 1)
+                                                {{ __('item_hour.monday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                            @elseif($previous_close_day_of_week == 2)
+                                                {{ __('item_hour.tuesday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                            @elseif($previous_close_day_of_week == 3)
+                                                {{ __('item_hour.wednesday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                            @elseif($previous_close_day_of_week == 4)
+                                                {{ __('item_hour.thursday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                            @elseif($previous_close_day_of_week == 5)
+                                                {{ __('item_hour.friday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                            @elseif($previous_close_day_of_week == 6)
+                                                {{ __('item_hour.saturday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                            @elseif($previous_close_day_of_week == 7)
+                                                {{ __('item_hour.sunday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                            @endif
+
+                                            {{ __('item_hour.item-will-re-open') }}
+
+                                            @if($next_open_day_of_week == 1)
+                                                {{ __('item_hour.monday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                            @elseif($next_open_day_of_week == 2)
+                                                {{ __('item_hour.tuesday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                            @elseif($next_open_day_of_week == 3)
+                                                {{ __('item_hour.wednesday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                            @elseif($next_open_day_of_week == 4)
+                                                {{ __('item_hour.thursday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                            @elseif($next_open_day_of_week == 5)
+                                                {{ __('item_hour.friday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                            @elseif($next_open_day_of_week == 6)
+                                                {{ __('item_hour.saturday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                            @elseif($next_open_day_of_week == 7)
+                                                {{ __('item_hour.sunday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                            @endif
+
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
+
+                            <div class="row mb-4">
+                                <div class="col-12">
+
+                                    <div class="row bg-light border-left pt-1 pb-1">
+                                        <div class="col-3">
+                                            <span class="">{{ __('item_hour.monday') }}</span>
+                                        </div>
+                                        <div class="col-9 text-right">
+                                            @if(count($item_hours_monday) > 0)
+                                                @foreach($item_hours_monday as $item_hours_monday_key => $an_item_hours_monday)
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <span>{{ $an_item_hours_monday }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ __('item_hour.item-closed') }}</span>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="row border-left pt-1 pb-1">
+                                        <div class="col-3">
+                                            <span class="">{{ __('item_hour.tuesday') }}</span>
+                                        </div>
+                                        <div class="col-9 text-right">
+                                            @if(count($item_hours_tuesday) > 0)
+                                                @foreach($item_hours_tuesday as $item_hours_tuesday_key => $an_item_hours_tuesday)
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <span>{{ $an_item_hours_tuesday }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ __('item_hour.item-closed') }}</span>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="row bg-light border-left pt-1 pb-1">
+                                        <div class="col-3">
+                                            <span class="">{{ __('item_hour.wednesday') }}</span>
+                                        </div>
+                                        <div class="col-9 text-right">
+                                            @if(count($item_hours_wednesday) > 0)
+                                                @foreach($item_hours_wednesday as $item_hours_wednesday_key => $an_item_hours_wednesday)
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <span>{{ $an_item_hours_wednesday }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ __('item_hour.item-closed') }}</span>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="row border-left pt-1 pb-1">
+                                        <div class="col-3">
+                                            <span class="">{{ __('item_hour.thursday') }}</span>
+                                        </div>
+                                        <div class="col-9 text-right">
+                                            @if(count($item_hours_thursday) > 0)
+                                                @foreach($item_hours_thursday as $item_hours_thursday_key => $an_item_hours_thursday)
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <span>{{ $an_item_hours_thursday }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ __('item_hour.item-closed') }}</span>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="row bg-light border-left pt-1 pb-1">
+                                        <div class="col-3">
+                                            <span class="">{{ __('item_hour.friday') }}</span>
+                                        </div>
+                                        <div class="col-9 text-right">
+                                            @if(count($item_hours_friday) > 0)
+                                                @foreach($item_hours_friday as $item_hours_friday_key => $an_item_hours_friday)
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <span>{{ $an_item_hours_friday }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ __('item_hour.item-closed') }}</span>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="row border-left pt-1 pb-1">
+                                        <div class="col-3">
+                                            <span class="">{{ __('item_hour.saturday') }}</span>
+                                        </div>
+                                        <div class="col-9 text-right">
+                                            @if(count($item_hours_saturday) > 0)
+                                                @foreach($item_hours_saturday as $item_hours_saturday_key => $an_item_hours_saturday)
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <span>{{ $an_item_hours_saturday }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ __('item_hour.item-closed') }}</span>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="row bg-light border-left pt-1 pb-1">
+                                        <div class="col-3">
+                                            <span class="">{{ __('item_hour.sunday') }}</span>
+                                        </div>
+                                        <div class="col-9 text-right">
+                                            @if(count($item_hours_sunday) > 0)
+                                                @foreach($item_hours_sunday as $item_hours_sunday_key => $an_item_hours_sunday)
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <span>{{ $an_item_hours_sunday }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ __('item_hour.item-closed') }}</span>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    @if(count($item_hour_exceptions_obj) > 0)
+                                        <div class="row pt-1 pb-1">
+                                            <div class="col-12">
+                                                <a class="text-secondary" href="#" data-toggle="modal" data-target="#itemHourExceptionsModal">
+                                                    <i class="far fa-window-restore"></i>
+                                                    {{ __('item_hour.item-hour-exceptions-link') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                        <!-- End opening hours -->
+
                         @if(\Illuminate\Support\Facades\Auth::check())
                             @if(\Illuminate\Support\Facades\Auth::user()->id != $item->user_id)
                             <div class="listing__sidebar__working__hours">
@@ -1912,7 +2160,13 @@
                                                     @endforeach
                                                 </div>
                                                 <div class="listing__item__text__info__right">
-                                                    {{ $similar_item->created_at->diffForHumans() }}
+                                                    @if($similar_item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                                        @if($similar_item->hasOpened())
+                                                            <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                                                        @else
+                                                            <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                                                        @endif
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -1998,7 +2252,13 @@
                                                     @endforeach
                                                 </div>
                                                 <div class="listing__item__text__info__right">
-                                                    {{ $nearby_item->created_at->diffForHumans() }}
+                                                    @if($nearby_item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                                        @if($nearby_item->hasOpened())
+                                                            <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                                                        @else
+                                                            <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                                                        @endif
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -2338,6 +2598,68 @@
             </div>
         </div>
     @endif
+
+
+    @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+        @if(count($item_hour_exceptions_obj) > 0)
+        <div class="modal fade" id="itemHourExceptionsModal" tabindex="-1" role="dialog" aria-labelledby="itemHourExceptionsModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ __('item_hour.modal-item-hour-exceptions-title')  }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <p>{{ $item->item_title . ' ' . __('item_hour.modal-item-hour-exceptions-description') }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+
+                                @foreach($item_hour_exceptions_obj as $item_hour_exceptions_obj_key => $item_hour_exception)
+                                    <div class="row pt-1 pb-1 bg-light mb-1 align-items-center">
+                                        <div class="col-4">
+                                            <i class="far fa-calendar-alt"></i>
+                                            {{ $item_hour_exceptions_obj_key }}
+                                        </div>
+                                        <div class="col-8 text-right">
+                                            @php
+                                                $item_hour_exception_iterator = $item_hour_exception->getIterator();
+                                            @endphp
+
+                                            @if(count($item_hour_exception_iterator) > 0)
+                                                @foreach($item_hour_exception_iterator as $item_hour_exception_iterator_key => $an_item_hour_exception_iterator)
+                                                    <i class="far fa-clock"></i>
+                                                    @if(count($item_hour_exception_iterator) - 1 == $item_hour_exception_iterator_key)
+                                                        {{ $an_item_hour_exception_iterator }}
+                                                    @else
+                                                        {{ $an_item_hour_exception_iterator . ', ' }}
+                                                    @endif
+                                                @endforeach
+                                            @else
+                                                {{ __('item_hour.item-closed') }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">{{ __('importer_csv.error-notify-modal-close') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+    @endif
+
 @endsection
 
 @section('scripts')

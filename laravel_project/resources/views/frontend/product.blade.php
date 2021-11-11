@@ -19,9 +19,9 @@
 
     <!-- Display on xl -->
     @if(!empty($item->item_image) && !empty($item->item_image_blur))
-        <div class="site-blocks-cover inner-page-cover overlay d-none d-xl-flex" style="background-image: url({{ Storage::disk('public')->url('item/' . $item->item_image_blur) }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover inner-page-cover overlay d-none d-xl-flex" style="background-image: url({{ Storage::disk('public')->url('item/' . $item->item_image_blur) }});">
     @else
-        <div class="site-blocks-cover inner-page-cover overlay d-none d-xl-flex" style="background-image: url({{ asset('frontend/images/placeholder/full_item_feature_image.webp') }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover inner-page-cover overlay d-none d-xl-flex" style="background-image: url({{ asset('frontend/images/placeholder/full_item_feature_image.webp') }});">
     @endif
         <div class="container">
             <div class="row align-items-center item-blocks-cover">
@@ -164,9 +164,9 @@
 
     <!-- Display on lg, md -->
     @if(!empty($item->item_image) && !empty($item->item_image_blur))
-        <div class="site-blocks-cover inner-page-cover overlay d-none d-md-flex d-lg-flex d-xl-none" style="background-image: url({{ Storage::disk('public')->url('item/' . $item->item_image_blur) }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover inner-page-cover overlay d-none d-md-flex d-lg-flex d-xl-none" style="background-image: url({{ Storage::disk('public')->url('item/' . $item->item_image_blur) }});">
     @else
-        <div class="site-blocks-cover inner-page-cover overlay d-none d-md-flex d-lg-flex d-xl-none" style="background-image: url({{ asset('frontend/images/placeholder/full_item_feature_image.webp') }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover inner-page-cover overlay d-none d-md-flex d-lg-flex d-xl-none" style="background-image: url({{ asset('frontend/images/placeholder/full_item_feature_image.webp') }});">
     @endif
         <div class="container">
             <div class="row align-items-center item-blocks-cover">
@@ -307,9 +307,9 @@
 
     <!-- Display on sm and xs -->
     @if(!empty($item->item_image) && !empty($item->item_image_blur))
-        <div class="site-blocks-cover site-blocks-cover-sm inner-page-cover overlay d-md-none" style="background-image: url({{ Storage::disk('public')->url('item/' . $item->item_image_blur) }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover site-blocks-cover-sm inner-page-cover overlay d-md-none" style="background-image: url({{ Storage::disk('public')->url('item/' . $item->item_image_blur) }});">
     @else
-        <div class="site-blocks-cover site-blocks-cover-sm inner-page-cover overlay d-md-none" style="background-image: url({{ asset('frontend/images/placeholder/full_item_feature_image.webp') }});" data-aos="fade" data-stellar-background-ratio="0.5">
+        <div class="site-blocks-cover site-blocks-cover-sm inner-page-cover overlay d-md-none" style="background-image: url({{ asset('frontend/images/placeholder/full_item_feature_image.webp') }});">
     @endif
         <div class="container">
             <div class="row align-items-center item-blocks-cover-sm">
@@ -730,26 +730,254 @@
                             @endforeach
                         @endif
 
+                        @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
                         <div class="row mb-2 align-items-center">
                             <div class="col-12">
-                                <h3 class="h5 text-black">{{ __('rating_summary.managed-by') }}</h3>
+                                <h3 class="h5 text-black">{{ __('item_hour.item-hours') }}</h3>
                             </div>
                         </div>
 
-                        <div class="row align-items-center">
-                            <div class="col-4">
-                                @if(empty($item->user->user_image))
-                                    <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
+                        @if($item_hours->count() > 0)
+                        <div class="row">
+                            <div class="col-12 pl-0 pr-0">
+                                @if($current_open_range)
+                                    <div class="alert alert-success" role="alert">
+                                        <i class="fas fa-door-open"></i>
+                                        {{ __('item_hour.item-open-since') . ' ' . $current_open_range->start() . '.' }}
+                                        {{ __('item_hour.item-will-close') . ' ' . $current_open_range->end() . '.' }}
+                                    </div>
                                 @else
+                                    <div class="alert alert-warning" role="alert">
+                                        <i class="fas fa-exclamation-circle"></i>
 
-                                    <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+                                        @php
+                                            $previous_close_datetime = $opening_hours_obj->previousClose($datetime_now);
+                                            $next_open_datetime = $opening_hours_obj->nextOpen($datetime_now);
+
+                                            $previous_close_day_of_week = intval($previous_close_datetime->format('N'));
+                                            $next_open_day_of_week = intval($next_open_datetime->format('N'));
+                                        @endphp
+
+                                        {{ __('item_hour.item-closed-since') }}
+
+                                        @if($previous_close_day_of_week == 1)
+                                            {{ __('item_hour.monday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                        @elseif($previous_close_day_of_week == 2)
+                                            {{ __('item_hour.tuesday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                        @elseif($previous_close_day_of_week == 3)
+                                            {{ __('item_hour.wednesday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                        @elseif($previous_close_day_of_week == 4)
+                                            {{ __('item_hour.thursday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                        @elseif($previous_close_day_of_week == 5)
+                                            {{ __('item_hour.friday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                        @elseif($previous_close_day_of_week == 6)
+                                            {{ __('item_hour.saturday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                        @elseif($previous_close_day_of_week == 7)
+                                            {{ __('item_hour.sunday') . ' ' . $previous_close_datetime->format('H:i') . '.' }}
+                                        @endif
+
+                                        {{ __('item_hour.item-will-re-open') }}
+
+                                        @if($next_open_day_of_week == 1)
+                                            {{ __('item_hour.monday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                        @elseif($next_open_day_of_week == 2)
+                                            {{ __('item_hour.tuesday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                        @elseif($next_open_day_of_week == 3)
+                                            {{ __('item_hour.wednesday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                        @elseif($next_open_day_of_week == 4)
+                                            {{ __('item_hour.thursday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                        @elseif($next_open_day_of_week == 5)
+                                            {{ __('item_hour.friday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                        @elseif($next_open_day_of_week == 6)
+                                            {{ __('item_hour.saturday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                        @elseif($next_open_day_of_week == 7)
+                                            {{ __('item_hour.sunday') . ' ' . $next_open_datetime->format('H:i') . '.' }}
+                                        @endif
+
+                                    </div>
                                 @endif
                             </div>
-                            <div class="col-8 pl-0">
-                                <span class="font-size-13">{{ $item->user->name }}</span><br/>
-                                <span class="font-size-13">{{ __('frontend.item.posted') . ' ' . $item->created_at->diffForHumans() }}</span>
+                        </div>
+                        @endif
+
+                        <div class="row mb-4">
+                            <div class="col-12">
+
+                                <div class="row bg-light border-left pt-1 pb-1">
+                                    <div class="col-3">
+                                        <span class="">{{ __('item_hour.monday') }}</span>
+                                    </div>
+                                    <div class="col-9 text-right">
+                                        @if(count($item_hours_monday) > 0)
+                                            @foreach($item_hours_monday as $item_hours_monday_key => $an_item_hours_monday)
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ $an_item_hours_monday }}</span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <span>{{ __('item_hour.item-closed') }}</span>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row border-left pt-1 pb-1">
+                                    <div class="col-3">
+                                        <span class="">{{ __('item_hour.tuesday') }}</span>
+                                    </div>
+                                    <div class="col-9 text-right">
+                                        @if(count($item_hours_tuesday) > 0)
+                                            @foreach($item_hours_tuesday as $item_hours_tuesday_key => $an_item_hours_tuesday)
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ $an_item_hours_tuesday }}</span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <span>{{ __('item_hour.item-closed') }}</span>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row bg-light border-left pt-1 pb-1">
+                                    <div class="col-3">
+                                        <span class="">{{ __('item_hour.wednesday') }}</span>
+                                    </div>
+                                    <div class="col-9 text-right">
+                                        @if(count($item_hours_wednesday) > 0)
+                                            @foreach($item_hours_wednesday as $item_hours_wednesday_key => $an_item_hours_wednesday)
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ $an_item_hours_wednesday }}</span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <span>{{ __('item_hour.item-closed') }}</span>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row border-left pt-1 pb-1">
+                                    <div class="col-3">
+                                        <span class="">{{ __('item_hour.thursday') }}</span>
+                                    </div>
+                                    <div class="col-9 text-right">
+                                        @if(count($item_hours_thursday) > 0)
+                                            @foreach($item_hours_thursday as $item_hours_thursday_key => $an_item_hours_thursday)
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ $an_item_hours_thursday }}</span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <span>{{ __('item_hour.item-closed') }}</span>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row bg-light border-left pt-1 pb-1">
+                                    <div class="col-3">
+                                        <span class="">{{ __('item_hour.friday') }}</span>
+                                    </div>
+                                    <div class="col-9 text-right">
+                                        @if(count($item_hours_friday) > 0)
+                                            @foreach($item_hours_friday as $item_hours_friday_key => $an_item_hours_friday)
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ $an_item_hours_friday }}</span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <span>{{ __('item_hour.item-closed') }}</span>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row border-left pt-1 pb-1">
+                                    <div class="col-3">
+                                        <span class="">{{ __('item_hour.saturday') }}</span>
+                                    </div>
+                                    <div class="col-9 text-right">
+                                        @if(count($item_hours_saturday) > 0)
+                                            @foreach($item_hours_saturday as $item_hours_saturday_key => $an_item_hours_saturday)
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ $an_item_hours_saturday }}</span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <span>{{ __('item_hour.item-closed') }}</span>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row bg-light border-left pt-1 pb-1">
+                                    <div class="col-3">
+                                        <span class="">{{ __('item_hour.sunday') }}</span>
+                                    </div>
+                                    <div class="col-9 text-right">
+                                        @if(count($item_hours_sunday) > 0)
+                                            @foreach($item_hours_sunday as $item_hours_sunday_key => $an_item_hours_sunday)
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span>{{ $an_item_hours_sunday }}</span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <span>{{ __('item_hour.item-closed') }}</span>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                @if(count($item_hour_exceptions_obj) > 0)
+                                    <div class="row pt-1 pb-1">
+                                        <div class="col-12">
+                                            <a class="text-secondary" href="#" data-toggle="modal" data-target="#itemHourExceptionsModal">
+                                                <i class="far fa-window-restore"></i>
+                                                {{ __('item_hour.item-hour-exceptions-link') }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+
                             </div>
                         </div>
+                        @endif
 
                         @if(\Illuminate\Support\Facades\Auth::check())
                             @if(\Illuminate\Support\Facades\Auth::user()->id != $item->user_id)
@@ -822,15 +1050,39 @@
                                         @endif
                                     </div>
                                 </div>
-
                             @endif
-                        @else
-                            <div class="row mt-3 mb-5 align-items-center">
+                        @endif
+
+                        <div class="row mb-2 align-items-center">
+                            <div class="col-12">
+                                <h3 class="h5 text-black">{{ __('rating_summary.managed-by') }}</h3>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-center mb-4">
+                            <div class="col-4">
+                                @if(empty($item->user->user_image))
+                                    <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
+                                @else
+
+                                    <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+                                @endif
+                            </div>
+                            <div class="col-8 pl-0">
+                                <span class="font-size-13">{{ $item->user->name }}</span><br/>
+                                <span class="font-size-13">{{ __('frontend.item.posted') . ' ' . $item->created_at->diffForHumans() }}</span>
+                            </div>
+                        </div>
+
+                        @if(!\Illuminate\Support\Facades\Auth::check())
+                            <div class="row mb-4 align-items-center">
                                 <div class="col-12">
                                     <a class="btn btn-primary btn-block rounded text-white" href="#" data-toggle="modal" data-target="#itemLeadModal">{{ __('rating_summary.contact') }}</a>
                                 </div>
                             </div>
                         @endif
+
+                        <hr>
 
                         @include('frontend.partials.search.side')
 
@@ -878,13 +1130,13 @@
         </div>
         <div class="row mt-5">
 
-            @foreach($similar_items as $key => $similar_item)
+            @foreach($similar_items as $similar_items_key => $similar_item)
                 <div class="col-lg-6">
                     <div class="d-block d-md-flex listing">
                         <a href="{{ route('page.item', $similar_item->item_slug) }}" class="img d-block" style="background-image: url({{ !empty($similar_item->item_image_small) ? Storage::disk('public')->url('item/' . $similar_item->item_image_small) : (!empty($similar_item->item_image) ? Storage::disk('public')->url('item/' . $similar_item->item_image) : asset('frontend/images/placeholder/full_item_feature_image_small.webp')) }})"></a>
                         <div class="lh-content">
 
-                            @foreach($similar_item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY) as $key => $category)
+                            @foreach($similar_item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY) as $similar_items_all_categories_key => $category)
                                 <a href="{{ route('page.category', $category->category_slug) }}">
                                     <span class="category">
                                         @if(!empty($category->category_icon))
@@ -923,33 +1175,44 @@
                                 </div>
                             @endif
 
-                            <div class="row">
-                                <div class="col-2 pr-0">
-                                    @if(empty($similar_item->user->user_image))
-                                        <img src="{{ asset('frontend/images/placeholder/profile-'. intval($similar_item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
-                                    @else
+                            <hr class="item-box-hr">
 
-                                        <img src="{{ Storage::disk('public')->url('user/' . $similar_item->user->user_image) }}" alt="{{ $similar_item->user->name }}" class="img-fluid rounded-circle">
+                            <div class="row align-items-center">
+
+                                <div class="col-5 col-md-7 pr-0">
+                                    <div class="row align-items-center item-box-user-div">
+                                        <div class="col-3 item-box-user-img-div">
+                                            @if(empty($similar_item->user->user_image))
+                                                <img src="{{ asset('frontend/images/placeholder/profile-'. intval($similar_item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
+                                            @else
+                                                <img src="{{ Storage::disk('public')->url('user/' . $similar_item->user->user_image) }}" alt="{{ $similar_item->user->name }}" class="img-fluid rounded-circle">
+                                            @endif
+                                        </div>
+                                        <div class="col-9 line-height-1-2 item-box-user-name-div">
+                                            <div class="row pb-1">
+                                                <div class="col-12">
+                                                    <span class="font-size-13">{{ str_limit($similar_item->user->name, 14, '.') }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="row line-height-1-0">
+                                                <div class="col-12">
+                                                    <span class="review">{{ $similar_item->created_at->diffForHumans() }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-7 col-md-5 pl-0 text-right">
+                                    @if($similar_item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                        @if($similar_item->hasOpened())
+                                            <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                                        @else
+                                            <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                                        @endif
                                     @endif
                                 </div>
-                                <div class="col-10 line-height-1-2">
 
-                                    <div class="row pb-1">
-                                        <div class="col-12">
-                                            <span class="font-size-13">{{ $similar_item->user->name }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="row line-height-1-0">
-                                        <div class="col-12">
-                                            @if($similar_item->totalComments() > 1)
-                                                <span class="review">{{ $similar_item->totalComments() . ' comments' }}</span>
-                                            @elseif($similar_item->totalComments() == 1)
-                                                <span class="review">{{ $similar_item->totalComments() . ' comment' }}</span>
-                                            @endif
-                                            <span class="review">{{ $similar_item->created_at->diffForHumans() }}</span>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -971,13 +1234,13 @@
             </div>
             <div class="row mt-5">
 
-                @foreach($nearby_items as $key => $nearby_item)
+                @foreach($nearby_items as $nearby_items_key => $nearby_item)
                     <div class="col-lg-6">
                         <div class="d-block d-md-flex listing">
                             <a href="{{ route('page.item', $nearby_item->item_slug) }}" class="img d-block" style="background-image: url({{ !empty($nearby_item->item_image_small) ? Storage::disk('public')->url('item/' . $nearby_item->item_image_small) : (!empty($nearby_item->item_image) ? Storage::disk('public')->url('item/' . $nearby_item->item_image) : asset('frontend/images/placeholder/full_item_feature_image_small.webp')) }})"></a>
                             <div class="lh-content">
 
-                                @foreach($nearby_item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY) as $key => $category)
+                                @foreach($nearby_item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY) as $nearby_items_all_categories_key => $category)
                                     <a href="{{ route('page.category', $category->category_slug) }}">
                                     <span class="category">
                                         @if(!empty($category->category_icon))
@@ -1016,33 +1279,44 @@
                                     </div>
                                 @endif
 
-                                <div class="row">
-                                    <div class="col-2 pr-0">
-                                        @if(empty($nearby_item->user->user_image))
-                                            <img src="{{ asset('frontend/images/placeholder/profile-'. intval($nearby_item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
-                                        @else
+                                <hr class="item-box-hr">
 
-                                            <img src="{{ Storage::disk('public')->url('user/' . $nearby_item->user->user_image) }}" alt="{{ $nearby_item->user->name }}" class="img-fluid rounded-circle">
+                                <div class="row">
+
+                                    <div class="col-5 col-md-7 pr-0">
+                                        <div class="row align-items-center item-box-user-div">
+                                            <div class="col-3 item-box-user-img-div">
+                                                @if(empty($nearby_item->user->user_image))
+                                                    <img src="{{ asset('frontend/images/placeholder/profile-'. intval($nearby_item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
+                                                @else
+                                                    <img src="{{ Storage::disk('public')->url('user/' . $nearby_item->user->user_image) }}" alt="{{ $nearby_item->user->name }}" class="img-fluid rounded-circle">
+                                                @endif
+                                            </div>
+                                            <div class="col-9 line-height-1-2 item-box-user-name-div">
+                                                <div class="row pb-1">
+                                                    <div class="col-12">
+                                                        <span class="font-size-13">{{ str_limit($nearby_item->user->name, 14, '.') }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row line-height-1-0">
+                                                    <div class="col-12">
+                                                        <span class="review">{{ $nearby_item->created_at->diffForHumans() }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-7 col-md-5 pl-0 text-right">
+                                        @if($nearby_item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                                            @if($nearby_item->hasOpened())
+                                                <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                                            @else
+                                                <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                                            @endif
                                         @endif
                                     </div>
-                                    <div class="col-10 line-height-1-2">
 
-                                        <div class="row pb-1">
-                                            <div class="col-12">
-                                                <span class="font-size-13">{{ $nearby_item->user->name }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row line-height-1-0">
-                                            <div class="col-12">
-                                                @if($nearby_item->totalComments() > 1)
-                                                    <span class="review">{{ $nearby_item->totalComments() . ' comments' }}</span>
-                                                @elseif($nearby_item->totalComments() == 1)
-                                                    <span class="review">{{ $nearby_item->totalComments() . ' comment' }}</span>
-                                                @endif
-                                                <span class="review">{{ $nearby_item->created_at->diffForHumans() }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1350,6 +1624,66 @@
 </div>
 @endif
 
+@if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+    @if(count($item_hour_exceptions_obj) > 0)
+        <div class="modal fade" id="itemHourExceptionsModal" tabindex="-1" role="dialog" aria-labelledby="itemHourExceptionsModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ __('item_hour.modal-item-hour-exceptions-title')  }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <p>{{ $item->item_title . ' ' . __('item_hour.modal-item-hour-exceptions-description') }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+
+                                @foreach($item_hour_exceptions_obj as $item_hour_exceptions_obj_key => $item_hour_exception)
+                                    <div class="row pt-1 pb-1 bg-light mb-1 align-items-center">
+                                        <div class="col-4">
+                                            <i class="far fa-calendar-alt"></i>
+                                            {{ $item_hour_exceptions_obj_key }}
+                                        </div>
+                                        <div class="col-8 text-right">
+                                            @php
+                                                $item_hour_exception_iterator = $item_hour_exception->getIterator();
+                                            @endphp
+
+                                            @if(count($item_hour_exception_iterator) > 0)
+                                                @foreach($item_hour_exception_iterator as $item_hour_exception_iterator_key => $an_item_hour_exception_iterator)
+                                                    <i class="far fa-clock"></i>
+                                                    @if(count($item_hour_exception_iterator) - 1 == $item_hour_exception_iterator_key)
+                                                        {{ $an_item_hour_exception_iterator }}
+                                                    @else
+                                                        {{ $an_item_hour_exception_iterator . ', ' }}
+                                                    @endif
+                                                @endforeach
+                                            @else
+                                                {{ __('item_hour.item-closed') }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">{{ __('importer_csv.error-notify-modal-close') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+@endif
+
 @endsection
 
 @section('scripts')
@@ -1363,6 +1697,8 @@
 
     <script>
         $(document).ready(function(){
+
+            "use strict";
 
             /**
              * Start initial image gallery justify gallery

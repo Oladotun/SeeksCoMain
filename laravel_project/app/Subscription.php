@@ -83,16 +83,14 @@ class Subscription extends Model
 
         // get paid users id array
         $paid_user_ids = array();
-        $paid_subscriptions = Subscription::join('users as u', 'subscriptions.user_id', '=', 'u.id')
+
+        $paid_user_ids = Subscription::join('users as u', 'subscriptions.user_id', '=', 'u.id')
             ->where('u.email_verified_at', '!=', null)
             ->where('u.user_suspended', User::USER_NOT_SUSPENDED)
             ->where('subscriptions.subscription_end_date', '!=', null)
-            ->where('subscriptions.subscription_end_date','>=', $today)->get();
-
-        foreach($paid_subscriptions as $paid_subscriptions_key => $paid_subscription)
-        {
-            $paid_user_ids[] = $paid_subscription->user_id;
-        }
+            ->where('subscriptions.subscription_end_date','>=', $today)
+            ->pluck('u.id')
+            ->toArray();
 
         return $paid_user_ids;
     }
@@ -103,19 +101,17 @@ class Subscription extends Model
         $today = $today->format("Y-m-d");
 
         $free_user_ids = array();
-        $free_subscriptions = Subscription::join('users as u', 'subscriptions.user_id', '=', 'u.id')
+
+        $free_user_ids = Subscription::join('users as u', 'subscriptions.user_id', '=', 'u.id')
             ->where('u.email_verified_at', '!=', null)
             ->where('u.user_suspended', User::USER_NOT_SUSPENDED)
             ->where('subscriptions.subscription_end_date', null)
             ->orWhere(function($query) use ($today) {
                 $query->where('subscriptions.subscription_end_date', '!=', null)
                     ->where('subscriptions.subscription_end_date','<=', $today);
-            })->get();
-
-        foreach($free_subscriptions as $free_subscriptions_key => $free_subscription)
-        {
-            $free_user_ids[] = $free_subscription->user_id;
-        }
+            })
+            ->pluck('u.id')
+            ->toArray();
 
         return $free_user_ids;
     }
@@ -123,15 +119,12 @@ class Subscription extends Model
     public function getActiveUserIds()
     {
         $active_user_ids = array();
-        $subscriptions = Subscription::join('users as u', 'subscriptions.user_id', '=', 'u.id')
+
+        $active_user_ids = Subscription::join('users as u', 'subscriptions.user_id', '=', 'u.id')
             ->where('u.email_verified_at', '!=', null)
             ->where('u.user_suspended', User::USER_NOT_SUSPENDED)
-            ->get();
-
-        foreach($subscriptions as $subscriptions_key => $subscription)
-        {
-            $active_user_ids[] = $subscription->user_id;
-        }
+            ->pluck('u.id')
+            ->toArray();
 
         return $active_user_ids;
     }

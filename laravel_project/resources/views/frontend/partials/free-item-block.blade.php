@@ -48,34 +48,44 @@
         </div>
         @endif
 
+        <hr class="item-box-hr">
+
         <div class="row align-items-center">
-            <div class="col-2 pr-0">
-                @if(empty($item->user->user_image))
-                    <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
-                @else
-                    <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+
+            <div class="col-5 col-md-7 pr-0">
+                <div class="row align-items-center item-box-user-div">
+                    <div class="col-3 item-box-user-img-div">
+                        @if(empty($item->user->user_image))
+                            <img src="{{ asset('frontend/images/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="Image" class="img-fluid rounded-circle">
+                        @else
+                            <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}" class="img-fluid rounded-circle">
+                        @endif
+                    </div>
+                    <div class="col-9 line-height-1-2 item-box-user-name-div">
+                        <div class="row pb-1">
+                            <div class="col-12">
+                                <span class="font-size-13">{{ str_limit($item->user->name, 12, '.') }}</span>
+                            </div>
+                        </div>
+                        <div class="row line-height-1-0">
+                            <div class="col-12">
+                                <span class="review">{{ $item->created_at->diffForHumans() }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-7 col-md-5 pl-0 text-right">
+                @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                    @if($item->hasOpened())
+                        <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                    @else
+                        <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                    @endif
                 @endif
             </div>
-            <div class="col-10 line-height-1-2">
 
-                <div class="row pb-1">
-                    <div class="col-12">
-                        <span class="font-size-13">{{ $item->user->name }}</span>
-                    </div>
-                </div>
-                <div class="row line-height-1-0">
-                    <div class="col-12">
-
-                        @if($item->totalComments() > 1)
-                            <span class="review">{{ $item->totalComments() . ' comments' }}</span>
-                        @elseif($item->totalComments() == 1)
-                            <span class="review">{{ $item->totalComments() . ' comment' }}</span>
-                        @endif
-                        <span class="review">{{ $item->created_at->diffForHumans() }}</span>
-
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>

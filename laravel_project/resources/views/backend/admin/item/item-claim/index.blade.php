@@ -36,18 +36,18 @@
                                         <option value="{{ \App\ItemClaim::ITEM_CLAIM_FILTER_APPROVED }}" {{ $item_claim_status == \App\ItemClaim::ITEM_CLAIM_FILTER_APPROVED ? 'selected' : '' }}>{{ __('item_claim.status-disapproved') }}</option>
                                     </select>
                                 </div>
-                                <div class="form-group mr-2">
-                                    <select class="custom-select" name="item_claim_item_id">
-                                        <option value="0">{{ __('item_claim.show-all-items') }}</option>
-                                        @foreach($all_items as $all_items_key => $item)
-                                            @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
-                                                <option value="{{ $item->id }}" {{ $item->id == $item_claim_item_id ? 'selected' : '' }}>{{ $item->item_title . " (" . $item->city->city_name . ", " . $item->state->state_name . ")"}}</option>
-                                            @else
-                                                <option value="{{ $item->id }}" {{ $item->id == $item_claim_item_id ? 'selected' : '' }}>{{ $item->item_title }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-                                </div>
+{{--                                <div class="form-group mr-2">--}}
+{{--                                    <select class="custom-select" name="item_claim_item_id">--}}
+{{--                                        <option value="0">{{ __('item_claim.show-all-items') }}</option>--}}
+{{--                                        @foreach($all_items as $all_items_key => $item)--}}
+{{--                                            @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)--}}
+{{--                                                <option value="{{ $item->id }}" {{ $item->id == $item_claim_item_id ? 'selected' : '' }}>{{ $item->item_title . " (" . $item->city->city_name . ", " . $item->state->state_name . ")"}}</option>--}}
+{{--                                            @else--}}
+{{--                                                <option value="{{ $item->id }}" {{ $item->id == $item_claim_item_id ? 'selected' : '' }}>{{ $item->item_title }}</option>--}}
+{{--                                            @endif--}}
+{{--                                        @endforeach--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
                                 <button type="submit" class="btn btn-primary mr-2">{{ __('backend.shared.update') }}</button>
                             </form>
                         </div>
@@ -123,6 +123,9 @@
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
+
+            "use strict";
+
             $('#dataTable').DataTable();
         });
     </script>

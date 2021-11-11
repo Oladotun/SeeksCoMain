@@ -37,7 +37,7 @@
                                 <div class="form-group mr-2">
                                     <select class="custom-select" name="country">
                                         <option value="0">{{ __('backend.state.select-country') }}</option>
-                                        @foreach($all_countries as $key => $country)
+                                        @foreach($all_countries as $all_countries_key => $country)
                                             <option value="{{ $country->id }}" {{ $country->id == $country_id ? 'selected' : '' }}>{{ $country->country_name }}</option>
                                         @endforeach
                                     </select>
@@ -105,6 +105,9 @@
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
+
+            "use strict";
+
             $('#dataTable').DataTable();
         });
     </script>

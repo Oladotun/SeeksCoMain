@@ -17,11 +17,15 @@ use App\State;
 use App\Subscription;
 use App\User;
 use Artesaos\SEOTools\Facades\SEOMeta;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
-use function GuzzleHttp\Psr7\str;
+use Illuminate\Validation\ValidationException;
+use Intervention\Image\Facades\Image;
+use Exception;
 
 class ImporterController extends Controller
 {
@@ -273,7 +277,23 @@ class ImporterController extends Controller
                         else
                         {
                             $import_item_data_column = $import_item_data_columns[$selected_column];
-                            $new_import_item_data->$import_item_data_column = $row_value;
+
+                            if($import_item_data_column == 'import_item_data_item_image_galleries')
+                            {
+                                $import_item_data_item_image_galleries_str = '';
+                                $import_item_data_item_image_galleries_array = preg_split('/\s+/', $row_value);
+
+                                foreach($import_item_data_item_image_galleries_array as $import_item_data_item_image_galleries_array_key => $import_item_data_item_image_galleries_line)
+                                {
+                                    $import_item_data_item_image_galleries_str .= trim($import_item_data_item_image_galleries_line) . "\n";
+                                }
+
+                                $new_import_item_data->$import_item_data_column = $import_item_data_item_image_galleries_str;
+                            }
+                            else
+                            {
+                                $new_import_item_data->$import_item_data_column = $row_value;
+                            }
                         }
                     }
 
@@ -564,7 +584,37 @@ class ImporterController extends Controller
             'import_item_data_item_social_twitter' => 'nullable|url|max:255',
             'import_item_data_item_social_linkedin' => 'nullable|url|max:255',
             'import_item_data_item_youtube_id' => 'nullable|max:255',
+            'import_item_data_item_image' => 'nullable|url|max:65535',
+            'import_item_data_item_image_galleries' => 'nullable|max:65535',
         ]);
+
+        /**
+         * Start validate URLs for import_item_data_item_image_galleries
+         */
+        $import_item_data_item_image_galleries = $request->import_item_data_item_image_galleries;
+
+        $validate_error = array();
+
+        // iterate the $import_item_data_item_image_galleries
+        foreach(preg_split("/((\r?\n)|(\r\n?))/", $import_item_data_item_image_galleries) as $import_item_data_item_image_galleries_line)
+        {
+            if(!empty($import_item_data_item_image_galleries_line))
+            {
+                if(!starts_with($import_item_data_item_image_galleries_line, "http://") && !starts_with($import_item_data_item_image_galleries_line, "https://"))
+                {
+                    $validate_error['import_item_data_item_image_galleries'] = __('sitemap_import.alert.url-starts-with');
+                    break;
+                }
+            }
+        }
+        /**
+         * End validate URLs for import_item_data_item_image_galleries
+         */
+
+        if(count($validate_error) > 0)
+        {
+            throw ValidationException::withMessages($validate_error);
+        }
 
         $import_item_data->import_item_data_item_title = $request->import_item_data_item_title;
         $import_item_data->import_item_data_item_slug = $request->import_item_data_item_slug;
@@ -582,6 +632,10 @@ class ImporterController extends Controller
         $import_item_data->import_item_data_item_social_twitter = $request->import_item_data_item_social_twitter;
         $import_item_data->import_item_data_item_social_linkedin = $request->import_item_data_item_social_linkedin;
         $import_item_data->import_item_data_item_youtube_id = $request->import_item_data_item_youtube_id;
+
+        $import_item_data->import_item_data_item_image = $request->import_item_data_item_image;
+        $import_item_data->import_item_data_item_image_galleries = $import_item_data_item_image_galleries;
+
         $import_item_data->save();
 
         /**
@@ -766,175 +820,132 @@ class ImporterController extends Controller
                                        array $select_categories,
                                        int $item_type)
     {
-        // validate import_item_data_process_status
-        if($import_item_data->import_item_data_process_status == ImportItemData::PROCESS_STATUS_PROCESSED_SUCCESS)
-        {
-            $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.import-item-cannot-process-success-processed');
-            $import_item_data->save();
-            return false;
-        }
+        $new_item = null;
 
-        // validate item_type
-        if($item_type != Item::ITEM_TYPE_REGULAR && $item_type != Item::ITEM_TYPE_ONLINE)
+        try
         {
-            $import_item_data->import_item_data_process_error_log = __('theme_directory_hub.importer.import-error.item-type-not-exist');
-            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-            $import_item_data->save();
-            return false;
-        }
-
-        // validate item_title
-        $item_title = trim($import_item_data->import_item_data_item_title);
-        if(empty($item_title))
-        {
-            $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.item-title-required');
-            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-            $import_item_data->save();
-            return false;
-        }
-
-        // validate item_description
-        $item_description = trim($import_item_data->import_item_data_item_description);
-        if(empty($item_description))
-        {
-            $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.item-description-required');
-            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-            $import_item_data->save();
-            return false;
-        }
-
-        // validate item_postal_code
-        $item_postal_code = null;
-        if($item_type == Item::ITEM_TYPE_REGULAR)
-        {
-            $item_postal_code = trim($import_item_data->import_item_data_item_postal_code);
-        }
-//        if(empty($item_postal_code))
-//        {
-//            $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.item-postal-code-required');
-//            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-//            $import_item_data->save();
-//            return false;
-//        }
-
-        // validate user
-        $item_user = User::find($user_id);
-        if(!$item_user)
-        {
-            $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.user-not-exist');
-            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-            $import_item_data->save();
-            return false;
-        }
-
-        // validate item_status
-        if($item_status != Item::ITEM_SUBMITTED && $item_status != Item::ITEM_PUBLISHED && $item_status != Item::ITEM_SUSPENDED)
-        {
-            $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.item-status-not-exist');
-            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-            $import_item_data->save();
-            return false;
-        }
-
-        // validate item_featured
-        if($item_featured != Item::ITEM_FEATURED && $item_featured != Item::ITEM_NOT_FEATURED)
-        {
-            $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.item-featured-not-exist');
-            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-            $import_item_data->save();
-            return false;
-        }
-
-        // validate categories array, remove out any non-exist categories
-        $select_categories_array = array();
-        $item_categories_string = "";
-        foreach($select_categories as $select_categories_key => $select_category)
-        {
-            $select_category = Category::find($select_category);
-            if($select_category)
+            // validate import_item_data_process_status
+            if($import_item_data->import_item_data_process_status == ImportItemData::PROCESS_STATUS_PROCESSED_SUCCESS)
             {
-                $select_categories_array[] = $select_category->id;
-                $item_categories_string = $item_categories_string . " " . $select_category->category_name;
+                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.import-item-cannot-process-success-processed');
+                $import_item_data->save();
+                return false;
             }
-        }
-        if(count($select_categories_array) == 0)
-        {
-            $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.categories-required');
-            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-            $import_item_data->save();
-            return false;
-        }
 
-        // validate country
-        $country_id = null;
-        if($item_type == Item::ITEM_TYPE_REGULAR)
-        {
-            $country_origin = trim($import_item_data->import_item_data_country);
-            $country_find = true;
-
-            /**
-             * Start guess country by country name
-             */
-            $country_exist = Country::where('country_name', $country_origin)->get();
-            if($country_exist->count() == 0)
+            // validate item_type
+            if($item_type != Item::ITEM_TYPE_REGULAR && $item_type != Item::ITEM_TYPE_ONLINE)
             {
-                $country_lowercase = strtolower($country_origin);
-                $country_exist = Country::where('country_name', $country_lowercase)->get();
+                $import_item_data->import_item_data_process_error_log = __('theme_directory_hub.importer.import-error.item-type-not-exist');
+                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                $import_item_data->save();
+                return false;
+            }
 
-                if($country_exist->count() == 0)
+            // validate item_title
+            $item_title = trim($import_item_data->import_item_data_item_title);
+            if(empty($item_title))
+            {
+                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.item-title-required');
+                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                $import_item_data->save();
+                return false;
+            }
+
+            // validate item_description
+            $item_description = trim($import_item_data->import_item_data_item_description);
+            if(empty($item_description))
+            {
+                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.item-description-required');
+                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                $import_item_data->save();
+                return false;
+            }
+
+            // validate item_postal_code
+            $item_postal_code = null;
+            if($item_type == Item::ITEM_TYPE_REGULAR)
+            {
+                $item_postal_code = trim($import_item_data->import_item_data_item_postal_code);
+            }
+
+            // validate user
+            $item_user = User::find($user_id);
+            if(!$item_user)
+            {
+                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.user-not-exist');
+                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                $import_item_data->save();
+                return false;
+            }
+
+            // validate item_status
+            if($item_status != Item::ITEM_SUBMITTED && $item_status != Item::ITEM_PUBLISHED && $item_status != Item::ITEM_SUSPENDED)
+            {
+                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.item-status-not-exist');
+                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                $import_item_data->save();
+                return false;
+            }
+
+            // validate item_featured
+            if($item_featured != Item::ITEM_FEATURED && $item_featured != Item::ITEM_NOT_FEATURED)
+            {
+                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.item-featured-not-exist');
+                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                $import_item_data->save();
+                return false;
+            }
+
+            // validate categories array, remove out any non-exist categories
+            $select_categories_array = array();
+            $item_categories_string = "";
+            foreach($select_categories as $select_categories_key => $select_category)
+            {
+                $select_category = Category::find($select_category);
+                if($select_category)
                 {
-                    $country_ucfirst = ucfirst($country_lowercase);
-                    $country_exist = Country::where('country_name', $country_ucfirst)->get();
-
-                    if($country_exist->count() == 0)
-                    {
-                        $country_ucwords = ucwords($country_lowercase);
-                        $country_exist = Country::where('country_name', $country_ucwords)->get();
-
-                        if($country_exist->count() == 0)
-                        {
-                            $country_uppercase = strtoupper($country_lowercase);
-                            $country_exist = Country::where('country_name', $country_uppercase)->get();
-
-                            if($country_exist->count() == 0)
-                            {
-                                $country_find = false;
-                            }
-                        }
-                    }
+                    $select_categories_array[] = $select_category->id;
+                    $item_categories_string = $item_categories_string . " " . $select_category->category_name;
                 }
             }
-            /**
-             * End guess country by country name
-             */
-
-            /**
-             * Start guess country by country abbr
-             */
-            if(!$country_find)
+            if(count($select_categories_array) == 0)
             {
+                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.categories-required');
+                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                $import_item_data->save();
+                return false;
+            }
+
+            // validate country
+            $country_id = null;
+            if($item_type == Item::ITEM_TYPE_REGULAR)
+            {
+                $country_origin = trim($import_item_data->import_item_data_country);
                 $country_find = true;
 
-                $country_exist = Country::where('country_abbr', $country_origin)->get();
+                /**
+                 * Start guess country by country name
+                 */
+                $country_exist = Country::where('country_name', $country_origin)->get();
                 if($country_exist->count() == 0)
                 {
                     $country_lowercase = strtolower($country_origin);
-                    $country_exist = Country::where('country_abbr', $country_lowercase)->get();
+                    $country_exist = Country::where('country_name', $country_lowercase)->get();
 
                     if($country_exist->count() == 0)
                     {
                         $country_ucfirst = ucfirst($country_lowercase);
-                        $country_exist = Country::where('country_abbr', $country_ucfirst)->get();
+                        $country_exist = Country::where('country_name', $country_ucfirst)->get();
 
                         if($country_exist->count() == 0)
                         {
                             $country_ucwords = ucwords($country_lowercase);
-                            $country_exist = Country::where('country_abbr', $country_ucwords)->get();
+                            $country_exist = Country::where('country_name', $country_ucwords)->get();
 
                             if($country_exist->count() == 0)
                             {
                                 $country_uppercase = strtoupper($country_lowercase);
-                                $country_exist = Country::where('country_abbr', $country_uppercase)->get();
+                                $country_exist = Country::where('country_name', $country_uppercase)->get();
 
                                 if($country_exist->count() == 0)
                                 {
@@ -944,95 +955,95 @@ class ImporterController extends Controller
                         }
                     }
                 }
+                /**
+                 * End guess country by country name
+                 */
 
-            }
-            /**
-             * End guess country by country abbr
-             */
-
-            if(!$country_find)
-            {
-                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.country-not-exist');
-                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-                $import_item_data->save();
-                return false;
-            }
-
-            $country_exist = $country_exist->first();
-            $country_id = $country_exist->id;
-        }
-
-
-        // validate state
-        $state_id = null;
-        if($item_type == Item::ITEM_TYPE_REGULAR)
-        {
-            $state_origin = trim($import_item_data->import_item_data_state);
-            $state_find = true;
-
-            /**
-             * Start guess state by state name
-             */
-            $state_exist = State::where('state_name', $state_origin)->where('country_id', $country_id)->get();
-            if($state_exist->count() == 0)
-            {
-                $state_lowercase = strtolower($state_origin);
-                $state_exist = State::where('state_name', $state_lowercase)->where('country_id', $country_id)->get();
-
-                if($state_exist->count() == 0)
+                /**
+                 * Start guess country by country abbr
+                 */
+                if(!$country_find)
                 {
-                    $state_ucfirst = ucfirst($state_lowercase);
-                    $state_exist = State::where('state_name', $state_ucfirst)->where('country_id', $country_id)->get();
+                    $country_find = true;
 
-                    if($state_exist->count() == 0)
+                    $country_exist = Country::where('country_abbr', $country_origin)->get();
+                    if($country_exist->count() == 0)
                     {
-                        $state_ucwords = ucwords($state_lowercase);
-                        $state_exist = State::where('state_name', $state_ucwords)->where('country_id', $country_id)->get();
+                        $country_lowercase = strtolower($country_origin);
+                        $country_exist = Country::where('country_abbr', $country_lowercase)->get();
 
-                        if($state_exist->count() == 0)
+                        if($country_exist->count() == 0)
                         {
-                            $state_uppercase = strtoupper($state_lowercase);
-                            $state_exist = State::where('state_name', $state_uppercase)->where('country_id', $country_id)->get();
+                            $country_ucfirst = ucfirst($country_lowercase);
+                            $country_exist = Country::where('country_abbr', $country_ucfirst)->get();
 
-                            if($state_exist->count() == 0)
+                            if($country_exist->count() == 0)
                             {
-                                $state_find = false;
+                                $country_ucwords = ucwords($country_lowercase);
+                                $country_exist = Country::where('country_abbr', $country_ucwords)->get();
+
+                                if($country_exist->count() == 0)
+                                {
+                                    $country_uppercase = strtoupper($country_lowercase);
+                                    $country_exist = Country::where('country_abbr', $country_uppercase)->get();
+
+                                    if($country_exist->count() == 0)
+                                    {
+                                        $country_find = false;
+                                    }
+                                }
                             }
                         }
                     }
-                }
-            }
-            /**
-             * End guess state by state name
-             */
 
-            /**
-             * Start guess state by state abbr
-             */
-            if(!$state_find)
+                }
+                /**
+                 * End guess country by country abbr
+                 */
+
+                if(!$country_find)
+                {
+                    $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.country-not-exist');
+                    $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                    $import_item_data->save();
+                    return false;
+                }
+
+                $country_exist = $country_exist->first();
+                $country_id = $country_exist->id;
+            }
+
+
+            // validate state
+            $state_id = null;
+            if($item_type == Item::ITEM_TYPE_REGULAR)
             {
+                $state_origin = trim($import_item_data->import_item_data_state);
                 $state_find = true;
 
-                $state_exist = State::where('state_abbr', $state_origin)->where('country_id', $country_id)->get();
+                /**
+                 * Start guess state by state name
+                 */
+                $state_exist = State::where('state_name', $state_origin)->where('country_id', $country_id)->get();
                 if($state_exist->count() == 0)
                 {
                     $state_lowercase = strtolower($state_origin);
-                    $state_exist = State::where('state_abbr', $state_lowercase)->where('country_id', $country_id)->get();
+                    $state_exist = State::where('state_name', $state_lowercase)->where('country_id', $country_id)->get();
 
                     if($state_exist->count() == 0)
                     {
                         $state_ucfirst = ucfirst($state_lowercase);
-                        $state_exist = State::where('state_abbr', $state_ucfirst)->where('country_id', $country_id)->get();
+                        $state_exist = State::where('state_name', $state_ucfirst)->where('country_id', $country_id)->get();
 
                         if($state_exist->count() == 0)
                         {
                             $state_ucwords = ucwords($state_lowercase);
-                            $state_exist = State::where('state_abbr', $state_ucwords)->where('country_id', $country_id)->get();
+                            $state_exist = State::where('state_name', $state_ucwords)->where('country_id', $country_id)->get();
 
                             if($state_exist->count() == 0)
                             {
                                 $state_uppercase = strtoupper($state_lowercase);
-                                $state_exist = State::where('state_abbr', $state_uppercase)->where('country_id', $country_id)->get();
+                                $state_exist = State::where('state_name', $state_uppercase)->where('country_id', $country_id)->get();
 
                                 if($state_exist->count() == 0)
                                 {
@@ -1042,228 +1053,410 @@ class ImporterController extends Controller
                         }
                     }
                 }
-            }
-            /**
-             * End guess state by state abbr
-             */
+                /**
+                 * End guess state by state name
+                 */
 
-            if(!$state_find)
-            {
-                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.state-not-exist');
-                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-                $import_item_data->save();
-                return false;
-            }
-
-            $state_exist = $state_exist->first();
-            $state_id = $state_exist->id;
-        }
-
-        // validate city
-        $city_id = null;
-        if($item_type == Item::ITEM_TYPE_REGULAR)
-        {
-            $city_origin = trim($import_item_data->import_item_data_city);
-            $city_exist = City::where('city_name', $city_origin)->where('state_id', $state_id)->get();
-            if($city_exist->count() == 0)
-            {
-                $city_lowercase = strtolower($city_origin);
-                $city_exist = City::where('city_name', $city_lowercase)->where('state_id', $state_id)->get();
-
-                if($city_exist->count() == 0)
+                /**
+                 * Start guess state by state abbr
+                 */
+                if(!$state_find)
                 {
-                    $city_ucfirst = ucfirst($city_lowercase);
-                    $city_exist = City::where('city_name', $city_ucfirst)->where('state_id', $state_id)->get();
+                    $state_find = true;
 
-                    if($city_exist->count() == 0)
+                    $state_exist = State::where('state_abbr', $state_origin)->where('country_id', $country_id)->get();
+                    if($state_exist->count() == 0)
                     {
-                        $city_ucwords = ucwords($city_lowercase);
-                        $city_exist = City::where('city_name', $city_ucwords)->where('state_id', $state_id)->get();
+                        $state_lowercase = strtolower($state_origin);
+                        $state_exist = State::where('state_abbr', $state_lowercase)->where('country_id', $country_id)->get();
 
-                        if($city_exist->count() == 0)
+                        if($state_exist->count() == 0)
                         {
-                            $city_uppercase = strtoupper($city_lowercase);
-                            $city_exist = City::where('city_name', $city_uppercase)->where('state_id', $state_id)->get();
+                            $state_ucfirst = ucfirst($state_lowercase);
+                            $state_exist = State::where('state_abbr', $state_ucfirst)->where('country_id', $country_id)->get();
 
-                            if($city_exist->count() == 0)
+                            if($state_exist->count() == 0)
                             {
-                                $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.city-not-exist');
-                                $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
-                                $import_item_data->save();
-                                return false;
+                                $state_ucwords = ucwords($state_lowercase);
+                                $state_exist = State::where('state_abbr', $state_ucwords)->where('country_id', $country_id)->get();
+
+                                if($state_exist->count() == 0)
+                                {
+                                    $state_uppercase = strtoupper($state_lowercase);
+                                    $state_exist = State::where('state_abbr', $state_uppercase)->where('country_id', $country_id)->get();
+
+                                    if($state_exist->count() == 0)
+                                    {
+                                        $state_find = false;
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
-            $city_exist = $city_exist->first();
-            $city_id = $city_exist->id;
-        }
+                /**
+                 * End guess state by state abbr
+                 */
 
-        // prepare item_slug
-        $item_slug = str_slug($item_title);
-
-        $item_slug_exist = Item::where('item_slug', $item_slug)->get();
-
-        if($item_slug_exist->count() > 0)
-        {
-            $item_slug = $item_slug . '-' . uniqid();
-        }
-
-        $item_address = null;
-        $item_address_hide = Item::ITEM_ADDR_HIDE;
-        $item_lat = null;
-        $item_lng = null;
-
-        if($item_type == Item::ITEM_TYPE_REGULAR)
-        {
-            $item_address = trim($import_item_data->import_item_data_item_address);
-
-            // prepare item_address_hide
-            $item_address_hide = Item::ITEM_ADDR_NOT_HIDE;
-            if(empty($item_address))
-            {
-                $item_address_hide = Item::ITEM_ADDR_HIDE;
-            }
-
-            // prepare item_lat & item_lng
-            $item_lat = trim($import_item_data->import_item_data_item_lat);
-            $item_lng = trim($import_item_data->import_item_data_item_lng);
-
-            if(empty($item_lat))
-            {
-                $item_lat = $city_exist->city_lat;
-            }
-
-            if(empty($item_lng))
-            {
-                $item_lng = $city_exist->city_lng;
-            }
-        }
-
-        // prepare website, facebook, twitter, linkedin
-        $import_item_data_item_website = trim($import_item_data->import_item_data_item_website);
-        $import_item_data_item_social_facebook = trim($import_item_data->import_item_data_item_social_facebook);
-        $import_item_data_item_social_twitter = trim($import_item_data->import_item_data_item_social_twitter);
-        $import_item_data_item_social_linkedin = trim($import_item_data->import_item_data_item_social_linkedin);
-
-        $item_website = empty($import_item_data_item_website) ? null : strtolower($import_item_data_item_website);
-        $item_social_facebook = empty($import_item_data_item_social_facebook) ? null : strtolower($import_item_data_item_social_facebook);
-        $item_social_twitter = empty($import_item_data_item_social_twitter) ? null : strtolower($import_item_data_item_social_twitter);
-        $item_social_linkedin = empty($import_item_data_item_social_linkedin) ? null : strtolower($import_item_data_item_social_linkedin);
-
-        if(!empty($item_website))
-        {
-            if(!starts_with($item_website, "http://") && !starts_with($item_website, "https://"))
-            {
-                $item_website = "https://" . $item_website;
-            }
-        }
-        if(!empty($item_social_facebook))
-        {
-            if(!starts_with($item_social_facebook, "http://") && !starts_with($item_social_facebook, "https://"))
-            {
-                $item_social_facebook = "https://" . $item_social_facebook;
-            }
-        }
-        if(!empty($item_social_twitter))
-        {
-            if(!starts_with($item_social_twitter, "http://") && !starts_with($item_social_twitter, "https://"))
-            {
-                $item_social_twitter = "https://" . $item_social_twitter;
-            }
-        }
-        if(!empty($item_social_linkedin))
-        {
-            if(!starts_with($item_social_linkedin, "http://") && !starts_with($item_social_linkedin, "https://"))
-            {
-                $item_social_linkedin = "https://" . $item_social_linkedin;
-            }
-        }
-
-        // prepare other data fields
-        $import_item_data_item_phone = trim($import_item_data->import_item_data_item_phone);
-        $import_item_data_item_youtube_id = trim($import_item_data->import_item_data_item_youtube_id);
-
-        $item_phone = empty($import_item_data_item_phone) ? null : $import_item_data_item_phone;
-        $item_youtube_id = empty($import_item_data_item_youtube_id) ? null : $import_item_data_item_youtube_id;
-
-        // prepare item_location_str
-        $item_location_str = null;
-        if($item_type == Item::ITEM_TYPE_REGULAR)
-        {
-            $item_location_str = $city_exist->city_name . ' ' . $state_exist->state_name . ' ' . $country_exist->country_name . ' ' . $item_postal_code;
-        }
-
-        // start create a new item model and save the new record to database
-        $new_item = new Item(array(
-            'user_id' => $user_id,
-            'item_status' => $item_status,
-            'item_featured' => $item_featured,
-            'item_featured_by_admin' => $item_featured == Item::ITEM_FEATURED ? Item::ITEM_FEATURED_BY_ADMIN : Item::ITEM_NOT_FEATURED_BY_ADMIN,
-            'item_title' => $item_title,
-            'item_slug' => $item_slug,
-            'item_description' => $item_description,
-            'item_address' => $item_address,
-            'item_address_hide' => $item_address_hide,
-            'city_id' => $city_id,
-            'state_id' => $state_id,
-            'country_id' => $country_id,
-            'item_postal_code' => $item_postal_code,
-            'item_lat' => $item_lat,
-            'item_lng' => $item_lng,
-            'item_youtube_id' => $item_youtube_id,
-            'item_phone' => $item_phone,
-            'item_website' => $item_website,
-            'item_social_facebook' => $item_social_facebook,
-            'item_social_twitter' => $item_social_twitter,
-            'item_social_linkedin' => $item_social_linkedin,
-            'item_categories_string' => $item_categories_string,
-            'item_location_str' => $item_location_str,
-            'item_type' => $item_type,
-        ));
-        $new_item->save();
-
-        // sync the categories for the new item record
-        $new_item->allCategories()->sync($select_categories_array);
-
-        // start create the item features for this new item
-        $category_custom_fields = new CustomField();
-        $category_custom_fields = $category_custom_fields->getDistinctCustomFieldsByCategories($select_categories_array);
-
-        if($category_custom_fields->count() > 0)
-        {
-            $item_features_string = "";
-
-            foreach($category_custom_fields as $category_custom_fields_key => $custom_field)
-            {
-                $import_item_feature_data_exist = $import_item_data->importItemFeatureData()
-                    ->where('import_item_feature_data_custom_field_id', $custom_field->id)->get();
-
-                $item_feature_value = "";
-                if($import_item_feature_data_exist->count() > 0)
+                if(!$state_find)
                 {
-                    $item_feature_value = $import_item_feature_data_exist->first()->import_item_feature_data_item_feature_value;
-
-                    $item_features_string .= $item_feature_value . ' ';
+                    $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.state-not-exist');
+                    $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                    $import_item_data->save();
+                    return false;
                 }
 
-                $new_item_feature = new ItemFeature(array(
-                    'custom_field_id' => $custom_field->id,
-                    'item_feature_value' => $item_feature_value,
-                ));
-
-                $created_item_feature = $new_item->features()->save($new_item_feature);
+                $state_exist = $state_exist->first();
+                $state_id = $state_exist->id;
             }
 
-            $new_item->item_features_string = $item_features_string;
+            // validate city
+            $city_id = null;
+            if($item_type == Item::ITEM_TYPE_REGULAR)
+            {
+                $city_origin = trim($import_item_data->import_item_data_city);
+                $city_exist = City::where('city_name', $city_origin)->where('state_id', $state_id)->get();
+                if($city_exist->count() == 0)
+                {
+                    $city_lowercase = strtolower($city_origin);
+                    $city_exist = City::where('city_name', $city_lowercase)->where('state_id', $state_id)->get();
+
+                    if($city_exist->count() == 0)
+                    {
+                        $city_ucfirst = ucfirst($city_lowercase);
+                        $city_exist = City::where('city_name', $city_ucfirst)->where('state_id', $state_id)->get();
+
+                        if($city_exist->count() == 0)
+                        {
+                            $city_ucwords = ucwords($city_lowercase);
+                            $city_exist = City::where('city_name', $city_ucwords)->where('state_id', $state_id)->get();
+
+                            if($city_exist->count() == 0)
+                            {
+                                $city_uppercase = strtoupper($city_lowercase);
+                                $city_exist = City::where('city_name', $city_uppercase)->where('state_id', $state_id)->get();
+
+                                if($city_exist->count() == 0)
+                                {
+                                    $import_item_data->import_item_data_process_error_log = __('importer_csv.import-errors.city-not-exist');
+                                    $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+                                    $import_item_data->save();
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+                $city_exist = $city_exist->first();
+                $city_id = $city_exist->id;
+            }
+
+            // prepare item_slug
+            $item_slug = str_slug($item_title);
+            if(empty($item_slug))
+            {
+                $item_slug = uniqid();
+            }
+            else
+            {
+                $item_slug_exist = Item::where('item_slug', $item_slug)->get();
+                if($item_slug_exist->count() > 0)
+                {
+                    $item_slug = $item_slug . '-' . uniqid();
+                }
+            }
+
+            $item_address = null;
+            $item_address_hide = Item::ITEM_ADDR_HIDE;
+            $item_lat = null;
+            $item_lng = null;
+
+            if($item_type == Item::ITEM_TYPE_REGULAR)
+            {
+                $item_address = trim($import_item_data->import_item_data_item_address);
+
+                // prepare item_address_hide
+                $item_address_hide = Item::ITEM_ADDR_NOT_HIDE;
+                if(empty($item_address))
+                {
+                    $item_address_hide = Item::ITEM_ADDR_HIDE;
+                }
+
+                // prepare item_lat & item_lng
+                $item_lat = trim($import_item_data->import_item_data_item_lat);
+                $item_lng = trim($import_item_data->import_item_data_item_lng);
+
+                if(empty($item_lat))
+                {
+                    $item_lat = $city_exist->city_lat;
+                }
+
+                if(empty($item_lng))
+                {
+                    $item_lng = $city_exist->city_lng;
+                }
+            }
+
+            // prepare website, facebook, twitter, linkedin
+            $import_item_data_item_website = trim($import_item_data->import_item_data_item_website);
+            $import_item_data_item_social_facebook = trim($import_item_data->import_item_data_item_social_facebook);
+            $import_item_data_item_social_twitter = trim($import_item_data->import_item_data_item_social_twitter);
+            $import_item_data_item_social_linkedin = trim($import_item_data->import_item_data_item_social_linkedin);
+
+            $item_website = empty($import_item_data_item_website) ? null : strtolower($import_item_data_item_website);
+            $item_social_facebook = empty($import_item_data_item_social_facebook) ? null : strtolower($import_item_data_item_social_facebook);
+            $item_social_twitter = empty($import_item_data_item_social_twitter) ? null : strtolower($import_item_data_item_social_twitter);
+            $item_social_linkedin = empty($import_item_data_item_social_linkedin) ? null : strtolower($import_item_data_item_social_linkedin);
+
+            if(!empty($item_website))
+            {
+                if(!starts_with($item_website, "http://") && !starts_with($item_website, "https://"))
+                {
+                    $item_website = "https://" . $item_website;
+                }
+            }
+            if(!empty($item_social_facebook))
+            {
+                if(!starts_with($item_social_facebook, "http://") && !starts_with($item_social_facebook, "https://"))
+                {
+                    $item_social_facebook = "https://" . $item_social_facebook;
+                }
+            }
+            if(!empty($item_social_twitter))
+            {
+                if(!starts_with($item_social_twitter, "http://") && !starts_with($item_social_twitter, "https://"))
+                {
+                    $item_social_twitter = "https://" . $item_social_twitter;
+                }
+            }
+            if(!empty($item_social_linkedin))
+            {
+                if(!starts_with($item_social_linkedin, "http://") && !starts_with($item_social_linkedin, "https://"))
+                {
+                    $item_social_linkedin = "https://" . $item_social_linkedin;
+                }
+            }
+
+            // prepare other data fields
+            $import_item_data_item_phone = trim($import_item_data->import_item_data_item_phone);
+            $import_item_data_item_youtube_id = trim($import_item_data->import_item_data_item_youtube_id);
+
+            $item_phone = empty($import_item_data_item_phone) ? null : $import_item_data_item_phone;
+            $item_youtube_id = empty($import_item_data_item_youtube_id) ? null : $import_item_data_item_youtube_id;
+
+            // prepare item_location_str
+            $item_location_str = null;
+            if($item_type == Item::ITEM_TYPE_REGULAR)
+            {
+                $item_location_str = $city_exist->city_name . ' ' . $state_exist->state_name . ' ' . $country_exist->country_name . ' ' . $item_postal_code;
+            }
+
+            // start create a new item model and save the new record to database
+            $new_item = new Item(array(
+                'user_id' => $user_id,
+                'item_status' => $item_status,
+                'item_featured' => $item_featured,
+                'item_featured_by_admin' => $item_featured == Item::ITEM_FEATURED ? Item::ITEM_FEATURED_BY_ADMIN : Item::ITEM_NOT_FEATURED_BY_ADMIN,
+                'item_title' => $item_title,
+                'item_slug' => $item_slug,
+                'item_description' => $item_description,
+                'item_address' => $item_address,
+                'item_address_hide' => $item_address_hide,
+                'city_id' => $city_id,
+                'state_id' => $state_id,
+                'country_id' => $country_id,
+                'item_postal_code' => $item_postal_code,
+                'item_lat' => $item_lat,
+                'item_lng' => $item_lng,
+                'item_youtube_id' => $item_youtube_id,
+                'item_phone' => $item_phone,
+                'item_website' => $item_website,
+                'item_social_facebook' => $item_social_facebook,
+                'item_social_twitter' => $item_social_twitter,
+                'item_social_linkedin' => $item_social_linkedin,
+                'item_categories_string' => $item_categories_string,
+                'item_location_str' => $item_location_str,
+                'item_type' => $item_type,
+            ));
             $new_item->save();
+
+            // sync the categories for the new item record
+            $new_item->allCategories()->sync($select_categories_array);
+
+            // start create the item features for this new item
+            $category_custom_fields = new CustomField();
+            $category_custom_fields = $category_custom_fields->getDistinctCustomFieldsByCategories($select_categories_array);
+
+            if($category_custom_fields->count() > 0)
+            {
+                $item_features_string = "";
+
+                foreach($category_custom_fields as $category_custom_fields_key => $custom_field)
+                {
+                    $import_item_feature_data_exist = $import_item_data->importItemFeatureData()
+                        ->where('import_item_feature_data_custom_field_id', $custom_field->id)->get();
+
+                    $item_feature_value = "";
+                    if($import_item_feature_data_exist->count() > 0)
+                    {
+                        $item_feature_value = $import_item_feature_data_exist->first()->import_item_feature_data_item_feature_value;
+
+                        $item_features_string .= $item_feature_value . ' ';
+                    }
+
+                    $new_item_feature = new ItemFeature(array(
+                        'custom_field_id' => $custom_field->id,
+                        'item_feature_value' => $item_feature_value,
+                    ));
+
+                    $created_item_feature = $new_item->features()->save($new_item_feature);
+                }
+
+                $new_item->item_features_string = $item_features_string;
+                $new_item->save();
+            }
+
+            /**
+             * Start process feature image and gallery images
+             */
+            $arrContextOptions=array(
+                "ssl"=>array(
+                    "verify_peer"=>false,
+                    "verify_peer_name"=>false,
+                ),
+            );
+
+            // feature image
+            $import_item_data_item_image = $import_item_data->import_item_data_item_image;
+
+            if(!empty($import_item_data_item_image))
+            {
+                $import_item_data_item_image_content = base64_encode(file_get_contents($import_item_data_item_image, false, stream_context_create($arrContextOptions)));
+
+                $currentDate = Carbon::now()->toDateString();
+
+                $item_feature_image_name = $item_slug.'-'.$currentDate.'-'.uniqid().'.jpg';
+                $item_feature_image_name_medium = $item_slug . '-' . $currentDate . '-' . uniqid() . '-medium.jpg';
+                $item_feature_image_name_small = $item_slug . '-' . $currentDate . '-' . uniqid() . '-small.jpg';
+                $item_feature_image_name_tiny = $item_slug . '-' . $currentDate . '-' . uniqid() . '-tiny.jpg';
+
+                // blur feature image name
+                $item_feature_image_name_blur = $item_slug . '-' . $currentDate . '-' . uniqid() . '-blur.jpg';
+
+                if(!Storage::disk('public')->exists('item')){
+                    Storage::disk('public')->makeDirectory('item');
+                }
+
+                // original size
+                $item_feature_image = Image::make(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '',$import_item_data_item_image_content)))
+                    ->resize(800, 687, function($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
+                $item_feature_image = $item_feature_image->stream('jpg', 70);
+                Storage::disk('public')->put('item/'.$item_feature_image_name, $item_feature_image);
+
+                // medium size
+                $item_feature_image_medium = Image::make(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '',$import_item_data_item_image_content)))
+                    ->resize(350, 300, function($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
+                $item_feature_image_medium = $item_feature_image_medium->stream('jpg', 70);
+                Storage::disk('public')->put('item/'.$item_feature_image_name_medium, $item_feature_image_medium);
+
+                // small size
+                $item_feature_image_small = Image::make(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '',$import_item_data_item_image_content)))
+                    ->resize(230, 198, function($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
+                $item_feature_image_small = $item_feature_image_small->stream('jpg', 70);
+                Storage::disk('public')->put('item/'.$item_feature_image_name_small, $item_feature_image_small);
+
+                // tiny size
+                $item_feature_image_tiny = Image::make(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '',$import_item_data_item_image_content)))
+                    ->resize(160, 138, function($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
+                $item_feature_image_tiny = $item_feature_image_tiny->stream('jpg', 70);
+                Storage::disk('public')->put('item/'.$item_feature_image_name_tiny, $item_feature_image_tiny);
+
+                // blur feature image
+                $item_feature_image_blur = Image::make(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '',$import_item_data_item_image_content)));
+                $item_feature_image_blur->blur(50);
+                $item_feature_image_blur->stream('jpg', 70);
+                Storage::disk('public')->put('item/'.$item_feature_image_name_blur, $item_feature_image_blur);
+
+                $new_item->item_image = $item_feature_image_name;
+                $new_item->item_image_medium = $item_feature_image_name_medium;
+                $new_item->item_image_small = $item_feature_image_name_small;
+                $new_item->item_image_tiny = $item_feature_image_name_tiny;
+                $new_item->item_image_blur = $item_feature_image_name_blur;
+                $new_item->save();
+            }
+
+            // gallery images
+            $import_item_data_item_image_galleries = $import_item_data->import_item_data_item_image_galleries;
+
+            foreach(preg_split("/((\r?\n)|(\r\n?))/", $import_item_data_item_image_galleries) as $import_item_data_item_image_galleries_line)
+            {
+                if(!empty($import_item_data_item_image_galleries_line))
+                {
+                    $item_gallery_image_content = base64_encode(file_get_contents($import_item_data_item_image_galleries_line, false, stream_context_create($arrContextOptions)));
+
+                    $currentDate = Carbon::now()->toDateString();
+                    $item_image_gallery_uniqid = uniqid();
+
+                    $item_image_gallery['item_image_gallery_name'] = 'gallary-'.$currentDate.'-'.$item_image_gallery_uniqid.'.jpg';
+                    $item_image_gallery['item_image_gallery_thumb_name'] = 'gallary-'.$currentDate.'-'.$item_image_gallery_uniqid.'-thumb.jpg';
+
+                    if(!Storage::disk('public')->exists('item/gallery')){
+                        Storage::disk('public')->makeDirectory('item/gallery');
+                    }
+
+                    // original
+                    $one_gallery_image = Image::make(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '',$item_gallery_image_content)))->stream('jpg', 80);
+                    Storage::disk('public')->put('item/gallery/'.$item_image_gallery['item_image_gallery_name'], $one_gallery_image);
+
+                    // thumb size
+                    $one_gallery_image_thumb = Image::make(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '',$item_gallery_image_content)))
+                        ->resize(null, 180, function($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                    $one_gallery_image_thumb = $one_gallery_image_thumb->stream('jpg', 70);
+                    Storage::disk('public')->put('item/gallery/'.$item_image_gallery['item_image_gallery_thumb_name'], $one_gallery_image_thumb);
+
+                    $created_item_image_gallery = $new_item->galleries()->create($item_image_gallery);
+                }
+            }
+            /**
+             * End process gallery images
+             */
+
+            // finish the listing import
+            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_SUCCESS;
+            $import_item_data->import_item_data_item_id = $new_item->id;
+            $import_item_data->save();
+            return true;
+        }
+        catch (Exception $e) {
+
+            Log::error($e);
+
+            $import_item_data->import_item_data_item_id = null;
+            $import_item_data->import_item_data_process_error_log = $e->getMessage();
+            $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_ERROR;
+            $import_item_data->save();
+
+            if($new_item)
+            {
+                $new_item->deleteItem();
+            }
+
+            return false;
         }
 
-        // finish the listing import
-        $import_item_data->import_item_data_process_status = ImportItemData::PROCESS_STATUS_PROCESSED_SUCCESS;
-        $import_item_data->import_item_data_item_id = $new_item->id;
-        $import_item_data->save();
-        return true;
     }
 }

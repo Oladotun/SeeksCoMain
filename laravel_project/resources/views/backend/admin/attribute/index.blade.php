@@ -137,6 +137,9 @@
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
+
+            "use strict";
+
             $('#dataTable').DataTable();
         });
     </script>

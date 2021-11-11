@@ -91,6 +91,7 @@ class StateController extends Controller
             'country_id' => 'required|numeric',
             'state_name' => 'required|regex:/^[\pL\s\-]+$/u|max:255',
             'state_abbr' => 'required|max:255',
+            'state_slug' => 'required|max:255|regex:/^[\w-]*$/',
         ]);
 
         $country = Country::find($request->country_id);
@@ -98,8 +99,8 @@ class StateController extends Controller
         if($country)
         {
             $state_name = $request->state_name;
-            $state_abbr = strtoupper($request->state_abbr);
-            $state_slug = str_slug($request->state_name . '-' . $country->id);
+            $state_abbr = $request->state_abbr;
+            $state_slug = $request->state_slug;
             $state_country_abbr = $country->country_abbr;
 
             $validate_error = array();
@@ -116,6 +117,13 @@ class StateController extends Controller
             if($state_abbr_exist > 0)
             {
                 $validate_error['state_abbr'] = __('prefer_country.error.state-abbr-exist');
+            }
+            $state_slug_exist = $country->states()
+                ->Where('state_slug', $state_slug)
+                ->count();
+            if($state_slug_exist > 0)
+            {
+                $validate_error['state_slug'] = __('setting_language.location.url-slug-exist');
             }
 
             if(count($validate_error) > 0)
@@ -194,6 +202,7 @@ class StateController extends Controller
             'country_id' => 'required|numeric',
             'state_name' => 'required|regex:/^[\pL\s\-]+$/u|max:255',
             'state_abbr' => 'required|max:255',
+            'state_slug' => 'required|max:255|regex:/^[\w-]*$/',
         ]);
 
         $country = Country::find($request->country_id);
@@ -201,8 +210,8 @@ class StateController extends Controller
         if($country)
         {
             $state_name = $request->state_name;
-            $state_abbr = strtoupper($request->state_abbr);
-            $state_slug = str_slug($request->state_name . '-' . $country->id);
+            $state_abbr = $request->state_abbr;
+            $state_slug = $request->state_slug;
 
             $validate_error = array();
             $state_name_exist = $country->states()
@@ -221,6 +230,15 @@ class StateController extends Controller
             {
                 $validate_error['state_abbr'] = __('prefer_country.error.state-abbr-exist');
             }
+            $state_slug_exist = $country->states()
+                ->Where('state_slug', $state_slug)
+                ->where('id', '!=', $state->id)
+                ->count();
+            if($state_slug_exist > 0)
+            {
+                $validate_error['state_slug'] = __('setting_language.location.url-slug-exist');
+            }
+
             if(count($validate_error) > 0)
             {
                 throw ValidationException::withMessages($validate_error);

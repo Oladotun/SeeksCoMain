@@ -2,12 +2,12 @@
 
 {{-- Greeting --}}
 @if (! empty($greeting))
-# {{ $greeting . " " . $toName . ","}}
+# {{ $greeting . (empty($toName) ? "" : " " . $toName . ",") }}
 @else
 @if ($level == 'error')
-# @lang('Whoops!') {{ " " . $toName . "," }}
+# @lang('Whoops') {{ empty($toName) ? "" : " " . $toName . "," }}
 @else
-# @lang('Hello!') {{ " " . $toName . "," }}
+# @lang('Hello') {{ empty($toName) ? "" : " " . $toName . "," }}
 @endif
 @endif
 

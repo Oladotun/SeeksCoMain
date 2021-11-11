@@ -6,11 +6,13 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Laravelista\Comments\Commentable;
 use Nicolaslopezj\Searchable\SearchableTrait;
 use Codebyray\ReviewRateable\Contracts\ReviewRateable;
 use Codebyray\ReviewRateable\Traits\ReviewRateable as ReviewRateableTrait;
+use Spatie\OpeningHours\OpeningHours;
 
 class Item extends Model implements ReviewRateable
 {
@@ -56,6 +58,7 @@ class Item extends Model implements ReviewRateable
     const ITEMS_SORT_BY_NEWEST_UPDATED = 5;
     const ITEMS_SORT_BY_OLDEST_UPDATED = 6;
     const ITEMS_SORT_BY_NEARBY_FIRST = 7;
+    const ITEMS_SORT_BY_MOST_RELEVANT = 8;
 
     const COUNT_PER_PAGE_10 = 10;
     const COUNT_PER_PAGE_25 = 25;
@@ -67,6 +70,12 @@ class Item extends Model implements ReviewRateable
 
     const ITEM_TYPE_REGULAR = 1;
     const ITEM_TYPE_ONLINE = 2;
+
+    const ITEM_NEARBY_SHOW_MAX = 4;
+    const ITEM_SIMILAR_SHOW_MAX = 4;
+
+    const ITEM_HOUR_SHOW = 1;
+    const ITEM_HOUR_NOT_SHOW = 2;
 
     /**
      * The attributes that are mass assignable.
@@ -106,6 +115,8 @@ class Item extends Model implements ReviewRateable
         'item_youtube_id',
         'item_location_str',
         'item_type',
+        'item_hour_time_zone',
+        'item_hour_show_hours',
     ];
 
     /**
@@ -252,6 +263,16 @@ class Item extends Model implements ReviewRateable
     public function threadItems()
     {
         return $this->hasMany('App\ThreadItem');
+    }
+
+    public function itemHours()
+    {
+        return $this->hasMany('App\ItemHour');
+    }
+
+    public function itemHourExceptions()
+    {
+        return $this->hasMany('App\ItemHourException');
     }
 
     /**
@@ -625,6 +646,83 @@ class Item extends Model implements ReviewRateable
         $this->save();
     }
 
+    public function hasOpened()
+    {
+        $opening_hours_array_monday = array();
+        $opening_hours_array_tuesday = array();
+        $opening_hours_array_wednesday = array();
+        $opening_hours_array_thursday = array();
+        $opening_hours_array_friday = array();
+        $opening_hours_array_saturday = array();
+        $opening_hours_array_sunday = array();
+        $opening_hour_exceptions_array = array();
+
+        $item_hours = $this->itemHours()->get();
+        foreach($item_hours as $item_hours_key => $item_hour)
+        {
+            $item_hour_open_time = substr($item_hour->item_hour_open_time, 0, -3);
+            $item_hour_close_time = substr($item_hour->item_hour_close_time, 0, -3);
+
+            if($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_MONDAY)
+            {
+                $opening_hours_array_monday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+            }
+            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_TUESDAY)
+            {
+                $opening_hours_array_tuesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+            }
+            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_WEDNESDAY)
+            {
+                $opening_hours_array_wednesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+            }
+            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_THURSDAY)
+            {
+                $opening_hours_array_thursday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+            }
+            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_FRIDAY)
+            {
+                $opening_hours_array_friday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+            }
+            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SATURDAY)
+            {
+                $opening_hours_array_saturday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+            }
+            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SUNDAY)
+            {
+                $opening_hours_array_sunday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+            }
+        }
+
+        $item_hour_exceptions = $this->itemHourExceptions()->get();
+        foreach($item_hour_exceptions as $item_hour_exceptions_key => $item_hour_exception)
+        {
+            $item_hour_exception_open_time = empty($item_hour_exception->item_hour_exception_open_time) ? null : substr($item_hour_exception->item_hour_exception_open_time, 0, -3);
+            $item_hour_exception_close_time = empty($item_hour_exception->item_hour_exception_close_time) ? null : substr($item_hour_exception->item_hour_exception_close_time, 0, -3);
+
+            if(!empty($item_hour_exception_open_time) && !empty($item_hour_exception_close_time))
+            {
+                $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date][] = $item_hour_exception_open_time . "-" . $item_hour_exception_close_time;
+            }
+            else
+            {
+                $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date] = [];
+            }
+        }
+
+        $opening_hours_obj = OpeningHours::createAndMergeOverlappingRanges([
+            'monday' => $opening_hours_array_monday,
+            'tuesday' => $opening_hours_array_tuesday,
+            'wednesday' => $opening_hours_array_wednesday,
+            'thursday' => $opening_hours_array_thursday,
+            'friday' => $opening_hours_array_friday,
+            'saturday' => $opening_hours_array_saturday,
+            'sunday' => $opening_hours_array_sunday,
+            'exceptions' => $opening_hour_exceptions_array,
+        ], $this->item_hour_time_zone);
+
+        return $opening_hours_obj->isOpen();
+    }
+
     /**
      * Delete item record
      * @throws Exception
@@ -750,7 +848,19 @@ class Item extends Model implements ReviewRateable
             $item_lead->deleteItemLead();
         }
 
-        // #13 - delete the item record
+        // #13 - delete item hours
+        if(Schema::hasTable('item_hours'))
+        {
+            $this->itemHours()->delete();
+        }
+
+        // #14 - delete item hour exceptions
+        if(Schema::hasTable('item_hour_exceptions'))
+        {
+            $this->itemHourExceptions()->delete();
+        }
+
+        // #15 - delete the item record
         $this->delete();
     }
 }

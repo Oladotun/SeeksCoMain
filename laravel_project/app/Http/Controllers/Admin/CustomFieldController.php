@@ -37,25 +37,152 @@ class CustomFieldController extends Controller
          * End SEO
          */
 
-        $category_id = $request->category;
+//        $category_id = $request->category;
+//
+//        if($category_id)
+//        {
+//            $category = Category::findOrFail($category_id);
+//
+//            //$all_custom_fields = $category->customFields()->orderBy('custom_field_order')->get();
+//            $all_custom_fields = $category->allCustomFields()->orderBy('custom_field_order')->get();
+//        }
+//        else
+//        {
+//            $all_custom_fields = CustomField::all();
+//        }
+//
+//        $all_categories = new Category();
+//        $all_categories = $all_categories->getPrintableCategories();
 
-        if($category_id)
+
+        $all_printable_categories = new Category();
+        $all_printable_categories = $all_printable_categories->getPrintableCategoriesNoDash();
+
+        /**
+         * Start initial filter
+         */
+        // filter search query
+        $search_query = empty($request->search_query) ? null : $request->search_query;
+        $search_values = !empty($search_query) ? preg_split('/\s+/', $search_query, -1, PREG_SPLIT_NO_EMPTY) : array();
+
+        // filter categories
+        $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
+
+        $filter_category_ids = array();
+        if(count($filter_categories) == 0)
         {
-            $category = Category::findOrFail($category_id);
-
-            //$all_custom_fields = $category->customFields()->orderBy('custom_field_order')->get();
-            $all_custom_fields = $category->allCustomFields()->orderBy('custom_field_order')->get();
+            foreach($all_printable_categories as $all_printable_categories_key => $printable_category)
+            {
+                $filter_category_ids[] = $printable_category['category_id'];
+            }
         }
         else
         {
-            $all_custom_fields = CustomField::all();
+            $filter_category_ids = $filter_categories;
         }
 
-        $all_categories = new Category();
-        $all_categories = $all_categories->getPrintableCategories();
+        // filter custom field type
+        $filter_custom_field_type = $request->filter_custom_field_type;
+        if(empty($filter_custom_field_type))
+        {
+            $filter_custom_field_type = array(CustomField::TYPE_TEXT, CustomField::TYPE_SELECT, CustomField::TYPE_MULTI_SELECT, CustomField::TYPE_LINK);
+        }
+
+        // filter sort by
+        if($search_query)
+        {
+            $filter_sort_by = CustomField::CUSTOM_FIELDS_SORT_BY_MOST_RELEVANT;
+        }
+        else
+        {
+            $filter_sort_by = empty($request->filter_sort_by) ? CustomField::CUSTOM_FIELDS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
+        }
+
+        // filter rows per page
+        $filter_count_per_page = empty($request->filter_count_per_page) ? CustomField::COUNT_PER_PAGE_10 : $request->filter_count_per_page;
+        /**
+         * End initial filter
+         */
+
+        /**
+         * Start build query
+         */
+        $custom_fields_query = CustomField::query();
+
+        $custom_fields_query->select('custom_fields.*');
+
+        // categories
+        $custom_fields_query->join('category_custom_field as ccf', 'custom_fields.id', '=', 'ccf.custom_field_id')
+            ->whereIn("ccf.category_id", $filter_category_ids);
+
+        // search query
+        if(is_array($search_values) && count($search_values) > 0)
+        {
+            $custom_fields_query->where(function ($query) use ($search_values) {
+                foreach($search_values as $search_values_key => $search_value)
+                {
+                    $query->orWhere('custom_fields.custom_field_name', 'LIKE', "%".$search_value."%");
+                }
+            });
+        }
+
+        // custom field type
+        $custom_fields_query->whereIn('custom_fields.custom_field_type', $filter_custom_field_type);
+
+        // sort by
+        if($filter_sort_by == CustomField::CUSTOM_FIELDS_SORT_BY_NEWEST_CREATED)
+        {
+            $custom_fields_query->orderBy('custom_fields.created_at', 'DESC');
+        }
+        elseif($filter_sort_by == CustomField::CUSTOM_FIELDS_SORT_BY_OLDEST_CREATED)
+        {
+            $custom_fields_query->orderBy('custom_fields.created_at', 'ASC');
+        }
+        elseif($filter_sort_by == CustomField::CUSTOM_FIELDS_SORT_BY_NEWEST_UPDATED)
+        {
+            $custom_fields_query->orderBy('custom_fields.updated_at', 'DESC');
+        }
+        elseif($filter_sort_by == CustomField::CUSTOM_FIELDS_SORT_BY_OLDEST_UPDATED)
+        {
+            $custom_fields_query->orderBy('custom_fields.updated_at', 'ASC');
+        }
+        elseif($filter_sort_by == CustomField::CUSTOM_FIELDS_SORT_BY_CUSTOM_FIELD_NAME_A_Z)
+        {
+            $custom_fields_query->orderBy('custom_fields.custom_field_name', 'ASC');
+        }
+        elseif($filter_sort_by == CustomField::CUSTOM_FIELDS_SORT_BY_CUSTOM_FIELD_NAME_Z_A)
+        {
+            $custom_fields_query->orderBy('custom_fields.custom_field_name', 'DESC');
+        }
+
+        $custom_fields_query->distinct('custom_fields.id');
+        /**
+         * End build query
+         */
+
+        /**
+         * Start getting query result
+         */
+        $custom_fields_count = $custom_fields_query->count();
+        $custom_fields = $custom_fields_query->paginate($filter_count_per_page);
+
+        $querystringArray = [
+            'search_query' => $search_query,
+            'filter_categories' => $filter_categories,
+            'filter_custom_field_type' => $filter_custom_field_type,
+            'filter_sort_by' => $filter_sort_by,
+            'filter_count_per_page' => $filter_count_per_page,
+        ];
+
+        $pagination = $custom_fields->appends($querystringArray);
+        /**
+         * End getting query result
+         */
+
 
         return response()->view('backend.admin.custom-field.index',
-            compact('all_categories', 'category_id', 'all_custom_fields'));
+            compact('custom_fields', 'custom_fields_count', 'all_printable_categories', 'filter_categories',
+                    'filter_custom_field_type', 'filter_sort_by', 'filter_count_per_page', 'search_query', 'pagination'));
     }
 
     /**
@@ -250,25 +377,12 @@ class CustomFieldController extends Controller
      */
     public function destroy(CustomField $customField)
     {
-        // check model relations before delete
-        if($customField->itemFeatures()->count() > 0)
-        {
-            \Session::flash('flash_message', __('alert.custom-field-delete-error-listing'));
-            \Session::flash('flash_type', 'danger');
+        $customField->deleteCustomField();
 
-            return redirect()->route('admin.custom-fields.edit', $customField);
-        }
-        else
-        {
-            // detach all associated categories before deleting
-            $customField->allCategories()->sync([]);
+        \Session::flash('flash_message', __('alert.custom-field-deleted'));
+        \Session::flash('flash_type', 'success');
 
-            $customField->delete();
+        return redirect()->route('admin.custom-fields.index');
 
-            \Session::flash('flash_message', __('alert.custom-field-deleted'));
-            \Session::flash('flash_type', 'success');
-
-            return redirect()->route('admin.custom-fields.index');
-        }
     }
 }

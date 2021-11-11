@@ -264,6 +264,8 @@
 
         $(document).ready(function(){
 
+            "use strict";
+
             @if($site_innerpage_header_background_type == \App\Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
             /**
              * Start Initial Youtube Background

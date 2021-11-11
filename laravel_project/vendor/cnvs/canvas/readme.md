@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/cnvs/canvas/actions"><img src="https://github.com/cnvs/canvas/workflows/build/badge.svg" alt="Build Status"></a>
+<a href="https://github.com/austintoddj/canvas/actions"><img src="https://github.com/austintoddj/canvas/workflows/build/badge.svg" alt="Build Status"></a>
 <a href="https://packagist.org/packages/cnvs/canvas"><img src="https://poser.pugx.org/cnvs/canvas/downloads"></a>
 <a href="https://packagist.org/packages/cnvs/canvas"><img src="https://poser.pugx.org/cnvs/canvas/v/stable"></a>
 <a href="https://packagist.org/packages/cnvs/canvas"><img src="https://poser.pugx.org/cnvs/canvas/license"></a>
@@ -29,7 +29,7 @@ just a few minutes. In addition to a distraction-free writing experience, you ca
 You may use composer to install Canvas into your Laravel project:
 
 ```bash
-composer require cnvs/canvas
+composer require austintoddj/canvas
 ```
 
 Publish the assets and primary configuration file using the `canvas:install` Artisan command:
@@ -129,19 +129,19 @@ Canvas uses the storage disk for media uploads. You may configure the different 
 
 ### Frontend
 
-While Canvas does not dictate a specific design for your frontend, it does provide a basic starting point using [Bootstrap](https://getbootstrap.com) and [Vue](https://vuejs.org) that will be helpful for many applications. The scaffolding is located in the `cnvs/studio` Composer package, which may be installed using Composer:
+While Canvas does not dictate a specific design for your frontend, it does provide a basic starting point using [Bootstrap](https://getbootstrap.com) and [Vue](https://vuejs.org) that will be helpful for many applications. The scaffolding is located in the `austintoddj/studio` Composer package, which may be installed using Composer:
 
 ```bash
-composer require cnvs/studio
+composer require austintoddj/studio
 ```
 
-Once the `cnvs/studio` package has been installed, you may install the frontend scaffolding using the `studio:install` Artisan command:
+Once the `austintoddj/studio` package has been installed, you may install the frontend scaffolding using the `studio:install` Artisan command:
 
 ```bash
 php artisan studio:install
 ```
 
-After installing the `cnvs/studio` Composer package and generating the frontend scaffolding, your `package.json` file will include the necessary dependencies to install and compile:
+After installing the `austintoddj/studio` Composer package and generating the frontend scaffolding, your `package.json` file will include the necessary dependencies to install and compile:
 
 ```bash
 # Using NPM
@@ -240,7 +240,7 @@ composer test
 
 ## Translate
 
-One of the goals for the team behind Canvas is to ensure proper localization across the app. If you come across any translation mistakes or issues and want to make a contribution, please [create a pull request](https://github.com/cnvs/canvas/pulls). If you don't see your native language included in the `resources/lang` directory, feel free to add it.
+One of the goals for the team behind Canvas is to ensure proper localization across the app. If you come across any translation mistakes or issues and want to make a contribution, please [create a pull request](https://github.com/austintoddj/canvas/pulls). If you don't see your native language included in the `resources/lang` directory, feel free to add it.
 
 ## License
 

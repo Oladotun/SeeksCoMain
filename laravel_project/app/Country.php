@@ -3,17 +3,22 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Session;
 
 class Country extends Model
 {
+    const COUNTRY_STATUS_ENABLE = 1;
+    const COUNTRY_STATUS_DISABLE = 0;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'country_abbr', 'country_name', 'country_slug',
+        'country_abbr',
+        'country_name',
+        'country_slug',
+        'country_status',
     ];
 
     /**

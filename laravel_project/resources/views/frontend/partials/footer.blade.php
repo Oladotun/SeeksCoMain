@@ -54,9 +54,11 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="table_option_dropdown_country">
                         @foreach($site_available_countries as $site_available_countries_key => $country)
+                            @if($country->country_status == \App\Country::COUNTRY_STATUS_ENABLE)
                             <a class="dropdown-item" href="{{ route('page.country.update', ['user_prefer_country_id' => $country->id]) }}">
                                 {{ $country->country_name }}
                             </a>
+                            @endif
                         @endforeach
                     </div>
                 </div>
@@ -72,9 +74,13 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="table_option_dropdown_locale">
                         @foreach(\App\Setting::LANGUAGES as $setting_languages_key => $language)
-                            <a class="dropdown-item" href="{{ route('page.locale.update', ['user_prefer_language' => $language]) }}">
-                                {{ __('prefer_languages.' . $language) }}
-                            </a>
+                            @if(\Illuminate\Support\Facades\Schema::hasTable('settings_languages'))
+                                @if($site_global_settings->settingLanguage->$language == \App\SettingLanguage::LANGUAGE_ENABLE)
+                                <a class="dropdown-item" href="{{ route('page.locale.update', ['user_prefer_language' => $setting_languages_key]) }}">
+                                    {{ __('prefer_languages.' . $setting_languages_key) }}
+                                </a>
+                                @endif
+                            @endif
                         @endforeach
                     </div>
                 </div>

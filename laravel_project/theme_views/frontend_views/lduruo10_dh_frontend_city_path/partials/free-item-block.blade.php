@@ -1,11 +1,11 @@
 <div class="listing__item">
     <a href="{{ route('page.item', $item->item_slug) }}">
         <div class="listing__item__pic set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
-            <!-- @if(empty($item->user->user_image))
+            @if(empty($item->user->user_image))
                 <img src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($item->user->id % 10) . '.webp') }}" alt="">
             @else
                 <img src="{{ Storage::disk('public')->url('user/' . $item->user->user_image) }}" alt="{{ $item->user->name }}">
-            @endif -->
+            @endif
         </div>
     </a>
     <div class="listing__item__text">
@@ -57,7 +57,13 @@
                 @endforeach
             </div>
             <div class="listing__item__text__info__right">
-                {{ $item->created_at->diffForHumans() }}
+                @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                    @if($item->hasOpened())
+                        <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                    @else
+                        <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                    @endif
+                @endif
             </div>
         </div>
     </div>

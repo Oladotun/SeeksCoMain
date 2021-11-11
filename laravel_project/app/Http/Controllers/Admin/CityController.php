@@ -7,7 +7,6 @@ use App\Country;
 use App\Http\Controllers\Controller;
 use App\State;
 use Artesaos\SEOTools\Facades\SEOMeta;
-use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -110,16 +109,16 @@ class CityController extends Controller
             'city_name' => 'required|regex:/^[\pL\s\-]+$/u|max:255',
             'city_lat' => 'required|numeric',
             'city_lng' => 'required|numeric',
+            'city_slug' => 'required|max:255|regex:/^[\w-]*$/',
         ]);
 
         $state = State::find($request->state_id);
 
         if($state)
         {
-            //$city_name = ucwords(strtolower($request->city_name));
             $city_name = $request->city_name;
             $city_state = $state->state_abbr;
-            $city_slug = str_slug($request->city_name . '-' . $state->id);
+            $city_slug = $request->city_slug;
             $city_lat = $request->city_lat;
             $city_lng = $request->city_lng;
 
@@ -127,10 +126,18 @@ class CityController extends Controller
             $city_name_exist = $state->cities()
                 ->where('city_name', $city_name)
                 ->count();
-
             if($city_name_exist > 0)
             {
                 $validate_error['city_name'] = __('prefer_country.error.city-name-exist');
+
+            }
+
+            $city_slug_exist = $state->cities()
+                ->where('city_slug', $city_slug)
+                ->count();
+            if($city_slug_exist > 0)
+            {
+                $validate_error['city_slug'] = __('setting_language.location.url-slug-exist');
 
             }
 
@@ -214,6 +221,7 @@ class CityController extends Controller
             'city_name' => 'required|regex:/^[\pL\s\-]+$/u|max:255',
             'city_lat' => 'required|numeric',
             'city_lng' => 'required|numeric',
+            'city_slug' => 'required|max:255|regex:/^[\w-]*$/',
         ]);
 
         $state = State::find($city->state_id);
@@ -223,17 +231,26 @@ class CityController extends Controller
             $city_name = $request->city_name;
             $city_lat = $request->city_lat;
             $city_lng = $request->city_lng;
-            $city_slug = str_slug($request->city_name . '-' . $city->state_id);
+            $city_slug = $request->city_slug;
 
             $validate_error = array();
             $city_name_exist = $state->cities()
                 ->where('city_name', $city_name)
                 ->where('id', '!=', $city->id)
                 ->count();
-
             if($city_name_exist > 0)
             {
                 $validate_error['city_name'] = __('prefer_country.error.city-name-exist');
+
+            }
+
+            $city_slug_exist = $state->cities()
+                ->where('city_slug', $city_slug)
+                ->where('id', '!=', $city->id)
+                ->count();
+            if($city_slug_exist > 0)
+            {
+                $validate_error['city_slug'] = __('setting_language.location.url-slug-exist');
 
             }
 

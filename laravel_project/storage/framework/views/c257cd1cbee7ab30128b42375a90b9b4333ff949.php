@@ -77,8 +77,6 @@
     .custom-site-logo a span {
         color: <?php echo e($customization_site_primary_color); ?>;
     }
-    .custom-site-logo img { max-height: 150px; }
-    .footer__about__logo img {max-height: 100px;}
     .header__menu ul li a:after {
         background: <?php echo e($customization_site_primary_color); ?> !important;
     }
@@ -251,6 +249,16 @@
     }
     /**
      * End website blog detail page
+     */
+
+    /**
+     * Start listing box
+     */
+    .listing__item_featured_box {
+        border: 1px solid <?php echo e($customization_site_primary_color); ?>;
+    }
+    /**
+     * End listing box
      */
 </style>
 

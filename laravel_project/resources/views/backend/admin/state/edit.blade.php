@@ -53,8 +53,24 @@
                                 <input id="state_abbr" type="text" class="form-control @error('state_abbr') is-invalid @enderror" name="state_abbr" value="{{ old('state_abbr') ? old('state_abbr') : $state->state_abbr }}">
                                 @error('state_abbr')
                                 <span class="invalid-tooltip">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+
+                            <div class="col-md-12">
+                                <label class="text-black" for="state_slug">{{ __('setting_language.location.url-slug') }}</label>
+                                <input id="state_slug" type="text" class="form-control @error('state_slug') is-invalid @enderror" name="state_slug" value="{{ old('state_slug') ? old('state_slug') : $state->state_slug }}">
+                                <small class="form-text text-muted">
+                                    {{ __('setting_language.location.url-slug-help') }}
+                                </small>
+                                @error('state_slug')
+                                <span class="invalid-tooltip">
+                                    <strong>{{ $message }}</strong>
+                                </span>
                                 @enderror
                             </div>
                         </div>

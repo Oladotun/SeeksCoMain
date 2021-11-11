@@ -34,7 +34,7 @@
                     <div class="row pb-2">
                         <div class="col-12">
                             <span class="text-gray-800">
-                                {{ $items_count . ' ' . __('category_description.records') }}
+                                {{ number_format($items_count) . ' ' . __('category_description.records') }}
                             </span>
                         </div>
                     </div>
@@ -115,6 +115,19 @@
                                                             <i class="far fa-edit"></i>
                                                             {{ __('backend.shared.edit') }}
                                                         </a>
+                                                        <hr class="mt-2 mb-2">
+                                                        <span class="text-info">
+                                                            <i class="far fa-plus-square"></i>
+                                                            {{ __('review.backend.posted-at') . ' ' . \Carbon\Carbon::parse($item->created_at)->diffForHumans() }}
+                                                        </span>
+                                                        @if($item->created_at != $item->updated_at)
+                                                            <span class="text-info">
+                                                                |
+                                                                <i class="far fa-edit"></i>
+                                                                {{ __('review.backend.updated-at') . ' ' . \Carbon\Carbon::parse($item->updated_at)->diffForHumans() }}
+                                                            </span>
+                                                        @endif
+
                                                     </div>
                                                 </div>
 
@@ -156,7 +169,8 @@
 
                     <div class="row">
                         <div class="col-12">
-                            {{ $items->appends(['filter_categories' => $filter_categories, 'filter_country' => $filter_country, 'filter_state' => $filter_state, 'filter_city' => $filter_city, 'filter_item_status' => $filter_item_status, 'filter_item_featured' => $filter_item_featured, 'filter_sort_by' => $filter_sort_by, 'filter_count_per_page' => $filter_count_per_page])->links() }}
+{{--                            {{ $items->appends(['filter_categories' => $filter_categories, 'filter_country' => $filter_country, 'filter_state' => $filter_state, 'filter_city' => $filter_city, 'filter_item_status' => $filter_item_status, 'filter_item_featured' => $filter_item_featured, 'filter_sort_by' => $filter_sort_by, 'filter_count_per_page' => $filter_count_per_page])->links() }}--}}
+                            {{ $pagination->links() }}
                         </div>
                     </div>
                 </div>
@@ -175,6 +189,19 @@
                     <div class="row">
                         <div class="col-12">
                             <form method="GET" action="{{ route('user.items.index') }}">
+
+                                <div class="row form-group">
+                                    <div class="col-md-12">
+                                        <label for="search_query" class="text-black">{{ __('frontend.search.search') }}</label>
+                                        <input id="search_query" type="text" class="form-control @error('search_query') is-invalid @enderror" name="search_query" value="{{ $search_query }}">
+                                        @error('search_query')
+                                        <span class="invalid-tooltip">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
                                 <div class="row form-group">
                                     <div class="col-md-12">
                                         <label for="filter_categories" class="text-gray-800">{{ __('listings_filter.categories') }}</label>
@@ -333,6 +360,8 @@
 
                                             <option value="{{ \App\Item::ITEMS_SORT_BY_HIGHEST_RATING }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_HIGHEST_RATING ? 'selected' : '' }}>{{ __('listings_filter.sort-by-highest') }}</option>
                                             <option value="{{ \App\Item::ITEMS_SORT_BY_LOWEST_RATING }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_LOWEST_RATING ? 'selected' : '' }}>{{ __('listings_filter.sort-by-lowest') }}</option>
+
+                                            <option value="{{ \App\Item::ITEMS_SORT_BY_MOST_RELEVANT }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_MOST_RELEVANT ? 'selected' : '' }}>{{ __('item_search.most-relevant') }}</option>
                                         </select>
                                         @error('filter_sort_by')
                                         <span class="invalid-tooltip">
@@ -364,7 +393,15 @@
 
                                 <div class="row form-group">
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-primary">{{ __('backend.shared.update') }}</button>
+                                        <button type="submit" class="btn btn-primary btn-block">{{ __('backend.shared.update') }}</button>
+                                    </div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="col-12">
+                                        <a class="btn btn-outline-primary btn-block" href="{{ route('user.items.index') }}">
+                                            {{ __('theme_directory_hub.filter-link-reset-all') }}
+                                        </a>
                                     </div>
                                 </div>
 
@@ -414,8 +451,10 @@
     @include('backend.admin.partials.bootstrap-select-locale')
 
     <script>
-        // Call the dataTables jQuery plugin
         $(document).ready(function() {
+
+            "use strict";
+
             /**
              * Start select all button
              */

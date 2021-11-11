@@ -9,6 +9,7 @@ use App\Country;
 use App\Customization;
 use App\Faq;
 use App\Item;
+use App\ItemHour;
 use App\ItemImageGallery;
 use App\ItemLead;
 use App\ItemSection;
@@ -24,6 +25,7 @@ use App\Theme;
 use App\User;
 use Artesaos\SEOTools\Facades\OpenGraph;
 use Artesaos\SEOTools\Facades\TwitterCard;
+use DateTime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,6 +39,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Artesaos\SEOTools\Facades\SEOMeta;
+
+use Spatie\OpeningHours\OpeningHours;
 
 class PagesController extends Controller
 {
@@ -81,7 +85,6 @@ class PagesController extends Controller
         $categories = Category::withCount(['allItems' => function ($query) use ($active_user_ids, $site_prefer_country_id) {
             $query->whereIn('items.user_id', $active_user_ids)
                 ->where('items.item_status', Item::ITEM_PUBLISHED)
-                //->where('items.country_id', $site_prefer_country_id)
                 ->where(function ($query) use ($site_prefer_country_id) {
                     $query->where('items.country_id', $site_prefer_country_id)
                         ->orWhereNull('items.country_id');
@@ -89,17 +92,6 @@ class PagesController extends Controller
             }])
             ->where('category_parent_id', null)
             ->orderBy('all_items_count', 'desc')->take(5)->get();
-
-        $total_items_count = Item::join('users as u', 'items.user_id', '=', 'u.id')
-            ->where('items.item_status', Item::ITEM_PUBLISHED)
-            //->where('items.country_id', $site_prefer_country_id)
-            ->where(function ($query) use ($site_prefer_country_id) {
-                $query->where('items.country_id', $site_prefer_country_id)
-                    ->orWhereNull('items.country_id');
-            })
-            ->where('u.email_verified_at', '!=', null)
-            ->where('u.user_suspended', User::USER_NOT_SUSPENDED)
-            ->count();
 
         /**
          * get first latest 6 paid listings
@@ -111,7 +103,6 @@ class PagesController extends Controller
         $paid_user_ids = $subscription_obj->getPaidUserIds();
 
         $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-            //->where('items.country_id', $site_prefer_country_id)
             ->where(function ($query) use ($site_prefer_country_id) {
                 $query->where('items.country_id', $site_prefer_country_id)
                     ->orWhereNull('items.country_id');
@@ -163,7 +154,6 @@ class PagesController extends Controller
          * get first 6 latest items
          */
         $latest_items = Item::latest('created_at')
-//            ->where('country_id', $site_prefer_country_id)
             ->where(function ($query) use ($site_prefer_country_id) {
                 $query->where('items.country_id', $site_prefer_country_id)
                     ->orWhereNull('items.country_id');
@@ -220,7 +210,7 @@ class PagesController extends Controller
 
         return response()->view($theme_view_path . 'index',
             compact('categories', 'paid_items', 'popular_items', 'latest_items',
-                'all_testimonials', 'recent_blog', 'total_items_count',
+                'all_testimonials', 'recent_blog',
                 'site_homepage_header_background_type', 'site_homepage_header_background_color',
                 'site_homepage_header_background_image', 'site_homepage_header_background_youtube_video',
                 'site_homepage_header_title_font_color', 'site_homepage_header_paragraph_font_color',
@@ -314,7 +304,7 @@ class PagesController extends Controller
             $paid_items_query->where('items.city_id', $filter_city);
         }
 
-        $paid_items_query->orderBy('items.created_at', 'ASC')
+        $paid_items_query->orderBy('items.created_at', 'DESC')
             ->distinct('items.id')
             ->with('state')
             ->with('city')
@@ -331,7 +321,8 @@ class PagesController extends Controller
         $free_items_query = Item::query();
 
         // get free users id array
-        $free_user_ids = $subscription_obj->getFreeUserIds();
+        //$free_user_ids = $subscription_obj->getFreeUserIds();
+        $free_user_ids = $subscription_obj->getActiveUserIds();
 
         if(count($item_ids) > 0)
         {
@@ -357,6 +348,7 @@ class PagesController extends Controller
                 $query->where('items.country_id', $site_prefer_country_id)
                     ->orWhereNull('items.country_id');
             })
+            ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
             ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
             ->whereIn('items.user_id', $free_user_ids);
 
@@ -852,7 +844,6 @@ class PagesController extends Controller
         $categories = Category::withCount(['allItems' => function ($query) use ($active_user_ids, $site_prefer_country_id) {
             $query->whereIn('items.user_id', $active_user_ids)
                 ->where('items.item_status', Item::ITEM_PUBLISHED)
-                //->where('items.country_id', $site_prefer_country_id)
                 ->where(function ($query) use ($site_prefer_country_id) {
                     $query->where('items.country_id', $site_prefer_country_id)
                         ->orWhereNull('items.country_id');
@@ -897,7 +888,6 @@ class PagesController extends Controller
         }
 
         $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-            //->where('items.country_id', $site_prefer_country_id)
             ->where(function ($query) use ($site_prefer_country_id) {
                 $query->where('items.country_id', $site_prefer_country_id)
                     ->orWhereNull('items.country_id');
@@ -921,7 +911,7 @@ class PagesController extends Controller
             $paid_items_query->where('items.city_id', $filter_city);
         }
 
-        $paid_items_query->orderBy('items.created_at', 'ASC')
+        $paid_items_query->orderBy('items.created_at', 'DESC')
             ->distinct('items.id')
             ->with('state')
             ->with('city')
@@ -933,7 +923,9 @@ class PagesController extends Controller
         $free_items_query = Item::query();
 
         // get free users id array
-        $free_user_ids = $subscription_obj->getFreeUserIds();
+        //$free_user_ids = $subscription_obj->getFreeUserIds();
+        //$free_user_ids = $subscription_obj->getActiveUserIds();
+        $free_user_ids = $active_user_ids;
 
         if(count($item_ids) > 0)
         {
@@ -941,11 +933,11 @@ class PagesController extends Controller
         }
 
         $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-            //->where('items.country_id', $site_prefer_country_id)
             ->where(function ($query) use ($site_prefer_country_id) {
                 $query->where('items.country_id', $site_prefer_country_id)
                     ->orWhereNull('items.country_id');
             })
+            ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
             ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
             ->whereIn('items.user_id', $free_user_ids);
 
@@ -1118,10 +1110,8 @@ class PagesController extends Controller
 
         $all_states = Country::find($site_prefer_country_id)
             ->states()
-            ->withCount(['items' => function ($query) use ($settings, $site_prefer_country_id) {
-                $query->where('country_id', $site_prefer_country_id);
-            }])
-            ->orderBy('state_name')->get();
+            ->orderBy('state_name')
+            ->get();
 
         $all_cities = collect([]);
         if(!empty($filter_state))
@@ -1236,7 +1226,6 @@ class PagesController extends Controller
             $paid_items_query->whereIn('id', $item_ids);
 
             $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-                //->where('items.country_id', $site_prefer_country_id)
                 ->where(function ($query) use ($site_prefer_country_id) {
                     $query->where('items.country_id', $site_prefer_country_id)
                         ->orWhereNull('items.country_id');
@@ -1260,7 +1249,7 @@ class PagesController extends Controller
                 $paid_items_query->where('items.city_id', $filter_city);
             }
 
-            $paid_items_query->orderBy('items.created_at', 'ASC')
+            $paid_items_query->orderBy('items.created_at', 'DESC')
                 ->distinct('items.id')
                 ->with('state')
                 ->with('city')
@@ -1272,16 +1261,17 @@ class PagesController extends Controller
             $free_items_query = Item::query();
 
             // get free users id array
-            $free_user_ids = $subscription_obj->getFreeUserIds();
+            //$free_user_ids = $subscription_obj->getFreeUserIds();
+            $free_user_ids = $subscription_obj->getActiveUserIds();
 
             $free_items_query->whereIn('id', $item_ids);
 
             $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-                //->where('items.country_id', $site_prefer_country_id)
                 ->where(function ($query) use ($site_prefer_country_id) {
                     $query->where('items.country_id', $site_prefer_country_id)
                         ->orWhereNull('items.country_id');
                 })
+                ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
                 ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
                 ->whereIn('items.user_id', $free_user_ids);
 
@@ -1591,7 +1581,7 @@ class PagesController extends Controller
                 $paid_items_query->where('items.city_id', $filter_city);
             }
 
-            $paid_items_query->orderBy('items.created_at', 'ASC')
+            $paid_items_query->orderBy('items.created_at', 'DESC')
                 ->distinct('items.id')
                 ->with('state')
                 ->with('city')
@@ -1603,7 +1593,8 @@ class PagesController extends Controller
             $free_items_query = Item::query();
 
             // get free users id array
-            $free_user_ids = $subscription_obj->getFreeUserIds();
+            //$free_user_ids = $subscription_obj->getFreeUserIds();
+            $free_user_ids = $subscription_obj->getActiveUserIds();
 
             if(count($item_ids) > 0)
             {
@@ -1613,6 +1604,7 @@ class PagesController extends Controller
             $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
                 ->where('items.country_id', $site_prefer_country_id)
                 ->where('items.state_id', $state->id)
+                ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
                 ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
                 ->whereIn('items.user_id', $free_user_ids);
 
@@ -1915,7 +1907,7 @@ class PagesController extends Controller
                                 ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
                         });
 
-                    $paid_items_query->orderBy('items.created_at', 'ASC')
+                    $paid_items_query->orderBy('items.created_at', 'DESC')
                         ->distinct('items.id')
                         ->with('state')
                         ->with('city')
@@ -1927,7 +1919,8 @@ class PagesController extends Controller
                     $free_items_query = Item::query();
 
                     // get free users id array
-                    $free_user_ids = $subscription_obj->getFreeUserIds();
+                    //$free_user_ids = $subscription_obj->getFreeUserIds();
+                    $free_user_ids = $subscription_obj->getActiveUserIds();
 
                     if(count($item_ids) > 0)
                     {
@@ -1938,6 +1931,7 @@ class PagesController extends Controller
                         ->where('items.country_id', $site_prefer_country_id)
                         ->where('items.state_id', $state->id)
                         ->where('items.city_id', $city->id)
+                        ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
                         ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
                         ->whereIn('items.user_id', $free_user_ids);
 
@@ -2214,7 +2208,7 @@ class PagesController extends Controller
                 $paid_items_query->where('items.city_id', $filter_city);
             }
 
-            $paid_items_query->orderBy('items.created_at', 'ASC')
+            $paid_items_query->orderBy('items.created_at', 'DESC')
                 ->distinct('items.id')
                 ->with('state')
                 ->with('city')
@@ -2226,7 +2220,8 @@ class PagesController extends Controller
             $free_items_query = Item::query();
 
             // get free users id array
-            $free_user_ids = $subscription_obj->getFreeUserIds();
+            //$free_user_ids = $subscription_obj->getFreeUserIds();
+            $free_user_ids = $subscription_obj->getActiveUserIds();
 
             if(count($item_ids) > 0)
             {
@@ -2236,6 +2231,7 @@ class PagesController extends Controller
             $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
                 ->where('items.country_id', $site_prefer_country_id)
                 ->where("items.state_id", $state->id)
+                ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
                 ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
                 ->whereIn('items.user_id', $free_user_ids);
 
@@ -2507,7 +2503,7 @@ class PagesController extends Controller
                             ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
                     });
 
-                $paid_items_query->orderBy('items.created_at', 'ASC')
+                $paid_items_query->orderBy('items.created_at', 'DESC')
                     ->distinct('items.id')
                     ->with('state')
                     ->with('city')
@@ -2519,7 +2515,8 @@ class PagesController extends Controller
                 $free_items_query = Item::query();
 
                 // get free users id array
-                $free_user_ids = $subscription_obj->getFreeUserIds();
+                //$free_user_ids = $subscription_obj->getFreeUserIds();
+                $free_user_ids = $subscription_obj->getActiveUserIds();
 
                 if(count($item_ids) > 0)
                 {
@@ -2530,6 +2527,7 @@ class PagesController extends Controller
                     ->where('items.country_id', $site_prefer_country_id)
                     ->where("items.state_id", $state->id)
                     ->where("items.city_id", $city->id)
+                    ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
                     ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
                     ->whereIn('items.user_id', $free_user_ids);
 
@@ -2789,6 +2787,106 @@ class PagesController extends Controller
                         ->get();
 
                     /**
+                     * Start initial opening hours
+                     */
+                    $opening_hours_array_monday = array();
+                    $opening_hours_array_tuesday = array();
+                    $opening_hours_array_wednesday = array();
+                    $opening_hours_array_thursday = array();
+                    $opening_hours_array_friday = array();
+                    $opening_hours_array_saturday = array();
+                    $opening_hours_array_sunday = array();
+                    $opening_hour_exceptions_array = array();
+
+                    $item_hours = $item->itemHours()->get();
+                    foreach($item_hours as $item_hours_key => $item_hour)
+                    {
+                        $item_hour_open_time = substr($item_hour->item_hour_open_time, 0, -3);
+                        $item_hour_close_time = substr($item_hour->item_hour_close_time, 0, -3);
+
+                        if($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_MONDAY)
+                        {
+                            $opening_hours_array_monday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_TUESDAY)
+                        {
+                            $opening_hours_array_tuesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_WEDNESDAY)
+                        {
+                            $opening_hours_array_wednesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_THURSDAY)
+                        {
+                            $opening_hours_array_thursday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_FRIDAY)
+                        {
+                            $opening_hours_array_friday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SATURDAY)
+                        {
+                            $opening_hours_array_saturday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SUNDAY)
+                        {
+                            $opening_hours_array_sunday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                    }
+
+                    $item_hour_exceptions = $item->itemHourExceptions()->get();
+                    foreach($item_hour_exceptions as $item_hour_exceptions_key => $item_hour_exception)
+                    {
+                        $item_hour_exception_open_time = empty($item_hour_exception->item_hour_exception_open_time) ? null : substr($item_hour_exception->item_hour_exception_open_time, 0, -3);
+                        $item_hour_exception_close_time = empty($item_hour_exception->item_hour_exception_close_time) ? null : substr($item_hour_exception->item_hour_exception_close_time, 0, -3);
+
+                        if(!empty($item_hour_exception_open_time) && !empty($item_hour_exception_close_time))
+                        {
+                            $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date][] = $item_hour_exception_open_time . "-" . $item_hour_exception_close_time;
+                        }
+                        else
+                        {
+                            $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date] = [];
+                        }
+                    }
+
+                    $opening_hours_obj = OpeningHours::createAndMergeOverlappingRanges([
+                        'monday' => $opening_hours_array_monday,
+                        'tuesday' => $opening_hours_array_tuesday,
+                        'wednesday' => $opening_hours_array_wednesday,
+                        'thursday' => $opening_hours_array_thursday,
+                        'friday' => $opening_hours_array_friday,
+                        'saturday' => $opening_hours_array_saturday,
+                        'sunday' => $opening_hours_array_sunday,
+                        'exceptions' => $opening_hour_exceptions_array,
+                    ], $item->item_hour_time_zone);
+
+                    $datetime_now = new DateTime('now');
+                    $current_open_range = $opening_hours_obj->currentOpenRange($datetime_now);
+
+                    $opening_hours_week = $opening_hours_obj->forWeek();
+                    $opening_hours_week_monday = $opening_hours_week['monday'];
+                    $opening_hours_week_tuesday = $opening_hours_week['tuesday'];
+                    $opening_hours_week_wednesday = $opening_hours_week['wednesday'];
+                    $opening_hours_week_thursday = $opening_hours_week['thursday'];
+                    $opening_hours_week_friday = $opening_hours_week['friday'];
+                    $opening_hours_week_saturday = $opening_hours_week['saturday'];
+                    $opening_hours_week_sunday = $opening_hours_week['sunday'];
+
+                    $item_hours_monday = $opening_hours_week_monday->getIterator();
+                    $item_hours_tuesday = $opening_hours_week_tuesday->getIterator();
+                    $item_hours_wednesday = $opening_hours_week_wednesday->getIterator();
+                    $item_hours_thursday = $opening_hours_week_thursday->getIterator();
+                    $item_hours_friday = $opening_hours_week_friday->getIterator();
+                    $item_hours_saturday = $opening_hours_week_saturday->getIterator();
+                    $item_hours_sunday = $opening_hours_week_sunday->getIterator();
+
+                    $item_hour_exceptions_obj = $opening_hours_obj->exceptions();
+                    /**
+                     * End initial opening hours
+                     */
+
+                    /**
                      * get 4 nearby items by current item lat and lng
                      */
                     $latitude = $item->item_lat;
@@ -2816,20 +2914,19 @@ class PagesController extends Controller
                     $category_obj = new Category();
                     $similar_item_ids = $category_obj->getItemIdsByCategoryIds($item_category_ids);
 
-                    $similar_items = Item::selectRaw('items.*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
-                        ->whereIn('items.id', $similar_item_ids)
+                    $similar_item_ids_length = count($similar_item_ids);
+                    if($similar_item_ids_length > Item::ITEM_SIMILAR_SHOW_MAX)
+                    {
+                        $similar_item_ids = array_slice($similar_item_ids, rand(0, $similar_item_ids_length-Item::ITEM_SIMILAR_SHOW_MAX), Item::ITEM_SIMILAR_SHOW_MAX);
+                    }
+
+                    $similar_items = Item::whereIn('items.id', $similar_item_ids)
                         ->where('items.id', '!=', $item->id)
                         ->where('items.item_status', Item::ITEM_PUBLISHED)
-                        ->where(function ($query) use ($item) {
-                            $query->where('items.country_id', $item->country_id)
-                                ->orWhereNull('items.country_id');
-                        })
                         ->distinct('items.id')
-                        ->orderBy('distance', 'ASC')
-                        ->with('state')
-                        ->with('city')
-                        ->with('user')
-                        ->take(4)->get();
+                        ->inRandomOrder()
+                        ->limit(Item::ITEM_SIMILAR_SHOW_MAX)
+                        ->get();
 
                     /**
                      * Start item claim
@@ -2884,7 +2981,10 @@ class PagesController extends Controller
                         compact('product', 'item', 'product_features', 'nearby_items', 'similar_items',
                             'ads_before_sidebar_content', 'ads_after_sidebar_content', 'item_display_categories',
                             'item_total_categories', 'item_all_categories', 'item_count_rating', 'item_average_rating',
-                            'item_has_claimed'));
+                            'item_has_claimed', 'opening_hours_obj', 'datetime_now', 'current_open_range', 'item_hours_monday',
+                            'item_hours_tuesday', 'item_hours_wednesday', 'item_hours_thursday', 'item_hours_friday',
+                            'item_hours_saturday', 'item_hours_sunday', 'item_hour_exceptions_obj', 'item_hours',
+                            'item_hour_exceptions'));
                 }
                 else
                 {
@@ -2917,299 +3017,417 @@ class PagesController extends Controller
 
         if($item)
         {
-            /**
-             * Start SEO
-             */
-            SEOMeta::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-            SEOMeta::setDescription($item->item_description);
-            SEOMeta::setCanonical(URL::current());
-            SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+            $item_user = $item->user()->first();
 
-            // OpenGraph
-            OpenGraph::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-            OpenGraph::setDescription($item->item_description);
-            OpenGraph::setUrl(URL::current());
-            if(empty($item->item_image))
+            if($item_user)
             {
-                OpenGraph::addImage(asset('frontend/images/placeholder/full_item_feature_image.webp'));
+                if($item_user->hasActive())
+                {
+                    /**
+                     * Start SEO
+                     */
+                    SEOMeta::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+                    SEOMeta::setDescription($item->item_description);
+                    SEOMeta::setCanonical(URL::current());
+                    SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+
+                    // OpenGraph
+                    OpenGraph::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+                    OpenGraph::setDescription($item->item_description);
+                    OpenGraph::setUrl(URL::current());
+                    if(empty($item->item_image))
+                    {
+                        OpenGraph::addImage(asset('frontend/images/placeholder/full_item_feature_image.webp'));
+                    }
+                    else
+                    {
+                        OpenGraph::addImage(Storage::disk('public')->url('item/' . $item->item_image));
+                    }
+
+                    // Twitter
+                    TwitterCard::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+                    /**
+                     * End SEO
+                     */
+
+                    $item_display_categories = $item->getAllCategories(Item::ITEM_TOTAL_SHOW_CATEGORY);
+                    $item_total_categories = $item->allCategories()->count();
+                    $item_all_categories = $item->getAllCategories();
+
+                    /**
+                     * Start initla item features
+                     */
+                    $item_features = $item->features()->where('item_feature_value', '<>', '')
+                        ->whereNotNull('item_feature_value')
+                        ->get();
+                    /**
+                     * End initial item features
+                     */
+
+                    /**
+                     * Start initial opening hours
+                     */
+                    $opening_hours_array_monday = array();
+                    $opening_hours_array_tuesday = array();
+                    $opening_hours_array_wednesday = array();
+                    $opening_hours_array_thursday = array();
+                    $opening_hours_array_friday = array();
+                    $opening_hours_array_saturday = array();
+                    $opening_hours_array_sunday = array();
+                    $opening_hour_exceptions_array = array();
+
+                    $item_hours = $item->itemHours()->get();
+                    foreach($item_hours as $item_hours_key => $item_hour)
+                    {
+                        $item_hour_open_time = substr($item_hour->item_hour_open_time, 0, -3);
+                        $item_hour_close_time = substr($item_hour->item_hour_close_time, 0, -3);
+
+                        if($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_MONDAY)
+                        {
+                            $opening_hours_array_monday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_TUESDAY)
+                        {
+                            $opening_hours_array_tuesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_WEDNESDAY)
+                        {
+                            $opening_hours_array_wednesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_THURSDAY)
+                        {
+                            $opening_hours_array_thursday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_FRIDAY)
+                        {
+                            $opening_hours_array_friday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SATURDAY)
+                        {
+                            $opening_hours_array_saturday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SUNDAY)
+                        {
+                            $opening_hours_array_sunday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                        }
+                    }
+
+                    $item_hour_exceptions = $item->itemHourExceptions()->get();
+                    foreach($item_hour_exceptions as $item_hour_exceptions_key => $item_hour_exception)
+                    {
+                        $item_hour_exception_open_time = empty($item_hour_exception->item_hour_exception_open_time) ? null : substr($item_hour_exception->item_hour_exception_open_time, 0, -3);
+                        $item_hour_exception_close_time = empty($item_hour_exception->item_hour_exception_close_time) ? null : substr($item_hour_exception->item_hour_exception_close_time, 0, -3);
+
+                        if(!empty($item_hour_exception_open_time) && !empty($item_hour_exception_close_time))
+                        {
+                            $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date][] = $item_hour_exception_open_time . "-" . $item_hour_exception_close_time;
+                        }
+                        else
+                        {
+                            $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date] = [];
+                        }
+                    }
+
+                    $opening_hours_obj = OpeningHours::createAndMergeOverlappingRanges([
+                        'monday' => $opening_hours_array_monday,
+                        'tuesday' => $opening_hours_array_tuesday,
+                        'wednesday' => $opening_hours_array_wednesday,
+                        'thursday' => $opening_hours_array_thursday,
+                        'friday' => $opening_hours_array_friday,
+                        'saturday' => $opening_hours_array_saturday,
+                        'sunday' => $opening_hours_array_sunday,
+                        'exceptions' => $opening_hour_exceptions_array,
+                    ], $item->item_hour_time_zone);
+
+                    $datetime_now = new DateTime('now');
+                    $current_open_range = $opening_hours_obj->currentOpenRange($datetime_now);
+
+                    $opening_hours_week = $opening_hours_obj->forWeek();
+                    $opening_hours_week_monday = $opening_hours_week['monday'];
+                    $opening_hours_week_tuesday = $opening_hours_week['tuesday'];
+                    $opening_hours_week_wednesday = $opening_hours_week['wednesday'];
+                    $opening_hours_week_thursday = $opening_hours_week['thursday'];
+                    $opening_hours_week_friday = $opening_hours_week['friday'];
+                    $opening_hours_week_saturday = $opening_hours_week['saturday'];
+                    $opening_hours_week_sunday = $opening_hours_week['sunday'];
+
+                    $item_hours_monday = $opening_hours_week_monday->getIterator();
+                    $item_hours_tuesday = $opening_hours_week_tuesday->getIterator();
+                    $item_hours_wednesday = $opening_hours_week_wednesday->getIterator();
+                    $item_hours_thursday = $opening_hours_week_thursday->getIterator();
+                    $item_hours_friday = $opening_hours_week_friday->getIterator();
+                    $item_hours_saturday = $opening_hours_week_saturday->getIterator();
+                    $item_hours_sunday = $opening_hours_week_sunday->getIterator();
+
+                    $item_hour_exceptions_obj = $opening_hours_obj->exceptions();
+                    /**
+                     * End initial opening hours
+                     */
+
+                    /**
+                     * get 4 nearby items by current item lat and lng
+                     */
+                    $latitude = $item->item_lat;
+                    $longitude = $item->item_lng;
+
+                    $nearby_items = Item::selectRaw('items.*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+                        ->where('id', '!=', $item->id)
+                        ->where('item_status', Item::ITEM_PUBLISHED)
+                        ->where('item_type', Item::ITEM_TYPE_REGULAR)
+                        ->orderBy('distance', 'ASC')
+                        ->with('state')
+                        ->with('city')
+                        ->with('user')
+                        ->take(4)->get();
+
+                    /**
+                     * get 4 similar items by current item lat and lng
+                     */
+                    $item_category_ids = array();
+                    foreach($item_all_categories as $item_all_categories_key => $category)
+                    {
+                        $item_category_ids[] = $category->id;
+                    }
+
+                    $category_obj = new Category();
+                    $similar_item_ids = $category_obj->getItemIdsByCategoryIds($item_category_ids);
+
+                    $similar_item_ids_length = count($similar_item_ids);
+                    if($similar_item_ids_length > Item::ITEM_SIMILAR_SHOW_MAX)
+                    {
+                        $similar_item_ids = array_slice($similar_item_ids, rand(0, $similar_item_ids_length-Item::ITEM_SIMILAR_SHOW_MAX), Item::ITEM_SIMILAR_SHOW_MAX);
+                    }
+
+                    $similar_items = Item::whereIn('items.id', $similar_item_ids)
+                        ->where('items.id', '!=', $item->id)
+                        ->where('items.item_status', Item::ITEM_PUBLISHED)
+                        ->distinct('items.id')
+                        ->inRandomOrder()
+                        ->limit(Item::ITEM_SIMILAR_SHOW_MAX)
+                        ->get();
+
+                    /**
+                     * Start get all item approved reviews
+                     */
+                    $item_count_rating = $item->getCountRating();
+                    $item_average_rating = $item->item_average_rating;
+
+                    $rating_sort_by = empty($request->rating_sort_by) ? Item::ITEM_RATING_SORT_BY_NEWEST : $request->rating_sort_by;
+                    $reviews = $item->getApprovedRatingsSortBy($rating_sort_by);
+
+                    if($item_count_rating > 0)
+                    {
+                        $item_one_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_ONE);
+                        $item_two_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_TWO);
+                        $item_three_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_THREE);
+                        $item_four_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_FOUR);
+                        $item_five_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_FIVE);
+
+                        $item_one_star_percentage = ($item_one_star_count_rating / $item_count_rating) * 100;
+                        $item_two_star_percentage = ($item_two_star_count_rating / $item_count_rating) * 100;
+                        $item_three_star_percentage = ($item_three_star_count_rating / $item_count_rating) * 100;
+                        $item_four_star_percentage = ($item_four_star_count_rating / $item_count_rating) * 100;
+                        $item_five_star_percentage = ($item_five_star_count_rating / $item_count_rating) * 100;
+                    }
+                    else
+                    {
+                        $item_one_star_percentage = 0;
+                        $item_two_star_percentage = 0;
+                        $item_three_star_percentage = 0;
+                        $item_four_star_percentage = 0;
+                        $item_five_star_percentage = 0;
+                    }
+                    /**
+                     * End get all item approved reviews
+                     */
+
+                    /**
+                     * Start item claim
+                     */
+                    $item_has_claimed = $item->hasClaimed();
+                    /**
+                     * End item claim
+                     */
+
+                    /**
+                     * Start fetch ads blocks
+                     */
+                    $advertisement = new Advertisement();
+
+                    $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_AFTER_BREADCRUMB,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_gallery = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_BEFORE_GALLERY,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_description = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_BEFORE_DESCRIPTION,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_location = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_BEFORE_LOCATION,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_features = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_BEFORE_FEATURES,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_reviews = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_BEFORE_REVIEWS,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_comments = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_BEFORE_COMMENTS,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_share = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_BEFORE_SHARE,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_after_share = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_AFTER_SHARE,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                        Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+                    /**
+                     * End fetch ads blocks
+                     */
+
+                    /**
+                     * Start fetch item sections
+                     */
+                    $item_sections_after_breadcrumb = $item->itemSections()
+                        ->where('item_section_position', ItemSection::POSITION_AFTER_BREADCRUMB)
+                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                        ->orderBy('item_section_order')
+                        ->get();
+
+                    $item_sections_after_gallery = $item->itemSections()
+                        ->where('item_section_position', ItemSection::POSITION_AFTER_GALLERY)
+                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                        ->orderBy('item_section_order')
+                        ->get();
+
+                    $item_sections_after_description = $item->itemSections()
+                        ->where('item_section_position', ItemSection::POSITION_AFTER_DESCRIPTION)
+                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                        ->orderBy('item_section_order')
+                        ->get();
+
+                    $item_sections_after_location_map = $item->itemSections()
+                        ->where('item_section_position', ItemSection::POSITION_AFTER_LOCATION_MAP)
+                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                        ->orderBy('item_section_order')
+                        ->get();
+
+                    $item_sections_after_features = $item->itemSections()
+                        ->where('item_section_position', ItemSection::POSITION_AFTER_FEATURES)
+                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                        ->orderBy('item_section_order')
+                        ->get();
+
+                    $item_sections_after_reviews = $item->itemSections()
+                        ->where('item_section_position', ItemSection::POSITION_AFTER_REVIEWS)
+                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                        ->orderBy('item_section_order')
+                        ->get();
+
+                    $item_sections_after_comments = $item->itemSections()
+                        ->where('item_section_position', ItemSection::POSITION_AFTER_COMMENTS)
+                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                        ->orderBy('item_section_order')
+                        ->get();
+
+                    $item_sections_after_share = $item->itemSections()
+                        ->where('item_section_position', ItemSection::POSITION_AFTER_SHARE)
+                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                        ->orderBy('item_section_order')
+                        ->get();
+                    /**
+                     * End fetch item sections
+                     */
+
+
+                    /**
+                     * Start initial blade view file path
+                     */
+                    $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
+                    $theme_view_path = $theme_view_path->getViewPath();
+                    /**
+                     * End initial blade view file path
+                     */
+
+                    /**
+                     * Start initial Google reCAPTCHA version 2
+                     */
+                    if($settings->setting_site_recaptcha_item_lead_enable == Setting::SITE_RECAPTCHA_ITEM_LEAD_ENABLE)
+                    {
+                        config_re_captcha($settings->setting_site_recaptcha_site_key, $settings->setting_site_recaptcha_secret_key);
+                    }
+                    /**
+                     * End initial Google reCAPTCHA version 2
+                     */
+
+                    return response()->view($theme_view_path . 'item',
+                        compact('item', 'nearby_items', 'similar_items',
+                            'reviews', 'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_gallery', 'ads_before_description',
+                            'ads_before_location', 'ads_before_features', 'ads_before_reviews', 'ads_before_comments',
+                            'ads_before_share', 'ads_after_share', 'ads_before_sidebar_content', 'ads_after_sidebar_content',
+                            'item_display_categories', 'item_total_categories', 'item_all_categories', 'item_count_rating',
+                            'item_average_rating', 'item_one_star_percentage', 'item_two_star_percentage', 'item_three_star_percentage',
+                            'item_four_star_percentage', 'item_five_star_percentage', 'rating_sort_by', 'item_has_claimed',
+                            'item_sections_after_breadcrumb', 'item_sections_after_gallery', 'item_sections_after_description',
+                            'item_sections_after_location_map', 'item_sections_after_features', 'item_sections_after_reviews',
+                            'item_sections_after_comments', 'item_sections_after_share', 'item_features', 'opening_hours_obj', 'datetime_now',
+                            'current_open_range', 'item_hours_monday', 'item_hours_tuesday', 'item_hours_wednesday', 'item_hours_thursday',
+                            'item_hours_friday', 'item_hours_saturday', 'item_hours_sunday', 'item_hour_exceptions_obj', 'item_hours',
+                            'item_hour_exceptions'));
+                }
+                else
+                {
+                    abort(404);
+                }
             }
             else
             {
-                OpenGraph::addImage(Storage::disk('public')->url('item/' . $item->item_image));
+                abort(404);
             }
-
-            // Twitter
-            TwitterCard::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-            /**
-             * End SEO
-             */
-
-            $item_display_categories = $item->getAllCategories(Item::ITEM_TOTAL_SHOW_CATEGORY);
-            $item_total_categories = $item->allCategories()->count();
-            $item_all_categories = $item->getAllCategories();
-
-            /**
-             * Start initla item features
-             */
-            $item_features = $item->features()->where('item_feature_value', '<>', '')
-                ->whereNotNull('item_feature_value')
-                ->get();
-            /**
-             * End initial item features
-             */
-
-            /**
-             * get 4 nearby items by current item lat and lng
-             */
-            $latitude = $item->item_lat;
-            $longitude = $item->item_lng;
-
-            $nearby_items = Item::selectRaw('items.*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
-                ->where('id', '!=', $item->id)
-                ->where('item_status', Item::ITEM_PUBLISHED)
-                ->where('item_type', Item::ITEM_TYPE_REGULAR)
-                ->orderBy('distance', 'ASC')
-                ->with('state')
-                ->with('city')
-                ->with('user')
-                ->take(4)->get();
-
-            /**
-             * get 4 similar items by current item lat and lng
-             */
-            $item_category_ids = array();
-            foreach($item_all_categories as $item_all_categories_key => $category)
-            {
-                $item_category_ids[] = $category->id;
-            }
-
-            $category_obj = new Category();
-            $similar_item_ids = $category_obj->getItemIdsByCategoryIds($item_category_ids);
-
-            $similar_items = Item::selectRaw('items.*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
-                ->whereIn('items.id', $similar_item_ids)
-                ->where('items.id', '!=', $item->id)
-                ->where('items.item_status', Item::ITEM_PUBLISHED)
-                ->where(function ($query) use ($item) {
-                    $query->where('items.country_id', $item->country_id)
-                        ->orWhereNull('items.country_id');
-                })
-                ->distinct('items.id')
-                ->orderBy('distance', 'ASC')
-                ->with('state')
-                ->with('city')
-                ->with('user')
-                ->take(4)->get();
-
-            /**
-             * Start get all item approved reviews
-             */
-            $item_count_rating = $item->getCountRating();
-            $item_average_rating = $item->item_average_rating;
-
-            $rating_sort_by = empty($request->rating_sort_by) ? Item::ITEM_RATING_SORT_BY_NEWEST : $request->rating_sort_by;
-            $reviews = $item->getApprovedRatingsSortBy($rating_sort_by);
-
-            if($item_count_rating > 0)
-            {
-                $item_one_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_ONE);
-                $item_two_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_TWO);
-                $item_three_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_THREE);
-                $item_four_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_FOUR);
-                $item_five_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_FIVE);
-
-                $item_one_star_percentage = ($item_one_star_count_rating / $item_count_rating) * 100;
-                $item_two_star_percentage = ($item_two_star_count_rating / $item_count_rating) * 100;
-                $item_three_star_percentage = ($item_three_star_count_rating / $item_count_rating) * 100;
-                $item_four_star_percentage = ($item_four_star_count_rating / $item_count_rating) * 100;
-                $item_five_star_percentage = ($item_five_star_count_rating / $item_count_rating) * 100;
-            }
-            else
-            {
-                $item_one_star_percentage = 0;
-                $item_two_star_percentage = 0;
-                $item_three_star_percentage = 0;
-                $item_four_star_percentage = 0;
-                $item_five_star_percentage = 0;
-            }
-            /**
-             * End get all item approved reviews
-             */
-
-            /**
-             * Start item claim
-             */
-            $item_has_claimed = $item->hasClaimed();
-            /**
-             * End item claim
-             */
-
-            /**
-             * Start fetch ads blocks
-             */
-            $advertisement = new Advertisement();
-
-            $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_AFTER_BREADCRUMB,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_gallery = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_BEFORE_GALLERY,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_description = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_BEFORE_DESCRIPTION,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_location = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_BEFORE_LOCATION,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_features = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_BEFORE_FEATURES,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_reviews = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_BEFORE_REVIEWS,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_comments = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_BEFORE_COMMENTS,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_share = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_BEFORE_SHARE,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_share = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_AFTER_SHARE,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-            /**
-             * End fetch ads blocks
-             */
-
-            /**
-             * Start fetch item sections
-             */
-            $item_sections_after_breadcrumb = $item->itemSections()
-                ->where('item_section_position', ItemSection::POSITION_AFTER_BREADCRUMB)
-                ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                ->orderBy('item_section_order')
-                ->get();
-
-            $item_sections_after_gallery = $item->itemSections()
-                ->where('item_section_position', ItemSection::POSITION_AFTER_GALLERY)
-                ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                ->orderBy('item_section_order')
-                ->get();
-
-            $item_sections_after_description = $item->itemSections()
-                ->where('item_section_position', ItemSection::POSITION_AFTER_DESCRIPTION)
-                ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                ->orderBy('item_section_order')
-                ->get();
-
-            $item_sections_after_location_map = $item->itemSections()
-                ->where('item_section_position', ItemSection::POSITION_AFTER_LOCATION_MAP)
-                ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                ->orderBy('item_section_order')
-                ->get();
-
-            $item_sections_after_features = $item->itemSections()
-                ->where('item_section_position', ItemSection::POSITION_AFTER_FEATURES)
-                ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                ->orderBy('item_section_order')
-                ->get();
-
-            $item_sections_after_reviews = $item->itemSections()
-                ->where('item_section_position', ItemSection::POSITION_AFTER_REVIEWS)
-                ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                ->orderBy('item_section_order')
-                ->get();
-
-            $item_sections_after_comments = $item->itemSections()
-                ->where('item_section_position', ItemSection::POSITION_AFTER_COMMENTS)
-                ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                ->orderBy('item_section_order')
-                ->get();
-
-            $item_sections_after_share = $item->itemSections()
-                ->where('item_section_position', ItemSection::POSITION_AFTER_SHARE)
-                ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                ->orderBy('item_section_order')
-                ->get();
-            /**
-             * End fetch item sections
-             */
-
-
-            /**
-             * Start initial blade view file path
-             */
-            $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
-            $theme_view_path = $theme_view_path->getViewPath();
-            /**
-             * End initial blade view file path
-             */
-
-            /**
-             * Start initial Google reCAPTCHA version 2
-             */
-            if($settings->setting_site_recaptcha_item_lead_enable == Setting::SITE_RECAPTCHA_ITEM_LEAD_ENABLE)
-            {
-                config_re_captcha($settings->setting_site_recaptcha_site_key, $settings->setting_site_recaptcha_secret_key);
-            }
-            /**
-             * End initial Google reCAPTCHA version 2
-             */
-
-            return response()->view($theme_view_path . 'item',
-                compact('item', 'nearby_items', 'similar_items',
-                'reviews', 'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_gallery', 'ads_before_description',
-                'ads_before_location', 'ads_before_features', 'ads_before_reviews', 'ads_before_comments',
-                'ads_before_share', 'ads_after_share', 'ads_before_sidebar_content', 'ads_after_sidebar_content',
-                'item_display_categories', 'item_total_categories', 'item_all_categories', 'item_count_rating',
-                'item_average_rating', 'item_one_star_percentage', 'item_two_star_percentage', 'item_three_star_percentage',
-                'item_four_star_percentage', 'item_five_star_percentage', 'rating_sort_by', 'item_has_claimed',
-                'item_sections_after_breadcrumb', 'item_sections_after_gallery', 'item_sections_after_description',
-                'item_sections_after_location_map', 'item_sections_after_features', 'item_sections_after_reviews',
-                'item_sections_after_comments', 'item_sections_after_share', 'item_features'));
         }
         else
         {
@@ -3455,10 +3673,7 @@ class PagesController extends Controller
 
     public function saveItem(Request $request, string $item_slug)
     {
-        //$site_prefer_country_id = app('site_prefer_country_id');
-
         $item = Item::where('item_slug', $item_slug)
-            //->where('country_id', $site_prefer_country_id)
             ->where('item_status', Item::ITEM_PUBLISHED)
             ->first();
 
@@ -3501,10 +3716,7 @@ class PagesController extends Controller
 
     public function unSaveItem(Request $request, string $item_slug)
     {
-        //$site_prefer_country_id = app('site_prefer_country_id');
-
         $item = Item::where('item_slug', $item_slug)
-            //->where('country_id', $site_prefer_country_id)
             ->where('item_status', Item::ITEM_PUBLISHED)
             ->first();
 

@@ -11,9 +11,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!--ConvertKit -->
-    <script async data-uid="6d05ba7dcf" src="https://sunny-hustler-5578.ck.page/6d05ba7dcf/index.js"></script>
-
     <!-- favicon -->
     @if($site_global_settings->setting_site_favicon)
         <link rel="icon" type="icon" href="{{ Storage::disk('public')->url('setting/'. $site_global_settings->setting_site_favicon) }}" sizes="96x96"/>
@@ -128,6 +125,8 @@
     };
 
     $(document).ready(function(){
+
+        "use strict";
 
         @if(is_demo_mode())
 

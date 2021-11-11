@@ -54,6 +54,8 @@ class ImportItemData extends Model
         'import_item_data_item_social_twitter',
         'import_item_data_item_social_linkedin',
         'import_item_data_item_youtube_id',
+        'import_item_data_item_image',
+        'import_item_data_item_image_galleries',
     );
 
 
@@ -92,6 +94,8 @@ class ImportItemData extends Model
         'import_item_data_item_id',
         'import_item_data_source',
         'import_item_data_process_error_log',
+        'import_item_data_item_image',
+        'import_item_data_item_image_galleries',
     ];
 
     public function importItemFeatureData()

@@ -56,13 +56,14 @@ class EnvironmentController extends Controller
     /**
      * Display the Environment page.
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function environmentClassic()
     {
-        $envConfig = $this->EnvironmentManager->getEnvContent();
+        return redirect()->route('LaravelInstaller::environmentWizard');
 
-        return view('vendor.installer.environment-classic', compact('envConfig'));
+        //$envConfig = $this->EnvironmentManager->getEnvContent();
+        //return view('vendor.installer.environment-classic', compact('envConfig'));
     }
 
     /**
@@ -74,12 +75,11 @@ class EnvironmentController extends Controller
      */
     public function saveClassic(Request $input, Redirector $redirect)
     {
-        $message = $this->EnvironmentManager->saveFileClassic($input);
+        return redirect()->route('LaravelInstaller::environmentWizard');
 
-        event(new EnvironmentSaved($input));
-
-        return $redirect->route('LaravelInstaller::environmentClassic')
-                        ->with(['message' => $message]);
+        //$message = $this->EnvironmentManager->saveFileClassic($input);
+        //event(new EnvironmentSaved($input));
+        //return $redirect->route('LaravelInstaller::environmentClassic')->with(['message' => $message]);
     }
 
     /**
@@ -111,7 +111,10 @@ class EnvironmentController extends Controller
         /**
          * Start to verify purchase code
          */
-        $purchase_verify = $this->verifyPurchase($request->app_purchase_code);
+        $app_purchase_code = empty($request->app_purchase_code) ? '' : $request->app_purchase_code;
+        $to_verify_codecanyon_username = empty($request->to_verify_codecanyon_username) ? '' : strtolower($request->to_verify_codecanyon_username);
+
+        $purchase_verify = $this->verifyPurchase($app_purchase_code, $to_verify_codecanyon_username);
 
         if(!$purchase_verify['verified'])
         {
@@ -131,7 +134,7 @@ class EnvironmentController extends Controller
                         ->with(['results' => $results]);
     }
 
-    private function verifyPurchase(string $purchase_code)
+    private function verifyPurchase(string $purchase_code, string $to_verify_codecanyon_username)
     {
         $code = $purchase_code;
         $personalToken = self::CODE_CANYON_TOKEN;
@@ -198,11 +201,12 @@ class EnvironmentController extends Controller
 
         // Now we can check the details of the purchase code
         // At this point, you are guaranteed to have a code that belongs to you
-        // You can apply logic such as checking the item's name or ID
+        // You can apply logic such as checking the item's id and buyer's username.
 
         $id = $body->item->id; // (int) 26890239
+        $codecanyon_username = strtolower($body->buyer);
 
-        if($id == self::CODE_CANYON_ITEM_ID)
+        if($id == self::CODE_CANYON_ITEM_ID && $to_verify_codecanyon_username == $codecanyon_username)
         {
             return array('verified' => true, 'message' => null);
         }

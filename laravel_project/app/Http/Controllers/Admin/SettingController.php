@@ -5,16 +5,21 @@ namespace App\Http\Controllers\Admin;
 use App\Country;
 use App\Http\Controllers\Controller;
 use App\Invoice;
+use App\Mail\Notification;
 use App\Plan;
 use App\Setting;
 use App\SettingBankTransfer;
 use App\SettingItem;
+use App\SettingLanguage;
 use App\Subscription;
+use App\User;
 use Artesaos\SEOTools\Facades\SEOMeta;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
@@ -73,8 +78,6 @@ class SettingController extends Controller
             'setting_site_google_analytic_tracking_id' => 'nullable|max:255',
             'setting_site_google_analytic_not_track_admin' => 'nullable|numeric',
 
-            'setting_site_language' => 'nullable|max:5',
-
             'setting_site_header_enabled' => 'nullable|numeric',
             'setting_site_header' => 'nullable',
             'setting_site_footer_enabled' => 'nullable|numeric',
@@ -92,7 +95,7 @@ class SettingController extends Controller
             'setting_site_map' => 'required|numeric|in:1,2',
             'setting_site_map_google_api_key' => 'nullable|max:255',
 
-            'setting_product_currency_symbol' => 'required|max:3',
+            'setting_product_currency_symbol' => 'required|max:4',
         ]);
 
         $settings = app('site_global_settings');
@@ -178,9 +181,6 @@ class SettingController extends Controller
         $settings->setting_site_google_analytic_enabled = $request->setting_site_google_analytic_enabled == Setting::TRACKING_ON ? Setting::TRACKING_ON : Setting::TRACKING_OFF;
         $settings->setting_site_google_analytic_tracking_id = $request->setting_site_google_analytic_tracking_id;
         $settings->setting_site_google_analytic_not_track_admin = $request->setting_site_google_analytic_not_track_admin == Setting::NOT_TRACKING_ADMIN ? Setting::NOT_TRACKING_ADMIN: Setting::TRACKING_ADMIN;
-
-        // site language
-        $settings->setting_site_language = empty($request->setting_site_language) ? null : $request->setting_site_language;
 
         // site header code
         $settings->setting_site_header_enabled = empty($request->setting_site_header_enabled) ? Setting::SITE_HEADER_DISABLED : Setting::SITE_HEADER_ENABLED;
@@ -1079,7 +1079,15 @@ class SettingController extends Controller
             'setting_site_sitemap_topic_enable',
             'setting_site_sitemap_topic_frequency',
             'setting_site_sitemap_topic_format',
-            'setting_site_sitemap_topic_include_to_index')->first();
+            'setting_site_sitemap_topic_include_to_index',
+            'setting_site_sitemap_state_enable',
+            'setting_site_sitemap_state_frequency',
+            'setting_site_sitemap_state_format',
+            'setting_site_sitemap_state_include_to_index',
+            'setting_site_sitemap_city_enable',
+            'setting_site_sitemap_city_frequency',
+            'setting_site_sitemap_city_format',
+            'setting_site_sitemap_city_include_to_index')->first();
         return response()->view('backend.admin.setting.sitemap.edit',
             compact('all_sitemap_settings'));
     }
@@ -1119,6 +1127,16 @@ class SettingController extends Controller
             'setting_site_sitemap_topic_frequency' => 'required|in:always,hourly,daily,weekly,monthly,yearly,never',
             'setting_site_sitemap_topic_format' => 'required|in:xml,html,txt,ror-rss,ror-rdf',
             'setting_site_sitemap_topic_include_to_index' => 'nullable|numeric',
+
+            'setting_site_sitemap_state_enable' => 'nullable|numeric',
+            'setting_site_sitemap_state_frequency' => 'required|in:always,hourly,daily,weekly,monthly,yearly,never',
+            'setting_site_sitemap_state_format' => 'required|in:xml,html,txt,ror-rss,ror-rdf',
+            'setting_site_sitemap_state_include_to_index' => 'nullable|numeric',
+
+            'setting_site_sitemap_city_enable' => 'nullable|numeric',
+            'setting_site_sitemap_city_frequency' => 'required|in:always,hourly,daily,weekly,monthly,yearly,never',
+            'setting_site_sitemap_city_format' => 'required|in:xml,html,txt,ror-rss,ror-rdf',
+            'setting_site_sitemap_city_include_to_index' => 'nullable|numeric',
         ]);
 
         $setting_site_sitemap_index_enable = empty($request->setting_site_sitemap_index_enable) ? Setting::SITE_SITEMAP_INDEX_DISABLE : Setting::SITE_SITEMAP_INDEX_ENABLE;
@@ -1155,6 +1173,16 @@ class SettingController extends Controller
         $setting_site_sitemap_topic_format = $request->setting_site_sitemap_topic_format;
         $setting_site_sitemap_topic_include_to_index = empty($request->setting_site_sitemap_topic_include_to_index) ? Setting::SITE_SITEMAP_NOT_INCLUDE_TO_INDEX : Setting::SITE_SITEMAP_INCLUDE_TO_INDEX;
 
+        $setting_site_sitemap_state_enable = empty($request->setting_site_sitemap_state_enable) ? Setting::SITE_SITEMAP_STATE_DISABLE : Setting::SITE_SITEMAP_STATE_ENABLE;
+        $setting_site_sitemap_state_frequency = $request->setting_site_sitemap_state_frequency;
+        $setting_site_sitemap_state_format = $request->setting_site_sitemap_state_format;
+        $setting_site_sitemap_state_include_to_index = empty($request->setting_site_sitemap_state_include_to_index) ? Setting::SITE_SITEMAP_NOT_INCLUDE_TO_INDEX : Setting::SITE_SITEMAP_INCLUDE_TO_INDEX;
+
+        $setting_site_sitemap_city_enable = empty($request->setting_site_sitemap_city_enable) ? Setting::SITE_SITEMAP_CITY_DISABLE : Setting::SITE_SITEMAP_CITY_ENABLE;
+        $setting_site_sitemap_city_frequency = $request->setting_site_sitemap_city_frequency;
+        $setting_site_sitemap_city_format = $request->setting_site_sitemap_city_format;
+        $setting_site_sitemap_city_include_to_index = empty($request->setting_site_sitemap_city_include_to_index) ? Setting::SITE_SITEMAP_NOT_INCLUDE_TO_INDEX : Setting::SITE_SITEMAP_INCLUDE_TO_INDEX;
+
         $setting = Setting::findOrFail(1);
         $setting->setting_site_sitemap_index_enable = $setting_site_sitemap_index_enable;
 
@@ -1189,6 +1217,16 @@ class SettingController extends Controller
         $setting->setting_site_sitemap_topic_frequency = $setting_site_sitemap_topic_frequency;
         $setting->setting_site_sitemap_topic_format = $setting_site_sitemap_topic_format;
         $setting->setting_site_sitemap_topic_include_to_index = $setting_site_sitemap_topic_include_to_index;
+
+        $setting->setting_site_sitemap_state_enable = $setting_site_sitemap_state_enable;
+        $setting->setting_site_sitemap_state_frequency = $setting_site_sitemap_state_frequency;
+        $setting->setting_site_sitemap_state_format = $setting_site_sitemap_state_format;
+        $setting->setting_site_sitemap_state_include_to_index = $setting_site_sitemap_state_include_to_index;
+
+        $setting->setting_site_sitemap_city_enable = $setting_site_sitemap_city_enable;
+        $setting->setting_site_sitemap_city_frequency = $setting_site_sitemap_city_frequency;
+        $setting->setting_site_sitemap_city_format = $setting_site_sitemap_city_format;
+        $setting->setting_site_sitemap_city_include_to_index = $setting_site_sitemap_city_include_to_index;
 
         $setting->save();
 
@@ -1416,5 +1454,209 @@ class SettingController extends Controller
         \Session::flash('flash_type', 'success');
 
         return redirect()->route('admin.settings.product.edit');
+    }
+
+    public function editSessionSetting(Request $request)
+    {
+        $settings = app('site_global_settings');
+
+        /**
+         * Start SEO
+         */
+        SEOMeta::setTitle(__('setting_session.seo.edit-setting-session', ['site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
+        SEOMeta::setDescription('');
+        SEOMeta::setCanonical(URL::current());
+        SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+        /**
+         * End SEO
+         */
+
+        $setting_session = env('SESSION_DRIVER', 'file');
+
+        return response()->view('backend.admin.setting.session.edit',
+            compact('setting_session'));
+    }
+
+    public function updateSessionSetting(Request $request)
+    {
+        /**
+         * Start form validation
+         */
+        $request->validate([
+            'setting_session' => 'required|max:255|in:file,cookie,database',
+        ]);
+
+        $setting_session = $request->setting_session;
+        /**
+         * End form validation
+         */
+
+        $path = base_path('.env');
+
+        if (file_exists($path)) {
+
+            $old_setting_session = env('SESSION_DRIVER', 'file');
+
+            file_put_contents($path, str_replace(
+                'SESSION_DRIVER='.$old_setting_session, 'SESSION_DRIVER='.$setting_session, file_get_contents($path)
+            ));
+        }
+
+        \Session::flash('flash_message', __('setting_session.alert.session-updated-success'));
+        \Session::flash('flash_type', 'success');
+
+        return redirect()->route('admin.settings.session.edit');
+    }
+
+    public function editLanguageSetting(Request $request)
+    {
+        $settings = app('site_global_settings');
+
+        /**
+         * Start SEO
+         */
+        SEOMeta::setTitle(__('setting_language.language.seo.edit', ['site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
+        SEOMeta::setDescription('');
+        SEOMeta::setCanonical(URL::current());
+        SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+        /**
+         * End SEO
+         */
+
+        return response()->view('backend.admin.setting.language.edit',
+            compact('settings'));
+    }
+
+    public function updateLanguageSetting(Request $request)
+    {
+        $request->validate([
+            'setting_language_default_language' => 'required|max:255',
+            'setting_languages' => 'required',
+        ]);
+
+        $setting_language_default_language = $request->setting_language_default_language;
+        $setting_languages = $request->setting_languages;
+
+        if(!in_array($setting_language_default_language, $setting_languages))
+        {
+            throw ValidationException::withMessages([
+                'setting_language_default_language' => __('setting_language.language.alert.default-not-in-available-languages')
+            ]);
+        }
+        else
+        {
+            $settings = app('site_global_settings');
+            $settings_languages = $settings->settingLanguage()->first();
+
+            $settings_languages->setting_language_default_language = $setting_language_default_language;
+
+            foreach(Setting::LANGUAGES as $settings_languages_key => $language)
+            {
+                if(in_array($settings_languages_key, $setting_languages))
+                {
+                    $settings_languages->$language = SettingLanguage::LANGUAGE_ENABLE;
+                }
+                else
+                {
+                    $settings_languages->$language = SettingLanguage::LANGUAGE_DISABLE;
+
+                    // update users table if any user set the prefer language that disabled, set it back to the
+                    // default language.
+                    $user_prefer_language_exist = User::where('user_prefer_language', $settings_languages_key)->count();
+
+                    if($user_prefer_language_exist > 0)
+                    {
+                        $update_user_prefer_language = User::where('user_prefer_language', $settings_languages_key)
+                            ->update(['user_prefer_language' => $setting_language_default_language]);
+                    }
+                }
+            }
+
+            $settings_languages->save();
+
+            \Session::flash('flash_message', __('setting_language.language.alert.updated-success'));
+            \Session::flash('flash_type', 'success');
+
+            return redirect()->route('admin.settings.language.edit');
+        }
+    }
+
+    public function testSmtpSetting(Request $request)
+    {
+        $request->validate([
+            'smtp_receiver_email' => 'required|email',
+        ]);
+
+        $settings = app('site_global_settings');
+
+        $smtp_receiver_email = $request->smtp_receiver_email;
+
+        /**
+         * Start initial SMTP settings
+         */
+        if($settings->settings_site_smtp_enabled == Setting::SITE_SMTP_ENABLED)
+        {
+            // config SMTP
+            config_smtp(
+                $settings->settings_site_smtp_sender_name,
+                $settings->settings_site_smtp_sender_email,
+                $settings->settings_site_smtp_host,
+                $settings->settings_site_smtp_port,
+                $settings->settings_site_smtp_encryption,
+                $settings->settings_site_smtp_username,
+                $settings->settings_site_smtp_password
+            );
+        }
+        else
+        {
+            \Session::flash('flash_message', __('category_index.test-smtp.enable-smtp-notify'));
+            \Session::flash('flash_type', 'danger');
+
+            return redirect()->route('admin.settings.general.edit');
+        }
+        /**
+         * End initial SMTP settings
+         */
+
+        if(!empty($settings->setting_site_name))
+        {
+            // set up APP_NAME
+            config([
+                'app.name' => $settings->setting_site_name,
+            ]);
+        }
+
+        $faker = \Faker\Factory::create();
+
+        // send an email notification to $smtp_receiver_email
+        $email_subject = __('category_index.test-smtp.email-subject');
+        $email_notify_message = [
+            __('category_index.test-smtp.email-body'),
+            $faker->sentence(30),
+        ];
+
+        try
+        {
+            Mail::to($smtp_receiver_email)->send(
+                new Notification(
+                    $email_subject,
+                    null,
+                    null,
+                    $email_notify_message
+                )
+            );
+
+            \Session::flash('flash_message', __('category_index.test-smtp.success-notify') . ' ' . $smtp_receiver_email . '.');
+            \Session::flash('flash_type', 'success');
+        }
+        catch (\Exception $e)
+        {
+            Log::error($e->getMessage() . "\n" . $e->getTraceAsString());
+
+            \Session::flash('flash_message', __('category_index.test-smtp.error-notify') . ' ' . $e->getMessage());
+            \Session::flash('flash_type', 'danger');
+        }
+
+        return redirect()->route('admin.settings.general.edit');
     }
 }

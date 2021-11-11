@@ -62,8 +62,13 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
             <div class="listing__item__text__info__right">
-                <?php echo e($item->created_at->diffForHumans()); ?>
-
+                <?php if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW): ?>
+                    <?php if($item->hasOpened()): ?>
+                        <span class="item-box-hour-span-opened"><?php echo e(__('item_hour.frontend-item-box-hour-opened')); ?></span>
+                    <?php else: ?>
+                        <span class="item-box-hour-span-closed"><?php echo e(__('item_hour.frontend-item-box-hour-closed')); ?></span>
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>

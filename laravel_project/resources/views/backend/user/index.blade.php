@@ -35,7 +35,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ __('backend.homepage.pending-listings') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pending_item_count }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($pending_item_count) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
@@ -51,7 +51,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ __('backend.homepage.all-listings') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $item_count }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($item_count) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-sign fa-2x text-gray-300"></i>
@@ -67,7 +67,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ __('backend.homepage.all-messages') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $message_count }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($message_count) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-comments fa-2x text-gray-300"></i>
@@ -83,7 +83,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ __('backend.homepage.all-comments') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $comment_count }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($comment_count) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-comment-alt fa-2x text-gray-300"></i>
@@ -102,8 +102,8 @@
                 </div>
                 <div class="card-body">
 
-                    @foreach($recent_threads as $key => $thread)
-                        <div class="row pt-2 pb-2 {{ $key%2 == 0 ? 'bg-light' : '' }}">
+                    @foreach($recent_threads as $recent_threads_key => $thread)
+                        <div class="row pt-2 pb-2 {{ $recent_threads_key%2 == 0 ? 'bg-light' : '' }}">
                             <div class="col-9">
                                 <span>{{ $thread->latestMessage->body }}</span>
                             </div>
@@ -129,8 +129,8 @@
                 </div>
                 <div class="card-body">
 
-                    @foreach($recent_comments as $key => $comment)
-                        <div class="row pt-2 pb-2 {{ $key%2 == 0 ? 'bg-light' : '' }}">
+                    @foreach($recent_comments as $recent_comments_key => $comment)
+                        <div class="row pt-2 pb-2 {{ $recent_comments_key%2 == 0 ? 'bg-light' : '' }}">
                             <div class="col-9">
                                 <span>{{ $comment->comment }}</span>
                             </div>

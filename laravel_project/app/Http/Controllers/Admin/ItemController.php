@@ -9,6 +9,8 @@ use App\CustomField;
 use App\Http\Controllers\Controller;
 use App\Item;
 use App\ItemFeature;
+use App\ItemHour;
+use App\ItemHourException;
 use App\ItemSection;
 use App\ItemSectionCollection;
 use App\Product;
@@ -16,6 +18,7 @@ use App\State;
 use App\User;
 use Artesaos\SEOTools\Facades\SEOMeta;
 use Carbon\Carbon;
+use DateTimeZone;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,6 +29,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use Intervention\Image\Facades\Image;
+use DateTime;
 
 class ItemController extends Controller
 {
@@ -58,6 +62,10 @@ class ItemController extends Controller
 
         $all_printable_categories = new Category();
         $all_printable_categories = $all_printable_categories->getPrintableCategoriesNoDash();
+
+        // filter search query
+        $search_query = empty($request->search_query) ? null : $request->search_query;
+        $search_values = !empty($search_query) ? preg_split('/\s+/', $search_query, -1, PREG_SPLIT_NO_EMPTY) : array();
 
         // filter categories
         $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
@@ -112,7 +120,14 @@ class ItemController extends Controller
         }
 
         // filter sort by
-        $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
+        if($search_query)
+        {
+            $filter_sort_by = Item::ITEMS_SORT_BY_MOST_RELEVANT;
+        }
+        else
+        {
+            $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
+        }
 
         // filter rows per page
         $filter_count_per_page = empty($request->filter_count_per_page) ? Item::COUNT_PER_PAGE_10 : $request->filter_count_per_page;
@@ -130,6 +145,18 @@ class ItemController extends Controller
         // categories
         $items_query->join('category_item as ci', 'items.id', '=', 'ci.item_id')
             ->whereIn("ci.category_id", $filter_category_ids);
+
+        // search query
+        if(is_array($search_values) && count($search_values) > 0)
+        {
+            $items_query->where(function ($query) use ($search_values) {
+                foreach($search_values as $search_values_key => $search_value)
+                {
+                    $query->where('items.item_title', 'LIKE', "%".$search_value."%")
+                        ->orWhere('items.item_categories_string', 'LIKE', "%".$search_value."%");
+                }
+            });
+        }
 
         // location
         if(!empty($filter_country))
@@ -190,15 +217,69 @@ class ItemController extends Controller
          */
         $items_count = $items_query->count();
         $items = $items_query->paginate($filter_count_per_page);
+
+        $querystringArray = [
+            'search_query' => $search_query,
+            'filter_categories' => $filter_categories,
+            'filter_country' => $filter_country,
+            'filter_state' => $filter_state,
+            'filter_city' => $filter_city,
+            'filter_item_status' => $filter_item_status,
+            'filter_item_featured' => $filter_item_featured,
+            'filter_sort_by' => $filter_sort_by,
+            'filter_count_per_page' => $filter_count_per_page,
+        ];
+
+        $pagination = $items->appends($querystringArray);
         /**
          * End getting query result
+         */
+
+        /**
+         * Start sorting the search by relevance
+         */
+        $props = [
+            'item_title',
+            'item_categories_string',
+        ];
+
+        $items = $items->sortByDesc(function($free_collection, $free_collection_key) use ($search_values, $props) {
+
+            // The bigger the weight, the higher the record
+            $weight = 0;
+            // Iterate through search terms
+            foreach($search_values as $search_values_key => $search_value)
+            {
+                // Iterate through $props
+                foreach($props as $prop)
+                {
+                    if(stripos($free_collection->$prop, $search_value) !== false)
+                    {
+                        // Increase weight if the search term is found
+                        if($prop == 'item_title')
+                        {
+                            $weight += 9;
+                        }
+                        else
+                        {
+                            $weight += 1;
+                        }
+
+                    }
+
+                }
+            }
+            return $weight;
+        });
+        /**
+         * End sorting the search by relevance
          */
 
         return response()->view('backend.admin.item.index',
             compact('items', 'items_count', 'all_printable_categories', 'filter_categories',
                 'filter_country', 'filter_state', 'filter_city', 'filter_item_status', 'filter_item_featured',
                 'filter_item_type', 'filter_sort_by', 'filter_count_per_page', 'all_countries', 'all_states',
-                'all_cities', 'request_query_array'));
+                'all_cities', 'request_query_array', 'search_query', 'pagination'));
     }
 
     /**
@@ -262,13 +343,22 @@ class ItemController extends Controller
          * End initial form of listing owner selector
          */
 
+        /**
+         * Start initial time zone selector
+         */
+        $time_zone_identifiers = DateTimeZone::listIdentifiers();
+        /**
+         * End initial time zone selector
+         */
+
         $setting_item_max_gallery_photos = $settings->settingItem->setting_item_max_gallery_photos;
         $setting_site_location_lat = $settings->setting_site_location_lat;
         $setting_site_location_lng = $settings->setting_site_location_lng;
 
         return response()->view('backend.admin.item.create',
             compact('all_categories', 'category_ids', 'all_customFields', 'setting_item_max_gallery_photos',
-                'setting_site_location_lat', 'setting_site_location_lng', 'all_countries', 'login_user', 'other_users'));
+                'setting_site_location_lat', 'setting_site_location_lng', 'all_countries', 'login_user', 'other_users',
+                'time_zone_identifiers'));
     }
 
     /**
@@ -302,8 +392,8 @@ class ItemController extends Controller
             'item_social_linkedin' => 'nullable|url|max:255',
             'item_youtube_id' => 'nullable|max:255',
             'item_type' => 'required|numeric|in:1,2',
-//            'feature_image' => 'image|max:5120',
-//            'image_gallery.*' => 'image|max:5120',
+            'item_hour_time_zone' => 'required|max:255',
+            'item_hour_show_hours' => 'required|numeric|in:1,2',
         ];
 
         // validate category_ids
@@ -403,7 +493,6 @@ class ItemController extends Controller
 
             $item_location_str = $select_city->city_name . ' ' . $select_state->state_name . ' ' . $select_country->country_name . ' ' . $item_postal_code;
         }
-
         /**
          * End validate location (city, state, country, lat, lng)
          */
@@ -438,7 +527,6 @@ class ItemController extends Controller
             $item_slug = $item_slug . '-' . uniqid();
         }
 
-
         $item_description = $request->item_description;
         $item_address = $request->item_address;
         $item_address_hide = $request->item_address_hide == Item::ITEM_ADDR_HIDE ? Item::ITEM_ADDR_HIDE : Item::ITEM_ADDR_NOT_HIDE;
@@ -457,6 +545,9 @@ class ItemController extends Controller
         $item_social_facebook = $request->item_social_facebook;
         $item_social_twitter = $request->item_social_twitter;
         $item_social_linkedin = $request->item_social_linkedin;
+
+        $item_hour_time_zone = $request->item_hour_time_zone;
+        $item_hour_show_hours = $request->item_hour_show_hours == Item::ITEM_HOUR_SHOW ? Item::ITEM_HOUR_SHOW : Item::ITEM_HOUR_NOT_SHOW;
 
         // start upload feature image
         $feature_image = $request->feature_image;
@@ -555,6 +646,8 @@ class ItemController extends Controller
             'item_categories_string' => $item_categories_string,
             'item_location_str' => $item_location_str,
             'item_type' => $item_type,
+            'item_hour_time_zone' => $item_hour_time_zone,
+            'item_hour_show_hours' => $item_hour_show_hours,
         ));
         $new_item->save();
 
@@ -638,11 +731,115 @@ class ItemController extends Controller
             }
         }
 
+        /**
+         * Start save item hours
+         */
+        $item_hours = empty($request->item_hours) ? array() : $request->item_hours;
+
+        foreach($item_hours as $item_hours_key => $item_hour)
+        {
+            $item_hour_record = explode(' ', $item_hour);
+
+            if(count($item_hour_record) == 3)
+            {
+                $item_hour_day_of_week = intval($item_hour_record[0]);
+
+                if($item_hour_day_of_week >= ItemHour::DAY_OF_WEEK_MONDAY && $item_hour_day_of_week <= ItemHour::DAY_OF_WEEK_SUNDAY)
+                {
+                    $item_hour_open_hour = intval(substr($item_hour_record[1], 0, 2));
+                    $item_hour_close_hour = intval(substr($item_hour_record[2], 0, 2));
+
+                    if($item_hour_open_hour <= $item_hour_close_hour)
+                    {
+                        $item_hour_open_time = $item_hour_record[1] . ':00';
+                        $item_hour_close_time = $item_hour_record[2] . ':00';
+
+                        if($item_hour_open_hour == 24)
+                        {
+                            $item_hour_open_time = '24:00:00';
+                        }
+
+                        if($item_hour_close_hour == 24)
+                        {
+                            $item_hour_close_time = '24:00:00';
+                        }
+
+                        if($item_hour_open_time != $item_hour_close_time)
+                        {
+                            $create_item_hour = new ItemHour(array(
+                                'item_id' => $new_item->id,
+                                'item_hour_day_of_week' => $item_hour_day_of_week,
+                                'item_hour_open_time' => $item_hour_open_time,
+                                'item_hour_close_time' => $item_hour_close_time,
+                            ));
+                            $create_item_hour->save();
+                        }
+                    }
+                }
+            }
+        }
+        /**
+         * End save item hours
+         */
+
+        /**
+         * Start save item hour exceptions
+         */
+        $item_hour_exceptions = empty($request->item_hour_exceptions) ? array() : $request->item_hour_exceptions;
+
+        foreach($item_hour_exceptions as $item_hour_exceptions_key => $item_hour_exception)
+        {
+            $item_hour_exception_record = explode(' ', $item_hour_exception);
+
+            $item_hour_exception_date = $item_hour_exception_record[0];
+
+            if(DateTime::createFromFormat('Y-m-d', $item_hour_exception_date) !== false)
+            {
+                $item_hour_exception_open_time = null;
+                $item_hour_exception_close_time = null;
+
+                if(count($item_hour_exception_record) == 3)
+                {
+                    $item_hour_exception_open_time = $item_hour_exception_record[1] . ':00';
+                    $item_hour_exception_close_time = $item_hour_exception_record[2] . ':00';
+
+                    $item_hour_exception_open_hour = intval(substr($item_hour_exception_record[1], 0, 2));
+                    $item_hour_exception_close_hour = intval(substr($item_hour_exception_record[2], 0, 2));
+
+                    if($item_hour_exception_open_hour == 24)
+                    {
+                        $item_hour_exception_open_time = '24:00:00';
+                    }
+
+                    if($item_hour_exception_close_hour == 24)
+                    {
+                        $item_hour_exception_close_time = '24:00:00';
+                    }
+
+                    if($item_hour_exception_open_hour > $item_hour_exception_close_hour || $item_hour_exception_open_time == $item_hour_exception_close_time)
+                    {
+                        continue;
+                    }
+                }
+
+                $create_item_hour_exception = new ItemHourException(array(
+                    'item_id' => $new_item->id,
+                    'item_hour_exception_date' => $item_hour_exception_date,
+                    'item_hour_exception_open_time' => $item_hour_exception_open_time,
+                    'item_hour_exception_close_time' => $item_hour_exception_close_time,
+                ));
+                $create_item_hour_exception->save();
+            }
+        }
+        /**
+         * End save item hour exceptions
+         */
+
         // success, flash message
         \Session::flash('flash_message', __('alert.item-created'));
         \Session::flash('flash_type', 'success');
 
-        return redirect()->route('admin.items.edit', $new_item);
+        return redirect()->route('admin.items.edit', ['item' => $new_item]);
     }
 
     /**
@@ -653,7 +850,7 @@ class ItemController extends Controller
      */
     public function show(Item $item)
     {
-        return redirect()->route('page.item', $item->item_slug);
+        return redirect()->route('page.item', ['item_slug' => $item->item_slug]);
     }
 
     /**
@@ -725,9 +922,27 @@ class ItemController extends Controller
 
         $setting_item_max_gallery_photos = $settings->settingItem->setting_item_max_gallery_photos;
 
+        /**
+         * Start initial time zone selector
+         */
+        $time_zone_identifiers = DateTimeZone::listIdentifiers();
+        /**
+         * End initial time zone selector
+         */
+
+        /**
+         * Start initial item hours and exceptions
+         */
+        $item_hours = $item->itemHours()->orderBy('item_hour_day_of_week')->get();
+        $item_hour_exceptions = $item->itemHourExceptions()->orderBy('item_hour_exception_date')->get();
+        /**
+         * End initial item hours and exceptions
+         */
+
         return response()->view('backend.admin.item.edit',
             compact('item_owner', 'all_countries', 'all_states', 'all_cities', 'all_customFields', 'item',
-                'categories', 'all_categories', 'category_ids', 'setting_item_max_gallery_photos'));
+                'categories', 'all_categories', 'category_ids', 'setting_item_max_gallery_photos', 'time_zone_identifiers',
+                'item_hours', 'item_hour_exceptions'));
     }
 
     /**
@@ -852,8 +1067,8 @@ class ItemController extends Controller
             'item_social_linkedin' => 'nullable|url|max:255',
             'item_youtube_id' => 'nullable|max:255',
             'item_type' => 'required|numeric|in:1,2',
-//            'feature_image' => 'image|max:5120',
-//            'image_gallery.*' => 'image|max:5120',
+            'item_hour_time_zone' => 'required|max:255',
+            'item_hour_show_hours' => 'required|numeric|in:1,2',
         ];
 
         // prepare validate rule for custom fields
@@ -970,6 +1185,9 @@ class ItemController extends Controller
         $item_social_twitter = $request->item_social_twitter;
         $item_social_linkedin = $request->item_social_linkedin;
 
+        $item_hour_time_zone = $request->item_hour_time_zone;
+        $item_hour_show_hours = $request->item_hour_show_hours == Item::ITEM_HOUR_SHOW ? Item::ITEM_HOUR_SHOW : Item::ITEM_HOUR_NOT_SHOW;
+
         // start upload feature image
         $feature_image = $request->feature_image;
         $item_feature_image_name = $item->item_image;
@@ -1085,6 +1303,9 @@ class ItemController extends Controller
 
         $item->item_type = $item_type;
 
+        $item->item_hour_time_zone = $item_hour_time_zone;
+        $item->item_hour_show_hours = $item_hour_show_hours;
+
         $item->save();
 
         // start to save custom fields data
@@ -1099,8 +1320,6 @@ class ItemController extends Controller
 
         $category_custom_fields = new CustomField();
         $category_custom_fields = $category_custom_fields->getDistinctCustomFieldsByCategories($select_categories);
-
-        //$category_custom_fields = $select_category->customFields()->orderBy('custom_field_order')->get();
 
         if($category_custom_fields->count() > 0)
         {
@@ -1176,11 +1395,115 @@ class ItemController extends Controller
             }
         }
 
+        /**
+         * Start save item hours
+         */
+        $item_hours = empty($request->item_hours) ? array() : $request->item_hours;
+
+        foreach($item_hours as $item_hours_key => $item_hour)
+        {
+            $item_hour_record = explode(' ', $item_hour);
+
+            if(count($item_hour_record) == 3)
+            {
+                $item_hour_day_of_week = intval($item_hour_record[0]);
+
+                if($item_hour_day_of_week >= ItemHour::DAY_OF_WEEK_MONDAY && $item_hour_day_of_week <= ItemHour::DAY_OF_WEEK_SUNDAY)
+                {
+                    $item_hour_open_hour = intval(substr($item_hour_record[1], 0, 2));
+                    $item_hour_close_hour = intval(substr($item_hour_record[2], 0, 2));
+
+                    if($item_hour_open_hour <= $item_hour_close_hour)
+                    {
+                        $item_hour_open_time = $item_hour_record[1] . ':00';
+                        $item_hour_close_time = $item_hour_record[2] . ':00';
+
+                        if($item_hour_open_hour == 24)
+                        {
+                            $item_hour_open_time = '24:00:00';
+                        }
+
+                        if($item_hour_close_hour == 24)
+                        {
+                            $item_hour_close_time = '24:00:00';
+                        }
+
+                        if($item_hour_open_time != $item_hour_close_time)
+                        {
+                            $create_item_hour = new ItemHour(array(
+                                'item_id' => $item->id,
+                                'item_hour_day_of_week' => $item_hour_day_of_week,
+                                'item_hour_open_time' => $item_hour_open_time,
+                                'item_hour_close_time' => $item_hour_close_time,
+                            ));
+                            $create_item_hour->save();
+                        }
+                    }
+                }
+            }
+        }
+        /**
+         * End save item hours
+         */
+
+        /**
+         * Start save item hour exceptions
+         */
+        $item_hour_exceptions = empty($request->item_hour_exceptions) ? array() : $request->item_hour_exceptions;
+
+        foreach($item_hour_exceptions as $item_hour_exceptions_key => $item_hour_exception)
+        {
+            $item_hour_exception_record = explode(' ', $item_hour_exception);
+
+            $item_hour_exception_date = $item_hour_exception_record[0];
+
+            if(DateTime::createFromFormat('Y-m-d', $item_hour_exception_date) !== false)
+            {
+                $item_hour_exception_open_time = null;
+                $item_hour_exception_close_time = null;
+
+                if(count($item_hour_exception_record) == 3)
+                {
+                    $item_hour_exception_open_time = $item_hour_exception_record[1] . ':00';
+                    $item_hour_exception_close_time = $item_hour_exception_record[2] . ':00';
+
+                    $item_hour_exception_open_hour = intval(substr($item_hour_exception_record[1], 0, 2));
+                    $item_hour_exception_close_hour = intval(substr($item_hour_exception_record[2], 0, 2));
+
+                    if($item_hour_exception_open_hour == 24)
+                    {
+                        $item_hour_exception_open_time = '24:00:00';
+                    }
+
+                    if($item_hour_exception_close_hour == 24)
+                    {
+                        $item_hour_exception_close_time = '24:00:00';
+                    }
+
+                    if($item_hour_exception_open_hour > $item_hour_exception_close_hour || $item_hour_exception_open_time == $item_hour_exception_close_time)
+                    {
+                        continue;
+                    }
+                }
+
+                $create_item_hour_exception = new ItemHourException(array(
+                    'item_id' => $item->id,
+                    'item_hour_exception_date' => $item_hour_exception_date,
+                    'item_hour_exception_open_time' => $item_hour_exception_open_time,
+                    'item_hour_exception_close_time' => $item_hour_exception_close_time,
+                ));
+                $create_item_hour_exception->save();
+            }
+        }
+        /**
+         * End save item hour exceptions
+         */
+
         // success, flash message
         \Session::flash('flash_message', __('alert.item-updated'));
         \Session::flash('flash_type', 'success');
 
-        return redirect()->route('admin.items.edit', $item);
+        return redirect()->route('admin.items.edit', ['item' => $item]);
     }
 
     /**
@@ -2569,5 +2892,162 @@ class ItemController extends Controller
         \Session::flash('flash_type', 'success');
 
         return redirect()->route('admin.items.index', $request->query());
+    }
+
+    public function destroyItemHour(Request $request, ItemHour $item_hour)
+    {
+        $item = $item_hour->item()->first();
+
+        if($item)
+        {
+            $item_hour->delete();
+
+            \Session::flash('flash_message', __('item_hour.alert.item-hour-deleted'));
+            \Session::flash('flash_type', 'success');
+
+            return redirect()->route('admin.items.edit', ['item' => $item]);
+        }
+        else
+        {
+            return redirect()->route('admin.items.index');
+        }
+    }
+
+    public function destroyItemHourException(Request $request, ItemHourException $item_hour_exception)
+    {
+        $item = $item_hour_exception->item()->first();
+
+        if($item)
+        {
+            $item_hour_exception->delete();
+
+            \Session::flash('flash_message', __('item_hour.alert.item-hour-exception-deleted'));
+            \Session::flash('flash_type', 'success');
+
+            return redirect()->route('admin.items.edit', ['item' => $item]);
+        }
+        else
+        {
+            return redirect()->route('admin.items.index');
+        }
+    }
+
+    public function updateItemHour(Request $request, ItemHour $item_hour)
+    {
+        $item = $item_hour->item()->first();
+
+        if($item)
+        {
+            $request->validate([
+                'item_hour_day_of_week' => 'required|numeric|between:1,7',
+                'item_hour_open_time_hour' => 'required|numeric|between:0,24',
+                'item_hour_open_time_minute' => 'required|numeric|between:0,59',
+                'item_hour_close_time_hour' => 'required|numeric|between:0,24',
+                'item_hour_close_time_minute' => 'required|numeric|between:0,59',
+            ]);
+
+            $item_hour_day_of_week = $request->item_hour_day_of_week;
+
+            $item_hour_open_time_hour = intval($request->item_hour_open_time_hour);
+            $item_hour_close_time_hour = intval($request->item_hour_close_time_hour);
+
+            if($item_hour_open_time_hour <= $item_hour_close_time_hour)
+            {
+                $item_hour_open_time = $request->item_hour_open_time_hour . ':' . $request->item_hour_open_time_minute . ':00';
+                $item_hour_close_time = $request->item_hour_close_time_hour . ':' . $request->item_hour_close_time_minute . ':00';
+
+                if($item_hour_open_time_hour == 24)
+                {
+                    $item_hour_open_time = '24:00:00';
+                }
+
+                if($item_hour_close_time_hour == 24)
+                {
+                    $item_hour_close_time = '24:00:00';
+                }
+
+                if($item_hour_open_time != $item_hour_close_time)
+                {
+                    $item_hour->item_hour_day_of_week = $item_hour_day_of_week;
+                    $item_hour->item_hour_open_time = $item_hour_open_time;
+                    $item_hour->item_hour_close_time = $item_hour_close_time;
+                    $item_hour->save();
+                }
+            }
+
+            \Session::flash('flash_message', __('item_hour.alert.item-hour-updated'));
+            \Session::flash('flash_type', 'success');
+
+            return redirect()->route('admin.items.edit', ['item' => $item]);
+        }
+        else
+        {
+            return redirect()->route('admin.items.index');
+        }
+    }
+
+    public function updateItemHourException(Request $request, ItemHourException $item_hour_exception)
+    {
+        $item = $item_hour_exception->item()->first();
+
+        if($item)
+        {
+            $request->validate([
+                'item_hour_exception_date' => 'required|date|date_format:Y-m-d',
+                'item_hour_exception_open_time_hour' => 'nullable|numeric|between:0,24',
+                'item_hour_exception_open_time_minute' => 'nullable|numeric|between:0,59',
+                'item_hour_exception_close_time_hour' => 'nullable|numeric|between:0,24',
+                'item_hour_exception_close_time_minute' => 'nullable|numeric|between:0,59',
+            ]);
+
+            $item_hour_exception_date = $request->item_hour_exception_date;
+            $item_hour_exception_open_time_hour = empty($request->item_hour_exception_open_time_hour) ? null : $request->item_hour_exception_open_time_hour;
+            $item_hour_exception_open_time_minute = empty($request->item_hour_exception_open_time_minute) ? null : $request->item_hour_exception_open_time_minute;
+            $item_hour_exception_close_time_hour = empty($request->item_hour_exception_close_time_hour) ? null : $request->item_hour_exception_close_time_hour;
+            $item_hour_exception_close_time_minute = empty($request->item_hour_exception_close_time_minute) ? null : $request->item_hour_exception_close_time_minute;
+
+            $item_hour_exception_open_time = null;
+            $item_hour_exception_close_time = null;
+
+            $can_be_updated = true;
+
+            if($item_hour_exception_open_time_hour && $item_hour_exception_open_time_minute && $item_hour_exception_close_time_hour && $item_hour_exception_close_time_minute)
+            {
+                $item_hour_exception_open_time = $item_hour_exception_open_time_hour . ':' . $item_hour_exception_open_time_minute . ':00';
+                $item_hour_exception_close_time = $item_hour_exception_close_time_hour . ':' . $item_hour_exception_close_time_minute . ':00';
+
+                if(intval($item_hour_exception_open_time_hour) == 24)
+                {
+                    $item_hour_exception_open_time = '24:00:00';
+                }
+
+                if(intval($item_hour_exception_close_time_hour) == 24)
+                {
+                    $item_hour_exception_close_time = '24:00:00';
+                }
+
+                if(intval($item_hour_exception_open_time_hour) > intval($item_hour_exception_close_time_hour) || $item_hour_exception_open_time == $item_hour_exception_close_time)
+                {
+                    $can_be_updated = false;
+                }
+            }
+
+            if($can_be_updated)
+            {
+                $item_hour_exception->item_hour_exception_date = $item_hour_exception_date;
+                $item_hour_exception->item_hour_exception_open_time = $item_hour_exception_open_time;
+                $item_hour_exception->item_hour_exception_close_time = $item_hour_exception_close_time;
+                $item_hour_exception->save();
+            }
+
+            \Session::flash('flash_message', __('item_hour.alert.item-hour-exception-updated'));
+            \Session::flash('flash_type', 'success');
+
+            return redirect()->route('admin.items.edit', ['item' => $item]);
+        }
+        else
+        {
+            return redirect()->route('admin.items.index');
+        }
     }
 }

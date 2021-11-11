@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
     'a_descriptive_summary' => 'A descriptive summary...',
     'a_unique_slug' => 'a-unique-slug',
     'add_a_caption' => 'Add a caption for your image',
@@ -144,4 +144,4 @@ return array (
     'your_posts_received' => 'your posts received:',
     'your_profile' => 'Your profile',
     'your_weekly_writer_summary_for' => 'Your weekly writer summary for',
-);
+];

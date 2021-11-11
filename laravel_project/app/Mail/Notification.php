@@ -39,7 +39,7 @@ class Notification extends Mailable
      * @param string|null $salutation
      */
     public function __construct(string $subject,
-                                string $to_name,
+                                string $to_name=null,
                                 string $greenting=null,
                                 array $intro_lines=[],
                                 string $action_text=null,

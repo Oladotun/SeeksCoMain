@@ -206,19 +206,6 @@
         </div>
     </li>
 
-{{--    <li class="nav-item">--}}
-{{--        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse_customization" aria-expanded="true" aria-controls="collapse_customization">--}}
-{{--            <i class="fas fa-pencil-ruler"></i>--}}
-{{--            <span>{{ __('customization.customization') }}</span>--}}
-{{--        </a>--}}
-{{--        <div id="collapse_customization" class="collapse" aria-labelledby="collapse_customization" data-parent="#accordionSidebar">--}}
-{{--            <div class="bg-white py-2 collapse-inner rounded">--}}
-{{--                <a class="collapse-item" href="{{ route('admin.customization.color.edit') }}">{{ __('customization.color') }}</a>--}}
-{{--                <a class="collapse-item" href="{{ route('admin.customization.header.edit') }}">{{ __('customization.header') }}</a>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    </li>--}}
-
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.settings.recaptcha.edit') }}">
             <i class="fas fa-check"></i>
@@ -266,6 +253,8 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{ route('admin.settings.general.edit') }}">{{ __('backend.sidebar.general') }}</a>
                 <a class="collapse-item" href="{{ route('admin.settings.cache.edit') }}">{{ __('setting_cache.cache') }}</a>
+                <a class="collapse-item" href="{{ route('admin.settings.session.edit') }}">{{ __('setting_session.session') }}</a>
+                <a class="collapse-item" href="{{ route('admin.settings.language.edit') }}">{{ __('setting_language.language.sidebar.language') }}</a>
                 <a class="collapse-item" href="{{ route('admin.settings.item.edit') }}">{{ __('backend.sidebar.listing') }}</a>
                 <a class="collapse-item" href="{{ route('admin.settings.product.edit') }}">{{ __('product_attributes.sidebar.admin.product') }}</a>
             </div>

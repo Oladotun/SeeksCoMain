@@ -35,6 +35,7 @@
                                 <th>{{ __('backend.country.name') }}</th>
                                 <th>{{ __('backend.country.abbr') }}</th>
                                 <th>{{ __('backend.country.slug') }}</th>
+                                <th>{{ __('setting_language.country.country-status') }}</th>
                                 <th>{{ __('backend.shared.action') }}</th>
                             </tr>
                             </thead>
@@ -44,16 +45,24 @@
                                 <th>{{ __('backend.country.name') }}</th>
                                 <th>{{ __('backend.country.abbr') }}</th>
                                 <th>{{ __('backend.country.slug') }}</th>
+                                <th>{{ __('setting_language.country.country-status') }}</th>
                                 <th>{{ __('backend.shared.action') }}</th>
                             </tr>
                             </tfoot>
                             <tbody>
-                            @foreach($all_countries as $key => $country)
+                            @foreach($all_countries as $all_countries_key => $country)
                                 <tr>
                                     <td>{{ $country->id }}</td>
                                     <td>{{ $country->country_name }}</td>
                                     <td>{{ $country->country_abbr }}</td>
                                     <td>{{ $country->country_slug }}</td>
+                                    <td>
+                                        @if($country->country_status == \App\Country::COUNTRY_STATUS_ENABLE)
+                                            <span class="bg-success rounded text-white pl-2 pr-2 pt-1 pb-1">{{ __('setting_language.country.country-status-enable') }}</span>
+                                        @else
+                                            <span class="bg-warning rounded text-white pl-2 pr-2 pt-1 pb-1">{{ __('setting_language.country.country-status-disable') }}</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <a href="{{ route('admin.countries.edit', $country->id) }}" class="btn btn-primary btn-circle">
                                             <i class="fas fa-cog"></i>
@@ -78,6 +87,9 @@
     <script>
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
+
+            "use strict";
+
             $('#dataTable').DataTable();
         });
     </script>

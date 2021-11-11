@@ -95,6 +95,8 @@
 <script>
     $(document).ready(function(){
 
+        "use strict";
+
         /**
          * The front-end form disable submit button UI
          */

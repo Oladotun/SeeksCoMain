@@ -10,10 +10,12 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="table_option_dropdown_country">
                         <?php $__currentLoopData = $site_available_countries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $site_available_countries_key => $country): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php if($country->country_status == \App\Country::COUNTRY_STATUS_ENABLE): ?>
                             <a class="dropdown-item" href="<?php echo e(route('page.country.update', ['user_prefer_country_id' => $country->id])); ?>">
                                 <?php echo e($country->country_name); ?>
 
                             </a>
+                            <?php endif; ?>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
@@ -30,10 +32,12 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="table_option_dropdown_locale">
                         <?php $__currentLoopData = \App\Setting::LANGUAGES; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $setting_languages_key => $language): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <a class="dropdown-item" href="<?php echo e(route('page.locale.update', ['user_prefer_language' => $language])); ?>">
-                                <?php echo e(__('prefer_languages.' . $language)); ?>
+                            <?php if($site_global_settings->settingLanguage->$language == \App\SettingLanguage::LANGUAGE_ENABLE): ?>
+                            <a class="dropdown-item" href="<?php echo e(route('page.locale.update', ['user_prefer_language' => $setting_languages_key])); ?>">
+                                <?php echo e(__('prefer_languages.' . $setting_languages_key)); ?>
 
                             </a>
+                            <?php endif; ?>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>

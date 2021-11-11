@@ -185,7 +185,7 @@ return array (
     'error-notify-modal-close' => "Close",
 
     'csv-file-upload-listing-instruction' => "Instruction",
-    'csv-file-upload-listing-instruction-columns' => "Columns for listing: title, slug (option), address (option), city, state, country, latitude (option), longitude (option), postal code, description, phone (option), website (option), facebook (option), twitter (option), linkedin (option), youtube id (option).",
+    'csv-file-upload-listing-instruction-columns' => "Columns for listing: title, slug (option), address (option), city, state, country, latitude (option), longitude (option), postal code, description, phone (option), website (option), facebook (option), twitter (option), linkedin (option), youtube id (option), feature image URL (option), gallery image URLs (option).",
     'csv-file-upload-listing-instruction-tip-1' => "Although the CSV file parse process will try its best to guess, please make sure the name of the city, state, and country matches the location data (Sidebar > Location > Country, State, City) of your website.",
     'csv-file-upload-listing-instruction-tip-2' => "If your website hosts in shared hosting, please try to upload a CSV file with less than 15,000 rows each time to avoid the maximum execution time exceeded error.",
     'csv-file-upload-listing-instruction-tip-3' => "Please group CSV files by categories for convenience. For example, restaurants in one CSV file named restaurant.csv, and hotels in another CSV file named hotel.csv.",

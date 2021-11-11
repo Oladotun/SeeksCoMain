@@ -175,7 +175,7 @@
         <div class="listing__text__top">
             <div class="listing__text__top__left">
                 <h5>{{ __('frontend.search.sub-title-1') }}</h5>
-                <span>{{ $total_results }} {{ __('theme_directory_hub.filter-results') }}</span>
+                <span>{{ number_format($total_results) }} {{ __('theme_directory_hub.filter-results') }}</span>
             </div>
             <div class="listing__text__top__right">
                 @if($filter_sort_by == \App\Item::ITEMS_SORT_BY_NEWEST_CREATED)

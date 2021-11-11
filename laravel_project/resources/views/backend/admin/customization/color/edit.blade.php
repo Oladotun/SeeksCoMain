@@ -159,6 +159,9 @@
     <script src="{{ asset('backend/vendor/spectrum/spectrum.min.js') }}"></script>
     <script>
         $(document).ready(function(){
+
+            "use strict";
+
             $('#site_primary_color').spectrum({
                 type: "component",
                 togglePaletteOnly: "true",

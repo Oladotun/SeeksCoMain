@@ -267,8 +267,9 @@
 
 @section('scripts')
     <script>
-        // Call the dataTables jQuery plugin
         $(document).ready(function() {
+
+            "use strict";
 
             @if($setting_site_bank_transfer_enable == \App\Setting::SITE_PAYMENT_BANK_TRANSFER_ENABLE)
 

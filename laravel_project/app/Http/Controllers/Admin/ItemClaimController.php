@@ -65,11 +65,10 @@ class ItemClaimController extends Controller
         $all_item_claims = $all_item_claims_query->get();
 
         // initial all items
-        $all_items = Item::where('item_status', Item::ITEM_PUBLISHED)
-            ->get();
+        //$all_items = Item::where('item_status', Item::ITEM_PUBLISHED)->get();
 
         return response()->view('backend.admin.item.item-claim.index',
-            compact('all_item_claims', 'item_claim_status', 'item_claim_item_id', 'all_items'));
+            compact('all_item_claims', 'item_claim_status', 'item_claim_item_id'));
 
     }
 

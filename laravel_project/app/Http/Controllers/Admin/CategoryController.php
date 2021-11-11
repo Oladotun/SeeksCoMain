@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Category;
 use App\Http\Controllers\Controller;
+use App\Item;
 use Artesaos\SEOTools\Facades\SEOMeta;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -18,9 +19,10 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
      * @return Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $settings = app('site_global_settings');
 
@@ -35,9 +37,101 @@ class CategoryController extends Controller
          * End SEO
          */
 
-        $all_categories = Category::all();
 
-        return response()->view('backend.admin.category.index', compact('all_categories'));
+        /**
+         * Start initial filter
+         */
+        // filter search query
+        $search_query = empty($request->search_query) ? null : $request->search_query;
+        $search_values = !empty($search_query) ? preg_split('/\s+/', $search_query, -1, PREG_SPLIT_NO_EMPTY) : array();
+
+        // filter sort by
+        if($search_query)
+        {
+            $filter_sort_by = Category::CATEGORIES_SORT_BY_MOST_RELEVANT;
+        }
+        else
+        {
+            $filter_sort_by = empty($request->filter_sort_by) ? Category::CATEGORIES_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
+        }
+
+        // filter rows per page
+        $filter_count_per_page = empty($request->filter_count_per_page) ? Category::COUNT_PER_PAGE_10 : $request->filter_count_per_page;
+        /**
+         * End initial filter
+         */
+
+
+        /**
+         * Start build query
+         */
+        $categories_query = Category::query();
+
+        $categories_query->select('categories.*');
+
+        // search query
+        if(is_array($search_values) && count($search_values) > 0)
+        {
+            $categories_query->where(function ($query) use ($search_values) {
+                foreach($search_values as $search_values_key => $search_value)
+                {
+                    $query->orWhere('categories.category_name', 'LIKE', "%".$search_value."%");
+                }
+            });
+        }
+
+        // sort by
+        if($filter_sort_by == Category::CATEGORIES_SORT_BY_NEWEST_CREATED)
+        {
+            $categories_query->orderBy('categories.created_at', 'DESC');
+        }
+        elseif($filter_sort_by == Category::CATEGORIES_SORT_BY_OLDEST_CREATED)
+        {
+            $categories_query->orderBy('categories.created_at', 'ASC');
+        }
+        elseif($filter_sort_by == Category::CATEGORIES_SORT_BY_NEWEST_UPDATED)
+        {
+            $categories_query->orderBy('categories.updated_at', 'DESC');
+        }
+        elseif($filter_sort_by == Category::CATEGORIES_SORT_BY_OLDEST_UPDATED)
+        {
+            $categories_query->orderBy('categories.updated_at', 'ASC');
+        }
+        elseif($filter_sort_by == Category::CATEGORIES_SORT_BY_CATEGORY_NAME_A_Z)
+        {
+            $categories_query->orderBy('categories.category_name', 'ASC');
+        }
+        elseif($filter_sort_by == Category::CATEGORIES_SORT_BY_CATEGORY_NAME_Z_A)
+        {
+            $categories_query->orderBy('categories.category_name', 'DESC');
+        }
+
+        $categories_query->distinct('categories.id');
+        /**
+         * End build query
+         */
+
+        /**
+         * Start getting query result
+         */
+        $categories_count = $categories_query->count();
+
+        $categories = $categories_query->paginate($filter_count_per_page);
+
+        $querystringArray = [
+            'search_query' => $search_query,
+            'filter_sort_by' => $filter_sort_by,
+            'filter_count_per_page' => $filter_count_per_page,
+        ];
+
+        $pagination = $categories->appends($querystringArray);
+        /**
+         * End getting query result
+         */
+
+        return response()->view('backend.admin.category.index',
+            compact('categories', 'categories_count', 'search_query', 'filter_sort_by', 'filter_count_per_page',
+                    'pagination'));
     }
 
     /**

@@ -18,9 +18,6 @@
     .header__menu ul li a {
         color: #323232;
     }
-    .custom-site-logo img { max-height: 150px; }
-    .footer__about__logo img {max-height: 100px;}
-
 </style>
 <!-- End page level nav style -->
 <?php /**PATH /var/www/seekscodirectory/laravel_project/theme_views/frontend_views/lduruo10_dh_frontend_city_path/partials/customization-css-full-width.blade.php ENDPATH**/ ?>

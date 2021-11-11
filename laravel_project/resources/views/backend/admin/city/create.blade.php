@@ -48,8 +48,23 @@
                         <div class="row form-group">
                             <div class="col-md-12">
                                 <label for="city_name" class="text-black">{{ __('backend.city.city-name') }}</label>
-                                <input id="city_name" type="text" class="form-control @error('city_name') is-invalid @enderror" name="city_name" value="{{ old('city_name') }}" autofocus>
+                                <input id="city_name" type="text" class="form-control @error('city_name') is-invalid @enderror" name="city_name" value="{{ old('city_name') }}">
                                 @error('city_name')
+                                <span class="invalid-tooltip">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-md-12">
+                                <label for="city_slug" class="text-black">{{ __('setting_language.location.url-slug') }}</label>
+                                <input id="city_slug" type="text" class="form-control @error('city_slug') is-invalid @enderror" name="city_slug" value="{{ old('city_slug') }}">
+                                <small class="form-text text-muted">
+                                    {{ __('setting_language.location.url-slug-help') }}
+                                </small>
+                                @error('city_slug')
                                 <span class="invalid-tooltip">
                                         <strong>{{ $message }}</strong>
                                     </span>

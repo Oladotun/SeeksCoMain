@@ -475,10 +475,12 @@
 
         $(document).ready(function() {
 
+            "use strict";
+
             /**
              * Start the croppie image plugin
              */
-            $image_crop = null;
+            var image_crop = null;
 
             $('#upload_image').on('click', function(){
 
@@ -503,9 +505,9 @@
 
             $('#upload_image_input').on('change', function(){
 
-                if(!$image_crop)
+                if(!image_crop)
                 {
-                    $image_crop = $('#image_demo').croppie({
+                    image_crop = $('#image_demo').croppie({
                         enableExif: true,
                         mouseWheelZoom: false,
                         viewport: {
@@ -528,19 +530,19 @@
 
                 reader.onload = function (event) {
 
-                    $image_crop.croppie('bind', {
+                    image_crop.croppie('bind', {
                         url: event.target.result
                     }).then(function(){
                         console.log('jQuery bind complete');
                     });
 
-                }
+                };
                 reader.readAsDataURL(this.files[0]);
             });
 
             $('#crop_image').on("click", function(event){
 
-                $image_crop.croppie('result', {
+                image_crop.croppie('result', {
                     type: 'base64',
                     size: 'viewport'
                 }).then(function(response){

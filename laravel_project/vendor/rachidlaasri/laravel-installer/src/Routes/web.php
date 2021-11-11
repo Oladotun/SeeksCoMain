@@ -64,7 +64,7 @@ Route::group(['prefix' => 'update', 'as' => 'LaravelUpdater::', 'namespace' => '
             'uses' => 'UpdateController@overview',
         ]);
 
-        Route::get('database', [
+        Route::post('database', [
             'as' => 'database',
             'uses' => 'UpdateController@database',
         ]);

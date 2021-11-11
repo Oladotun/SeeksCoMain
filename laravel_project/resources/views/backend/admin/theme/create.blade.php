@@ -62,9 +62,4 @@
 @endsection
 
 @section('scripts')
-    <script>
-        // Call the dataTables jQuery plugin
-        $(document).ready(function() {
-        });
-    </script>
 @endsection

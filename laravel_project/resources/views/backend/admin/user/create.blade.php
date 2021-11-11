@@ -104,9 +104,11 @@
                                     <option value="">{{ __('backend.setting.language.select-language') }}</option>
 
                                     @foreach(\App\Setting::LANGUAGES as $setting_languages_key => $language)
-                                        <option value="{{ $language }}" {{ old('user_prefer_language') == $language ? 'selected' : '' }}>
-                                            {{ __('prefer_languages.' . $language) }}
+                                        @if($site_global_settings->settingLanguage->$language == \App\SettingLanguage::LANGUAGE_ENABLE)
+                                        <option value="{{ $setting_languages_key }}" {{ old('user_prefer_language') == $setting_languages_key ? 'selected' : '' }}>
+                                            {{ __('prefer_languages.' . $setting_languages_key) }}
                                         </option>
+                                        @endif
                                     @endforeach
 
                                 </select>
@@ -127,8 +129,10 @@
                                 <select class="custom-select @error('user_prefer_country_id') is-invalid @enderror" name="user_prefer_country_id">
 
                                     <option value="">{{ __('prefer_country.select-country') }}</option>
-                                    @foreach($all_countries as $key => $country)
+                                    @foreach($all_countries as $all_countries_key => $country)
+                                        @if($country->country_status == \App\Country::COUNTRY_STATUS_ENABLE)
                                         <option {{ old('user_prefer_country_id') == $country->id ? 'selected' : '' }} value="{{ $country->id }}">{{ $country->country_name }}</option>
+                                        @endif
                                     @endforeach
 
                                 </select>
@@ -238,10 +242,12 @@
         // Call the dataTables jQuery plugin
         $(document).ready(function() {
 
+            "use strict";
+
             /**
              * Start the croppie image plugin
              */
-            $image_crop = null;
+            var image_crop = null;
 
             $('#upload_image').on('click', function(){
 
@@ -251,9 +257,9 @@
 
             $('#upload_image_input').on('change', function(){
 
-                if(!$image_crop)
+                if(!image_crop)
                 {
-                    $image_crop = $('#image_demo').croppie({
+                    image_crop = $('#image_demo').croppie({
                         enableExif: true,
                         mouseWheelZoom: false,
                         viewport: {
@@ -276,19 +282,19 @@
 
                 reader.onload = function (event) {
 
-                    $image_crop.croppie('bind', {
+                    image_crop.croppie('bind', {
                         url: event.target.result
                     }).then(function(){
                         console.log('jQuery bind complete');
                     });
 
-                }
+                };
                 reader.readAsDataURL(this.files[0]);
             });
 
             $('#crop_image').on("click", function(event){
 
-                $image_crop.croppie('result', {
+                image_crop.croppie('result', {
                     type: 'base64',
                     size: 'viewport'
                 }).then(function(response){
