@@ -8,6 +8,8 @@
     .header {
 
         background-color: #ffffff;
+        position: sticky;
+        top: 0;
     }
     .customization-header-font-color {
         color: #323232;
