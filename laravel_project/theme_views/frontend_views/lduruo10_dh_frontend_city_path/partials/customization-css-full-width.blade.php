@@ -21,6 +21,15 @@
         color: #323232;
     }
 
+    body {
+      padding-top: 20px;
+    }
+    @media (max-width: 979px) {
+      body {
+        padding-top: 0px;
+      }
+    }
+
     .custom-site-logo img { max-height: 100px; }
 </style>
 <!-- End page level nav style -->
