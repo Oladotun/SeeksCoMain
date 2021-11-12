@@ -343,6 +343,7 @@ class Item extends Model implements ReviewRateable
             ->where('reviewrateable_id', $this->id)
             ->where('approved', self::ITEM_REVIEW_APPROVED)
             ->first();
+            
 
         return floatval($average_rating_query->average_rating);
     }

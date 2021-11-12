@@ -2783,6 +2783,7 @@
                 spacing: "3px",
                 starWidth: "15px",
                 readOnly: true,
+                // rating: 1,
                 rating: {{ $item_average_rating }},
             });
             @endif

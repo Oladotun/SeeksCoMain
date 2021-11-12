@@ -2781,7 +2781,7 @@ class PagesController extends Controller
                     $item_all_categories = $item->getAllCategories();
 
                     $item_count_rating = $item->getCountRating();
-                    $item_average_rating = $item->item_average_rating;
+                    $item_average_rating = $item->getAverageRating();
 
                     $product_features = $product->productFeatures()
                         ->orderBy('product_feature_order')
@@ -3211,7 +3211,7 @@ class PagesController extends Controller
                      * Start get all item approved reviews
                      */
                     $item_count_rating = $item->getCountRating();
-                    $item_average_rating = $item->item_average_rating;
+                    $item_average_rating = $item->getAverageRating();
 
                     $rating_sort_by = empty($request->rating_sort_by) ? Item::ITEM_RATING_SORT_BY_NEWEST : $request->rating_sort_by;
                     $reviews = $item->getApprovedRatingsSortBy($rating_sort_by);
