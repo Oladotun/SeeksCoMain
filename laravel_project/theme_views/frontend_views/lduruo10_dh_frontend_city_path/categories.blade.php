@@ -22,7 +22,9 @@
                 <select class="selectpicker @error('filter_state') is-invalid @enderror" name="filter_state" id="filter_state" data-live-search="true">
                     <option value="0" {{ empty($filter_state) ? 'selected' : '' }}>{{ __('prefer_country.all-state') }}</option>
                     @foreach($all_states as $all_states_key => $state)
+                        @if($state->items_count > 0)
                         <option value="{{ $state->id }}" {{ $filter_state == $state->id ? 'selected' : '' }}>{{ $state->state_name }}</option>
+                        @endif
                     @endforeach
                 </select>
                 @error('filter_state')
@@ -36,7 +38,7 @@
                 <select class="selectpicker @error('filter_city') is-invalid @enderror" name="filter_city" id="filter_city" data-live-search="true">
                     <option value="0" {{ empty($filter_city) ? 'selected' : '' }}>{{ __('prefer_country.all-city') }}</option>
                     @foreach($all_cities as $all_cities_key => $city)
-                        <option value="{{ $city->id }}" {{ $filter_city == $city->id ? 'selected' : '' }}>{{ $city->city_name }}</option>
+                        <option value="{{ $city->id }}" {{ $filter_city == $city->id ? 'selected' : '' }}>{{ $city->city_name }} {{$city->items_count}}</option>
                     @endforeach
                 </select>
                 @error('filter_city')
@@ -294,9 +296,11 @@
 
         <div class="row mt-4">
             @foreach($all_states as $all_states_key => $state)
+            @if($state->items_count > 0)
                 <div class="col-6 col-lg-4 mb-3">
-                    <a href="{{ route('page.state', ['state_slug' => $state->state_slug]) }}">{{ $state->state_name }}</a>
+                    <a href="{{ route('page.state', ['state_slug' => $state->state_slug]) }}">{{ $state->state_name }} ({{ $state->items_count }} listings)</a>
                 </div>
+            @endif
             @endforeach
         </div>
         @endif

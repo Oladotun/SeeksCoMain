@@ -1,11 +1,11 @@
 <div class="listing__item">
     <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
         <div class="listing__item__pic set-bg" data-setbg="<?php echo e(!empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp')); ?>">
-            <?php if(empty($item->user->user_image)): ?>
+            <!-- <?php if(empty($item->user->user_image)): ?>
                 <img src="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($item->user->id % 10) . '.webp')); ?>" alt="">
             <?php else: ?>
                 <img src="<?php echo e(Storage::disk('public')->url('user/' . $item->user->user_image)); ?>" alt="<?php echo e($item->user->name); ?>">
-            <?php endif; ?>
+            <?php endif; ?> -->
         </div>
     </a>
     <div class="listing__item__text">

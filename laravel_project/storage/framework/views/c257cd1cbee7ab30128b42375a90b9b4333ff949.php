@@ -5,6 +5,7 @@
     a {
         color: <?php echo e($customization_site_primary_color); ?>;
     }
+    .custom-site-logo img { max-height: 100px; }
     .primary-btn {
         background: <?php echo e($customization_site_primary_color); ?>;
         border: 1px solid <?php echo e($customization_site_primary_color); ?>;

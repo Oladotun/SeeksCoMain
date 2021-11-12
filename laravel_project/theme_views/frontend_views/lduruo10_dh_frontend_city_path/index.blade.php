@@ -59,23 +59,24 @@
                                 @endif
 
                                 <h5>{{ $category->category_name }}</h5>
+                                <span class="number">{{ number_format(count($category->getItemIdsByCategoryIds([$category->id]))) }}</span>
                                 </a>
                             </div>
                         @endforeach
 
-                        <div class="categories__item custom-all-categories-div">
+                        <!-- <div class="categories__item custom-all-categories-div">
                             <a href="{{ route('page.categories') }}">
                                 <span class="custom-icon">
                                     <i class="fas fa-th"></i>
                                 </span>
                                 <h5>{{ __('frontend.homepage.all-categories') }}</h5>
                             </a>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
 
-            <div class="row pt-3 custom-all-categories-button">
+            <div class="row mt-3">
                 <div class="col-lg-12 text-center">
                     <a href="{{ route('page.categories') }}" class="primary-btn pl-3 pr-3 pt-2 pb-2">
                         <i class="fas fa-th mr-2"></i>
@@ -83,6 +84,16 @@
                     </a>
                 </div>
             </div>
+        <!-- <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <a href="{{ route('page.categories') }}" class="btn btn-primary rounded text-white">
+                        <span class="custom-icon">
+                                    <i class="fas fa-th"></i>
+                                </span>
+                        {{ __('frontend.homepage.all-categories') }}
+                    </a>
+                </div>
+            </div> -->
 
         </div>
     </section>
@@ -897,6 +908,14 @@
 
                 </div>
             </div>
+
+                <div class="col-lg-12 text-center">
+                        <a href="{{ route('page.categories') }}" class="primary-btn pl-3 pr-3 pt-2 pb-2">
+                            <i class="fas fa-th mr-2"></i>
+                            {{ __('all_latest_listings.view-all-latest') }}
+                        </a>
+                    </div>
+                </div>
         </div>
     </section>
     @endif
@@ -993,7 +1012,7 @@
                     @endforeach
                 </div>
 
-                <div class="row pt-3 custom-all-categories-button">
+                <div class="row mt-3">
                     <div class="col-lg-12 text-center">
                         <a href="{{ route('page.categories') }}" class="primary-btn pl-3 pr-3 pt-2 pb-2">
                             <i class="fas fa-th mr-2"></i>
@@ -1001,6 +1020,17 @@
                         </a>
                     </div>
                 </div>
+
+                <!-- <div class="row mt-3">
+                    <div class="col-12 text-center">
+                        <a href="{{ route('page.categories') }}" class="btn btn-primary rounded text-white">
+                            <span class="custom-icon">
+                                    <i class="fas fa-th"></i>
+                                </span>
+                            {{ __('all_latest_listings.view-all-latest') }}
+                        </a>
+                    </div>
+                </div> -->
             </div>
         </section>
     @endif
@@ -1093,7 +1123,7 @@
 
             </div>
 
-            <div class="row pt-3 custom-all-categories-button">
+            <div class="row mt-3">
                 <div class="col-lg-12 text-center">
                     <a href="{{ route('page.blog') }}" class="primary-btn pl-3 pr-3 pt-2 pb-2">
                         <i class="fas fa-rss mr-2"></i>

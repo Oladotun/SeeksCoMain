@@ -49,8 +49,8 @@ return [
      *     ])
      *
      */
-//    'approval_required' => false,
-    'approval_required' => true,
+   'approval_required' => false,
+    // 'approval_required' => true,
 
     /**
      * Set this option to `true` to enable guest commenting.

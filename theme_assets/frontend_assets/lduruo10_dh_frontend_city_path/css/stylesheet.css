@@ -16441,6 +16441,7 @@ form label {
 }
 .categories__item {
     padding-top: 20px;
+    padding-bottom: 25px;
 }
 .categories__item .custom-icon {
     font-size: 60px;
@@ -16613,7 +16614,7 @@ form label {
  */
 .categories__item_sm {
     width: 100%;
-    padding: 5px 10px 7px 10px;
+    padding: 5px 10px 10px 10px;
     margin-bottom: 10px;
 }
 .categories__item_sm .custom-icon {
@@ -16830,4 +16831,30 @@ form label {
 }
 /**
  * End product page
+ */
+
+/**
+ * Start open hour style
+ */
+.item-box-hour-span-opened {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #28a745;
+    border: 1px solid #28a745;
+    padding: 2px 8px;
+    border-radius: 3px;
+    line-height: 1;
+}
+
+.item-box-hour-span-closed {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    padding: 2px 8px;
+    border-radius: 3px;
+    line-height: 1;
+}
+/**
+ * End open hour style
  */

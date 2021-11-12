@@ -27,7 +27,9 @@ endif;
 unset($__errorArgs, $__bag); ?>" name="filter_state" id="filter_state" data-live-search="true">
                     <option value="0" <?php echo e(empty($filter_state) ? 'selected' : ''); ?>><?php echo e(__('prefer_country.all-state')); ?></option>
                     <?php $__currentLoopData = $all_states; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_states_key => $state): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php if($state->items_count > 0): ?>
                         <option value="<?php echo e($state->id); ?>" <?php echo e($filter_state == $state->id ? 'selected' : ''); ?>><?php echo e($state->state_name); ?></option>
+                        <?php endif; ?>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <?php $__errorArgs = ['filter_state'];
@@ -55,7 +57,7 @@ endif;
 unset($__errorArgs, $__bag); ?>" name="filter_city" id="filter_city" data-live-search="true">
                     <option value="0" <?php echo e(empty($filter_city) ? 'selected' : ''); ?>><?php echo e(__('prefer_country.all-city')); ?></option>
                     <?php $__currentLoopData = $all_cities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_cities_key => $city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($city->id); ?>" <?php echo e($filter_city == $city->id ? 'selected' : ''); ?>><?php echo e($city->city_name); ?></option>
+                        <option value="<?php echo e($city->id); ?>" <?php echo e($filter_city == $city->id ? 'selected' : ''); ?>><?php echo e($city->city_name); ?> <?php echo e($city->items_count); ?></option>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <?php $__errorArgs = ['filter_city'];
@@ -361,9 +363,11 @@ unset($__errorArgs, $__bag); ?>
 
         <div class="row mt-4">
             <?php $__currentLoopData = $all_states; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_states_key => $state): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php if($state->items_count > 0): ?>
                 <div class="col-6 col-lg-4 mb-3">
-                    <a href="<?php echo e(route('page.state', ['state_slug' => $state->state_slug])); ?>"><?php echo e($state->state_name); ?></a>
+                    <a href="<?php echo e(route('page.state', ['state_slug' => $state->state_slug])); ?>"><?php echo e($state->state_name); ?> (<?php echo e($state->items_count); ?> listings)</a>
                 </div>
+            <?php endif; ?>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
         <?php endif; ?>

@@ -8,6 +8,8 @@
     .header {
 
         background-color: #ffffff;
+        position: sticky;
+        top: 0;
     }
     .customization-header-font-color {
         color: #323232;
@@ -18,6 +20,17 @@
     .header__menu ul li a {
         color: #323232;
     }
+
+    body {
+      padding-top: 20px;
+    }
+    @media (max-width: 979px) {
+      body {
+        padding-top: 0px;
+      }
+    }
+
+    .custom-site-logo img { max-height: 100px; }
 </style>
 <!-- End page level nav style -->
 <?php /**PATH /var/www/seekscodirectory/laravel_project/theme_views/frontend_views/lduruo10_dh_frontend_city_path/partials/customization-css-full-width.blade.php ENDPATH**/ ?>
