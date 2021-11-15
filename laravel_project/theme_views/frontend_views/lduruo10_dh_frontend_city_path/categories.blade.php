@@ -13,224 +13,113 @@
 @section('content')
 
     <!-- Filter Begin -->
-    <div class="filter nice-scroll">
-        <form method="GET" action="{{ route('page.categories') }}">
-            <div class="filter__title">
-                <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
-            </div>
-            <div class="filter__select">
-                <select class="selectpicker @error('filter_state') is-invalid @enderror" name="filter_state" id="filter_state" data-live-search="true">
-                    <option value="0" {{ empty($filter_state) ? 'selected' : '' }}>{{ __('prefer_country.all-state') }}</option>
-                    @foreach($all_states as $all_states_key => $state)
-                        @if($state->items_count > 0)
-                        <option value="{{ $state->id }}" {{ $filter_state == $state->id ? 'selected' : '' }}>{{ $state->state_name }}</option>
-                        @endif
+    <div class="container-fluid">
+        <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
+            <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
+        <div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-4 col-lg-2">
+            <form method="GET" action="{{ route('page.categories') }}">
+                <div class="filter__title">
+                    <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
+                </div>
+                <div class="filter__select">
+                    <select class="selectpicker @error('filter_state') is-invalid @enderror" name="filter_state" id="filter_state" data-live-search="true">
+                        <option value="0" {{ empty($filter_state) ? 'selected' : '' }}>{{ __('prefer_country.all-state') }}</option>
+                        @foreach($all_states as $all_states_key => $state)
+                            @if($state->items_count > 0)
+                            <option value="{{ $state->id }}" {{ $filter_state == $state->id ? 'selected' : '' }}>{{ $state->state_name }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                    @error('filter_state')
+                    <span class="invalid-tooltip">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+
+                </div>
+                <div class="filter__select">
+                    <select class="selectpicker @error('filter_city') is-invalid @enderror" name="filter_city" id="filter_city" data-live-search="true">
+                        <option value="0" {{ empty($filter_city) ? 'selected' : '' }}>{{ __('prefer_country.all-city') }}</option>
+                        @foreach($all_cities as $all_cities_key => $city)
+                            <option value="{{ $city->id }}" {{ $filter_city == $city->id ? 'selected' : '' }}>{{ $city->city_name }} {{$city->items_count}}</option>
+                        @endforeach
+                    </select>
+                    @error('filter_city')
+                    <span class="invalid-tooltip">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="filter__select">
+                    <select class="selectpicker @error('filter_sort_by') is-invalid @enderror" name="filter_sort_by" id="filter_sort_by">
+                        <option value="{{ \App\Item::ITEMS_SORT_BY_NEWEST_CREATED }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_NEWEST_CREATED ? 'selected' : '' }}>{{ __('listings_filter.sort-by-newest') }}</option>
+                        <option value="{{ \App\Item::ITEMS_SORT_BY_OLDEST_CREATED }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_OLDEST_CREATED ? 'selected' : '' }}>{{ __('listings_filter.sort-by-oldest') }}</option>
+                        <option value="{{ \App\Item::ITEMS_SORT_BY_HIGHEST_RATING }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_HIGHEST_RATING ? 'selected' : '' }}>{{ __('listings_filter.sort-by-highest') }}</option>
+                        <option value="{{ \App\Item::ITEMS_SORT_BY_LOWEST_RATING }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_LOWEST_RATING ? 'selected' : '' }}>{{ __('listings_filter.sort-by-lowest') }}</option>
+                        <option value="{{ \App\Item::ITEMS_SORT_BY_NEARBY_FIRST }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_NEARBY_FIRST ? 'selected' : '' }}>{{ __('theme_directory_hub.filter-sort-by-nearby-first') }}</option>
+                    </select>
+                    @error('filter_sort_by')
+                    <span class="invalid-tooltip">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="filter__tags">
+                    <h6>{{ __('backend.category.category') }}</h6>
+
+                    @foreach($all_printable_categories as $key => $all_printable_category)
+                        <label class="filter_category_div" for="filter_categories_{{ $all_printable_category['category_id'] }}">
+                            {{ $all_printable_category['category_name'] }}
+                            <input {{ in_array($all_printable_category['category_id'], $filter_categories) ? 'checked' : '' }} name="filter_categories[]" type="checkbox" value="{{ $all_printable_category['category_id'] }}" id="filter_categories_{{ $all_printable_category['category_id'] }}">
+                            <span class="checkmark"></span>
+                        </label>
                     @endforeach
-                </select>
-                @error('filter_state')
-                <span class="invalid-tooltip">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
 
-            </div>
-            <div class="filter__select">
-                <select class="selectpicker @error('filter_city') is-invalid @enderror" name="filter_city" id="filter_city" data-live-search="true">
-                    <option value="0" {{ empty($filter_city) ? 'selected' : '' }}>{{ __('prefer_country.all-city') }}</option>
-                    @foreach($all_cities as $all_cities_key => $city)
-                        <option value="{{ $city->id }}" {{ $filter_city == $city->id ? 'selected' : '' }}>{{ $city->city_name }} {{$city->items_count}}</option>
-                    @endforeach
-                </select>
-                @error('filter_city')
-                <span class="invalid-tooltip">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
-            <div class="filter__select">
-                <select class="selectpicker @error('filter_sort_by') is-invalid @enderror" name="filter_sort_by" id="filter_sort_by">
-                    <option value="{{ \App\Item::ITEMS_SORT_BY_NEWEST_CREATED }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_NEWEST_CREATED ? 'selected' : '' }}>{{ __('listings_filter.sort-by-newest') }}</option>
-                    <option value="{{ \App\Item::ITEMS_SORT_BY_OLDEST_CREATED }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_OLDEST_CREATED ? 'selected' : '' }}>{{ __('listings_filter.sort-by-oldest') }}</option>
-                    <option value="{{ \App\Item::ITEMS_SORT_BY_HIGHEST_RATING }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_HIGHEST_RATING ? 'selected' : '' }}>{{ __('listings_filter.sort-by-highest') }}</option>
-                    <option value="{{ \App\Item::ITEMS_SORT_BY_LOWEST_RATING }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_LOWEST_RATING ? 'selected' : '' }}>{{ __('listings_filter.sort-by-lowest') }}</option>
-                    <option value="{{ \App\Item::ITEMS_SORT_BY_NEARBY_FIRST }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_NEARBY_FIRST ? 'selected' : '' }}>{{ __('theme_directory_hub.filter-sort-by-nearby-first') }}</option>
-                </select>
-                @error('filter_sort_by')
-                <span class="invalid-tooltip">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
-            <div class="filter__tags">
-                <h6>{{ __('backend.category.category') }}</h6>
+                    @error('filter_categories')
+                    <span class="invalid-tooltip">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
 
-                @foreach($all_printable_categories as $key => $all_printable_category)
-                    <label class="filter_category_div" for="filter_categories_{{ $all_printable_category['category_id'] }}">
-                        {{ $all_printable_category['category_name'] }}
-                        <input {{ in_array($all_printable_category['category_id'], $filter_categories) ? 'checked' : '' }} name="filter_categories[]" type="checkbox" value="{{ $all_printable_category['category_id'] }}" id="filter_categories_{{ $all_printable_category['category_id'] }}">
-                        <span class="checkmark"></span>
-                    </label>
-                @endforeach
-
-                @error('filter_categories')
-                <span class="invalid-tooltip">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <a href="javascript:;" class="show_more">{{ __('listings_filter.show-more') }}</a>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <a href="javascript:;" class="show_more">{{ __('listings_filter.show-more') }}</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="filter__btns">
-                <button type="submit">{{ __('theme_directory_hub.filter-button-filter-results') }}</button>
-                <a class="btn btn-outline-secondary filter__reset__btn" href="{{ route('page.categories') }}">{{ __('theme_directory_hub.filter-link-reset-all') }}</a>
-            </div>
-        </form>
-        <hr>
-
-        @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width')
-    </div>
-    <!-- Filter End -->
-
-    <!-- Listing Section Begin -->
-    <section class="listing nice-scroll">
-
-        @if($ads_before_breadcrumb->count() > 0)
-            @foreach($ads_before_breadcrumb as $ads_before_breadcrumb_key => $ad_before_breadcrumb)
-                <div class="row mb-5">
-                    @if($ad_before_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
-                        <div class="col-12 text-left">
-                            <div>
-                                {!! $ad_before_breadcrumb->advertisement_code !!}
-                            </div>
-                        </div>
-                    @elseif($ad_before_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
-                        <div class="col-12 text-center">
-                            <div>
-                                {!! $ad_before_breadcrumb->advertisement_code !!}
-                            </div>
-                        </div>
-                    @elseif($ad_before_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
-                        <div class="col-12 text-right">
-                            <div>
-                                {!! $ad_before_breadcrumb->advertisement_code !!}
-                            </div>
-                        </div>
-                    @endif
-
+                <div class="filter__btns">
+                    <button type="submit">{{ __('theme_directory_hub.filter-button-filter-results') }}</button>
+                    <a class="btn btn-outline-secondary filter__reset__btn" href="{{ route('page.categories') }}">{{ __('theme_directory_hub.filter-link-reset-all') }}</a>
                 </div>
-            @endforeach
-        @endif
+            </form>
+            <hr>
 
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('page.home') }}">
-                                <i class="fas fa-bars"></i>
-                                {{ __('frontend.shared.home') }}
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">{{ __('frontend.item.all-categories') }}</li>
-                    </ol>
-                </nav>
-            </div>
+            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width')
         </div>
+        <!-- Filter End -->
 
-        @if($ads_after_breadcrumb->count() > 0)
-            @foreach($ads_after_breadcrumb as $ads_after_breadcrumb_key => $ad_after_breadcrumb)
-                <div class="row mb-5">
-                    @if($ad_after_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
-                        <div class="col-12 text-left">
-                            <div>
-                                {!! $ad_after_breadcrumb->advertisement_code !!}
-                            </div>
-                        </div>
-                    @elseif($ad_after_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
-                        <div class="col-12 text-center">
-                            <div>
-                                {!! $ad_after_breadcrumb->advertisement_code !!}
-                            </div>
-                        </div>
-                    @elseif($ad_after_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
-                        <div class="col-12 text-right">
-                            <div>
-                                {!! $ad_after_breadcrumb->advertisement_code !!}
-                            </div>
-                        </div>
-                    @endif
+        <!-- Listing Section Begin -->
+        <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-left: 10%;">
 
-                </div>
-            @endforeach
-        @endif
-
-        @if($categories->count() > 0)
-            <div class="row mb-4">
-                @foreach($categories as $categories_key => $category)
-                    <div class="col-12 col-md-6 col-lg-3 pr-0">
-                        <div class="categories__item categories__item_sm">
-                            <a href="{{ route('page.category', $category->category_slug) }}">
-
-                                @if($category->category_icon)
-                                    <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="{{ $category->category_icon }}"></i></span>
-                                @else
-                                    <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="fas fa-heart"></i></span>
-                                @endif
-
-                                <h5>{{ $category->category_name }}</h5>
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-
-        <div class="listing__text__top">
-            <div class="listing__text__top__left">
-                <h5>{{ __('frontend.categories.sub-title-1') }}</h5>
-                <span>{{ number_format($total_results) }} {{ __('theme_directory_hub.filter-results') }}</span>
-            </div>
-            <div class="listing__text__top__right">
-                @if($filter_sort_by == \App\Item::ITEMS_SORT_BY_NEWEST_CREATED)
-                    {{ __('listings_filter.sort-by-newest') }}
-                @elseif($filter_sort_by == \App\Item::ITEMS_SORT_BY_OLDEST_CREATED)
-                    {{ __('listings_filter.sort-by-oldest') }}
-                @elseif($filter_sort_by == \App\Item::ITEMS_SORT_BY_HIGHEST_RATING)
-                    {{ __('listings_filter.sort-by-highest') }}
-                @elseif($filter_sort_by == \App\Item::ITEMS_SORT_BY_LOWEST_RATING)
-                    {{ __('listings_filter.sort-by-lowest') }}
-                @elseif($filter_sort_by == \App\Item::ITEMS_SORT_BY_NEARBY_FIRST)
-                    {{ __('theme_directory_hub.filter-sort-by-nearby-first') }}
-                @endif
-                <i class="fas fa-sort-amount-down"></i>
-            </div>
-        </div>
-
-        <div class="listing__list">
-
-            @if($ads_before_content->count() > 0)
-                @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)
+            @if($ads_before_breadcrumb->count() > 0)
+                @foreach($ads_before_breadcrumb as $ads_before_breadcrumb_key => $ad_before_breadcrumb)
                     <div class="row mb-5">
-                        @if($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
+                        @if($ad_before_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
                             <div class="col-12 text-left">
                                 <div>
-                                    {!! $ad_before_content->advertisement_code !!}
+                                    {!! $ad_before_breadcrumb->advertisement_code !!}
                                 </div>
                             </div>
-                        @elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
+                        @elseif($ad_before_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
                             <div class="col-12 text-center">
                                 <div>
-                                    {!! $ad_before_content->advertisement_code !!}
+                                    {!! $ad_before_breadcrumb->advertisement_code !!}
                                 </div>
                             </div>
-                        @elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
+                        @elseif($ad_before_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
                             <div class="col-12 text-right">
                                 <div>
-                                    {!! $ad_before_content->advertisement_code !!}
+                                    {!! $ad_before_breadcrumb->advertisement_code !!}
                                 </div>
                             </div>
                         @endif
@@ -239,37 +128,41 @@
                 @endforeach
             @endif
 
-            @if($paid_items->count() > 0)
-                @foreach($paid_items as $paid_items_key => $item)
-                    @include('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block')
-                @endforeach
-            @endif
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('page.home') }}">
+                                    <i class="fas fa-bars"></i>
+                                    {{ __('frontend.shared.home') }}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ __('frontend.item.all-categories') }}</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
 
-            @if($free_items->count() > 0)
-                @foreach($free_items as $free_items_key => $item)
-                    @include('frontend_views.lduruo10_dh_frontend_city_path.partials.free-item-block')
-                @endforeach
-            @endif
-
-            @if($ads_after_content->count() > 0)
-                @foreach($ads_after_content as $ads_after_content_key => $ad_after_content)
-                    <div class="row mt-5">
-                        @if($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
+            @if($ads_after_breadcrumb->count() > 0)
+                @foreach($ads_after_breadcrumb as $ads_after_breadcrumb_key => $ad_after_breadcrumb)
+                    <div class="row mb-5">
+                        @if($ad_after_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
                             <div class="col-12 text-left">
                                 <div>
-                                    {!! $ad_after_content->advertisement_code !!}
+                                    {!! $ad_after_breadcrumb->advertisement_code !!}
                                 </div>
                             </div>
-                        @elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
+                        @elseif($ad_after_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
                             <div class="col-12 text-center">
                                 <div>
-                                    {!! $ad_after_content->advertisement_code !!}
+                                    {!! $ad_after_breadcrumb->advertisement_code !!}
                                 </div>
                             </div>
-                        @elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
+                        @elseif($ad_after_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
                             <div class="col-12 text-right">
                                 <div>
-                                    {!! $ad_after_content->advertisement_code !!}
+                                    {!! $ad_after_breadcrumb->advertisement_code !!}
                                 </div>
                             </div>
                         @endif
@@ -277,40 +170,152 @@
                     </div>
                 @endforeach
             @endif
-        </div>
 
-        @if($pagination->hasPages())
-            <div class="row mb-5">
-                <div class="col-12">
-                    {{ $pagination->links() }}
-                </div>
-            </div>
-        @endif
+            @if($categories->count() > 0)
+                <div class="row mb-4">
+                    @foreach($categories as $categories_key => $category)
+                        <div class="col-12 col-md-6 col-lg-3 pr-0">
+                            <div class="categories__item categories__item_sm">
+                                <a href="{{ route('page.category', $category->category_slug) }}">
 
-        @if($all_states->count() > 0)
-        <div class="listing__text__top">
-            <div class="listing__text__top__left">
-                <h5>{{ __('frontend.categories.sub-title-2') }}</h5>
-            </div>
-        </div>
+                                    @if($category->category_icon)
+                                        <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="{{ $category->category_icon }}"></i></span>
+                                    @else
+                                        <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="fas fa-heart"></i></span>
+                                    @endif
 
-        <div class="row mt-4">
-            @foreach($all_states as $all_states_key => $state)
-            @if($state->items_count > 0)
-                <div class="col-6 col-lg-4 mb-3">
-                    <a href="{{ route('page.state', ['state_slug' => $state->state_slug]) }}">{{ $state->state_name }} ({{ $state->items_count }} listings)</a>
+                                    <h5>{{ $category->category_name }}</h5>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             @endif
-            @endforeach
-        </div>
-        @endif
 
-    </section>
-    <!-- Listing Section End -->
+            <div class="listing__text__top">
+                <div class="listing__text__top__left">
+                    <h5>{{ __('frontend.categories.sub-title-1') }}</h5>
+                    <span>{{ number_format($total_results) }} {{ __('theme_directory_hub.filter-results') }}</span>
+                </div>
+                <div class="listing__text__top__right">
+                    @if($filter_sort_by == \App\Item::ITEMS_SORT_BY_NEWEST_CREATED)
+                        {{ __('listings_filter.sort-by-newest') }}
+                    @elseif($filter_sort_by == \App\Item::ITEMS_SORT_BY_OLDEST_CREATED)
+                        {{ __('listings_filter.sort-by-oldest') }}
+                    @elseif($filter_sort_by == \App\Item::ITEMS_SORT_BY_HIGHEST_RATING)
+                        {{ __('listings_filter.sort-by-highest') }}
+                    @elseif($filter_sort_by == \App\Item::ITEMS_SORT_BY_LOWEST_RATING)
+                        {{ __('listings_filter.sort-by-lowest') }}
+                    @elseif($filter_sort_by == \App\Item::ITEMS_SORT_BY_NEARBY_FIRST)
+                        {{ __('theme_directory_hub.filter-sort-by-nearby-first') }}
+                    @endif
+                    <i class="fas fa-sort-amount-down"></i>
+                </div>
+            </div>
 
-    <!-- Map Begin -->
-    <div class="listing__map">
-        <div id="mapid-box"></div>
+            <div class="listing__list">
+
+                @if($ads_before_content->count() > 0)
+                    @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)
+                        <div class="row mb-5">
+                            @if($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
+                                <div class="col-12 text-left">
+                                    <div>
+                                        {!! $ad_before_content->advertisement_code !!}
+                                    </div>
+                                </div>
+                            @elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
+                                <div class="col-12 text-center">
+                                    <div>
+                                        {!! $ad_before_content->advertisement_code !!}
+                                    </div>
+                                </div>
+                            @elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
+                                <div class="col-12 text-right">
+                                    <div>
+                                        {!! $ad_before_content->advertisement_code !!}
+                                    </div>
+                                </div>
+                            @endif
+
+                        </div>
+                    @endforeach
+                @endif
+
+                @if($paid_items->count() > 0)
+                    @foreach($paid_items as $paid_items_key => $item)
+                        @include('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block')
+                    @endforeach
+                @endif
+
+                @if($free_items->count() > 0)
+                    @foreach($free_items as $free_items_key => $item)
+                        @include('frontend_views.lduruo10_dh_frontend_city_path.partials.free-item-block')
+                    @endforeach
+                @endif
+
+                @if($ads_after_content->count() > 0)
+                    @foreach($ads_after_content as $ads_after_content_key => $ad_after_content)
+                        <div class="row mt-5">
+                            @if($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
+                                <div class="col-12 text-left">
+                                    <div>
+                                        {!! $ad_after_content->advertisement_code !!}
+                                    </div>
+                                </div>
+                            @elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
+                                <div class="col-12 text-center">
+                                    <div>
+                                        {!! $ad_after_content->advertisement_code !!}
+                                    </div>
+                                </div>
+                            @elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
+                                <div class="col-12 text-right">
+                                    <div>
+                                        {!! $ad_after_content->advertisement_code !!}
+                                    </div>
+                                </div>
+                            @endif
+
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+
+            @if($pagination->hasPages())
+                <div class="row mb-5">
+                    <div class="col-12">
+                        {{ $pagination->links() }}
+                    </div>
+                </div>
+            @endif
+
+            @if($all_states->count() > 0)
+            <div class="listing__text__top">
+                <div class="listing__text__top__left">
+                    <h5>{{ __('frontend.categories.sub-title-2') }}</h5>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                @foreach($all_states as $all_states_key => $state)
+                @if($state->items_count > 0)
+                    <div class="col-6 col-lg-4 mb-3">
+                        <a href="{{ route('page.state', ['state_slug' => $state->state_slug]) }}">{{ $state->state_name }} ({{ $state->items_count }} listings)</a>
+                    </div>
+                @endif
+                @endforeach
+            </div>
+            @endif
+
+        </section>
+        <!-- Listing Section End -->
+
+        <!-- Map Begin -->
+      <!--   <div class="listing__map col-sm-12 col-md-3 col-lg-3" style="margin-top: 8.5%;">
+            <div id="mapid-box"></div>
+        </div> -->
+    </div>
     </div>
     <!-- Map End -->
 

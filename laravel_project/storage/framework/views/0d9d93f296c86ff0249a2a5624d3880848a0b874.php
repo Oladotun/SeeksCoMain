@@ -1,4 +1,4 @@
-f<div class="listing__item listing__item_featured_box">
+<div class="listing__item listing__item_featured_box">
     <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
         <div class="listing__item__pic set-bg" data-setbg="<?php echo e(!empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp')); ?>">
             <!-- <?php if(empty($item->user->user_image)): ?>

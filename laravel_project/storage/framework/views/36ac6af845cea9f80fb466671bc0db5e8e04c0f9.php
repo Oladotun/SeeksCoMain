@@ -66,7 +66,7 @@
 
 </head>
 
-<body class="ov-hid">
+<body> <!-- class="ov-hid" -->
 
 <?php if(is_demo_mode()): ?>
     <div id="demo-purchase-box">
@@ -99,7 +99,7 @@
 </div>
 
 
-<?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.nav', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+<?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.nav_item', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
 
 <?php echo $__env->yieldContent('content'); ?>

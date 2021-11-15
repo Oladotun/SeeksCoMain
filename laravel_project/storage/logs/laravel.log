@@ -4448,3 +4448,19 @@ Did you mean this?
 #54 /var/www/seekscodirectory/index.php(57): Illuminate\\Foundation\\Http\\Kernel->handle()
 #55 {main}
 "} 
+[2021-11-14 01:18:24] production.ERROR: There are no commands defined in the "views" namespace.
+
+Did you mean this?
+    view {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"views\" namespace.
+
+Did you mean this?
+    view at /var/www/seekscodirectory/laravel_project/vendor/symfony/console/Application.php:604)
+[stacktrace]
+#0 /var/www/seekscodirectory/laravel_project/vendor/symfony/console/Application.php(657): Symfony\\Component\\Console\\Application->findNamespace()
+#1 /var/www/seekscodirectory/laravel_project/vendor/symfony/console/Application.php(237): Symfony\\Component\\Console\\Application->find()
+#2 /var/www/seekscodirectory/laravel_project/vendor/symfony/console/Application.php(149): Symfony\\Component\\Console\\Application->doRun()
+#3 /var/www/seekscodirectory/laravel_project/vendor/laravel/framework/src/Illuminate/Console/Application.php(93): Symfony\\Component\\Console\\Application->run()
+#4 /var/www/seekscodirectory/laravel_project/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(131): Illuminate\\Console\\Application->run()
+#5 /var/www/seekscodirectory/laravel_project/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle()
+#6 {main}
+"} 

@@ -64,7 +64,7 @@
 
 </head>
 
-<body class="ov-hid">
+<body> <!-- class="ov-hid" -->
 
 @if(is_demo_mode())
     <div id="demo-purchase-box">
@@ -95,7 +95,7 @@
 </div>
 
 {{-- nav bar --}}
-@include('frontend_views.lduruo10_dh_frontend_city_path.partials.nav')
+@include('frontend_views.lduruo10_dh_frontend_city_path.partials.nav_item')
 
 {{-- main content --}}
 @yield('content')

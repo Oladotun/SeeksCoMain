@@ -1,0 +1,6 @@
+[submodule "laravel_project/vendor/laravel/socialite"]
+	path = laravel_project/vendor/laravel/socialite
+	url = https://github.com/Oladotun/SeeksCoMain.git
+[submodule "laravel_project/vendor/league/oauth1-client"]
+	path = laravel_project/vendor/league/oauth1-client
+	url = https://github.com/Oladotun/SeeksCoMain.git
