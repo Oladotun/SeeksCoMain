@@ -15,7 +15,7 @@
     <!-- Filter Begin -->
     <div class="container-fluid">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
-            <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
+        <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
         <div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-4 col-lg-2">
             <form method="GET" action="{{ route('page.categories') }}">
                 <div class="filter__title">

@@ -31,6 +31,7 @@
     }*/
 
     .custom-site-logo img { max-height: 200px; }
+    /*.navbar-brand {position: absolute;}*/
     .filter {padding-top: 15%;}
     /*.listing {padding-top: 17%;}*/
     .h5{word-wrap: break-word;}

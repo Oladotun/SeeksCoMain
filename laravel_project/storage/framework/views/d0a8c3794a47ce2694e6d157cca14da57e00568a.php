@@ -1,7 +1,7 @@
 <!-- Header Section Begin -->
 <header class="head">
     <!-- Image and text -->
-    <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-white font-weight-bold justify-content-between">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-white font-weight-bold justify-content-between justify-content-lg-between justify-content-xl-between">
       <!-- <a class="navbar-brand" href="#"> -->
 
         <!-- <div class="header__logo custom-site-logo"> -->
@@ -21,6 +21,14 @@
             <?php else: ?>
                 <a  class="navbar-brand header__logo custom-site-logo" href="<?php echo e(route('page.home')); ?>">
                     <img  src="<?php echo e(Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo)); ?>" alt="<?php echo e(empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name); ?>">
+                </a>
+
+                <a  class="d-none d-sm-block d-lg-none " href="<?php echo e(route('page.home')); ?>">  <!--show only on medium screen SeeksCo -->
+                    <strong class="display-4">SeeksCo</strong>
+                </a>
+
+                <a  class="d-block d-sm-none " href="<?php echo e(route('page.home')); ?>">
+                    <strong class="lead">SeeksCo</strong>
                 </a>
             <?php endif; ?>
             <!-- class="header__logo custom-site-logo"  -->

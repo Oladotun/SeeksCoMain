@@ -1,8 +1,8 @@
 <?php $__env->startSection('styles'); ?>
 
-    <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
+    <!-- <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
         <link href="<?php echo e(asset('frontend/vendor/leaflet/leaflet.css')); ?>" rel="stylesheet" />
-    <?php endif; ?>
+    <?php endif; ?> -->
 
     <link href="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.css')); ?>" rel="stylesheet" />
 
@@ -13,7 +13,7 @@
     <!-- Filter Begin -->
     <div class="container-fluid">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
-            <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
+        <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
         <div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-4 col-lg-2">
             <form method="GET" action="<?php echo e(route('page.categories')); ?>">
                 <div class="filter__title">
@@ -390,10 +390,10 @@ unset($__errorArgs, $__bag); ?>
 
 <?php $__env->startSection('scripts'); ?>
 
-    <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
-        <!-- Make sure you put this AFTER Leaflet's CSS -->
+   <!--  <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
+        Make sure you put this AFTER Leaflet's CSS
         <script src="<?php echo e(asset('frontend/vendor/leaflet/leaflet.js')); ?>"></script>
-    <?php endif; ?>
+    <?php endif; ?> -->
 
     <script src="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js')); ?>"></script>
     <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
@@ -406,62 +406,62 @@ unset($__errorArgs, $__bag); ?>
             /**
              * Start initial map box with OpenStreetMap
              */
-            <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
+            // <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
 
-            <?php if(count($paid_items) || count($free_items)): ?>
+            // <?php if(count($paid_items) || count($free_items)): ?>
 
-            var window_height = $(window).height() - 105;
-            $('#mapid-box').css('height', window_height + 'px');
+            // var window_height = $(window).height() - 105;
+            // $('#mapid-box').css('height', window_height + 'px');
 
-            var map = L.map('mapid-box', {
-                zoom: 15,
-                scrollWheelZoom: true,
-            });
+            // var map = L.map('mapid-box', {
+            //     zoom: 15,
+            //     scrollWheelZoom: true,
+            // });
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            // }).addTo(map);
 
-            var bounds = [];
-            <?php $__currentLoopData = $paid_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $paid_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <?php if($paid_item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
-            bounds.push([ <?php echo e($paid_item->item_lat); ?>, <?php echo e($paid_item->item_lng); ?> ]);
-            var marker = L.marker([<?php echo e($paid_item->item_lat); ?>, <?php echo e($paid_item->item_lng); ?>]).addTo(map);
+            // var bounds = [];
+            // <?php $__currentLoopData = $paid_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $paid_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            // <?php if($paid_item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
+            // bounds.push([ <?php echo e($paid_item->item_lat); ?>, <?php echo e($paid_item->item_lng); ?> ]);
+            // var marker = L.marker([<?php echo e($paid_item->item_lat); ?>, <?php echo e($paid_item->item_lng); ?>]).addTo(map);
 
-            <?php if($paid_item->item_address_hide): ?>
-            marker.bindPopup("<?php echo e($paid_item->item_title . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code); ?>");
-            <?php else: ?>
-            marker.bindPopup("<?php echo e($paid_item->item_title . ', ' . $paid_item->item_address . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code); ?>");
-            <?php endif; ?>
-            <?php endif; ?>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            // <?php if($paid_item->item_address_hide): ?>
+            // marker.bindPopup("<?php echo e($paid_item->item_title . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code); ?>");
+            // <?php else: ?>
+            // marker.bindPopup("<?php echo e($paid_item->item_title . ', ' . $paid_item->item_address . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code); ?>");
+            // <?php endif; ?>
+            // <?php endif; ?>
+            // <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-            <?php $__currentLoopData = $free_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $free_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <?php if($free_item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
-            bounds.push([ <?php echo e($free_item->item_lat); ?>, <?php echo e($free_item->item_lng); ?> ]);
-            var marker = L.marker([<?php echo e($free_item->item_lat); ?>, <?php echo e($free_item->item_lng); ?>]).addTo(map);
+            // <?php $__currentLoopData = $free_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $free_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            // <?php if($free_item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
+            // bounds.push([ <?php echo e($free_item->item_lat); ?>, <?php echo e($free_item->item_lng); ?> ]);
+            // var marker = L.marker([<?php echo e($free_item->item_lat); ?>, <?php echo e($free_item->item_lng); ?>]).addTo(map);
 
-            <?php if($free_item->item_address_hide): ?>
-            marker.bindPopup("<?php echo e($free_item->item_title . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code); ?>");
-            <?php else: ?>
-            marker.bindPopup("<?php echo e($free_item->item_title . ', ' . $free_item->item_address . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code); ?>");
-            <?php endif; ?>
-            <?php endif; ?>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            // <?php if($free_item->item_address_hide): ?>
+            // marker.bindPopup("<?php echo e($free_item->item_title . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code); ?>");
+            // <?php else: ?>
+            // marker.bindPopup("<?php echo e($free_item->item_title . ', ' . $free_item->item_address . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code); ?>");
+            // <?php endif; ?>
+            // <?php endif; ?>
+            // <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-            if(bounds.length === 0)
-            {
-                // Destroy mapid-box DOM since no regular listings found
-                $("#mapid-box").remove();
-            }
-            else
-            {
-                map.fitBounds(bounds);
-            }
+            // if(bounds.length === 0)
+            // {
+            //     // Destroy mapid-box DOM since no regular listings found
+            //     $("#mapid-box").remove();
+            // }
+            // else
+            // {
+            //     map.fitBounds(bounds);
+            // }
 
-            <?php endif; ?>
+            // <?php endif; ?>
 
-            <?php endif; ?>
+            // <?php endif; ?>
             /**
              * End initial map box with OpenStreetMap
              */
