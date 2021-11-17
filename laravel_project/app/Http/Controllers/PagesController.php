@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Artesaos\SEOTools\Facades\SEOMeta;
+use App\Http\Controllers\Auth\RegisterController;
 
 use Spatie\OpeningHours\OpeningHours;
 
@@ -46,175 +47,186 @@ class PagesController extends Controller
 {
     public function index(Request $request)
     {
-        $settings = app('site_global_settings');
-        $site_prefer_country_id = app('site_prefer_country_id');
+        
 
-        /**
-         * Start SEO
-         */
-        SEOMeta::setTitle($settings->setting_site_seo_home_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-        SEOMeta::setDescription($settings->setting_site_seo_home_description);
-        SEOMeta::setCanonical(URL::current());
-        SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+        if (Auth::check()){
 
-        // OpenGraph
-        OpenGraph::setTitle($settings->setting_site_seo_home_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-        OpenGraph::setDescription($settings->setting_site_seo_home_description);
-        OpenGraph::setUrl(URL::current());
-        if(empty($settings->setting_site_logo))
-        {
-            OpenGraph::addImage(asset('favicon-96x96.ico'));
-        }
-        else
-        {
-            OpenGraph::addImage(Storage::disk('public')->url('setting/' . $settings->setting_site_logo));
-        }
+            $settings = app('site_global_settings');
+            $site_prefer_country_id = app('site_prefer_country_id');
 
-        // Twitter
-        TwitterCard::setTitle($settings->setting_site_seo_home_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-        /**
-         * End SEO
-         */
+            /**
+             * Start SEO
+             */
+            SEOMeta::setTitle($settings->setting_site_seo_home_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+            SEOMeta::setDescription($settings->setting_site_seo_home_description);
+            SEOMeta::setCanonical(URL::current());
+            SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
 
-        $subscription_obj = new Subscription();
+            // OpenGraph
+            OpenGraph::setTitle($settings->setting_site_seo_home_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+            OpenGraph::setDescription($settings->setting_site_seo_home_description);
+            OpenGraph::setUrl(URL::current());
+            if(empty($settings->setting_site_logo))
+            {
+                OpenGraph::addImage(asset('favicon-96x96.ico'));
+            }
+            else
+            {
+                OpenGraph::addImage(Storage::disk('public')->url('setting/' . $settings->setting_site_logo));
+            }
 
-        /**
-         * first 5 categories order by total listings
-         */
-        $active_user_ids = $subscription_obj->getActiveUserIds();
-        $categories = Category::withCount(['allItems' => function ($query) use ($active_user_ids, $site_prefer_country_id) {
-            $query->whereIn('items.user_id', $active_user_ids)
-                ->where('items.item_status', Item::ITEM_PUBLISHED)
+            // Twitter
+            TwitterCard::setTitle($settings->setting_site_seo_home_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+            /**
+             * End SEO
+             */
+
+            $subscription_obj = new Subscription();
+
+            /**
+             * first 5 categories order by total listings
+             */
+            $active_user_ids = $subscription_obj->getActiveUserIds();
+            $categories = Category::withCount(['allItems' => function ($query) use ($active_user_ids, $site_prefer_country_id) {
+                $query->whereIn('items.user_id', $active_user_ids)
+                    ->where('items.item_status', Item::ITEM_PUBLISHED)
+                    ->where(function ($query) use ($site_prefer_country_id) {
+                        $query->where('items.country_id', $site_prefer_country_id)
+                            ->orWhereNull('items.country_id');
+                    });
+                }])
+                ->where('category_parent_id', null)
+                ->orderBy('all_items_count', 'desc')->take(5)->get();
+
+            /**
+             * get first latest 6 paid listings
+             */
+            // paid listing
+            $paid_items_query = Item::query();
+
+            // get paid users id array
+            $paid_user_ids = $subscription_obj->getPaidUserIds();
+
+            $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
                 ->where(function ($query) use ($site_prefer_country_id) {
                     $query->where('items.country_id', $site_prefer_country_id)
                         ->orWhereNull('items.country_id');
+                })
+                ->where('items.item_featured', Item::ITEM_FEATURED)
+                ->where(function($query) use ($paid_user_ids) {
+
+                    $query->whereIn('items.user_id', $paid_user_ids)
+                        ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
                 });
-            }])
-            ->where('category_parent_id', null)
-            ->orderBy('all_items_count', 'desc')->take(5)->get();
 
-        /**
-         * get first latest 6 paid listings
-         */
-        // paid listing
-        $paid_items_query = Item::query();
+            $paid_items_query->orderBy('items.created_at', 'DESC')->distinct('items.id');
 
-        // get paid users id array
-        $paid_user_ids = $subscription_obj->getPaidUserIds();
+            $paid_items = $paid_items_query->with('state')
+                ->with('city')
+                ->with('user')
+                ->take(6)
+                ->get();
 
-        $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-            ->where(function ($query) use ($site_prefer_country_id) {
-                $query->where('items.country_id', $site_prefer_country_id)
-                    ->orWhereNull('items.country_id');
-            })
-            ->where('items.item_featured', Item::ITEM_FEATURED)
-            ->where(function($query) use ($paid_user_ids) {
+            $paid_items = $paid_items->shuffle();
 
-                $query->whereIn('items.user_id', $paid_user_ids)
-                    ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
-            });
+            /**
+             * get nearest 9 popular items by device lat and lng
+             */
+            if(!empty(session('user_device_location_lat', '')) && !empty(session('user_device_location_lng', '')))
+            {
+                $latitude = session('user_device_location_lat', '');
+                $longitude = session('user_device_location_lng', '');
+            }
+            else
+            {
+                $latitude = $settings->setting_site_location_lat;
+                $longitude = $settings->setting_site_location_lng;
+            }
 
-        $paid_items_query->orderBy('items.created_at', 'DESC')->distinct('items.id');
+            $popular_items = Item::selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+                ->where('country_id', $site_prefer_country_id)
+                ->where('item_status', Item::ITEM_PUBLISHED)
+                ->orderBy('distance')
+                ->orderBy('created_at', 'DESC')
+                ->with('state')
+                ->with('city')
+                ->with('user')
+                ->take(9)->get();
 
-        $paid_items = $paid_items_query->with('state')
-            ->with('city')
-            ->with('user')
-            ->take(6)
-            ->get();
+            $popular_items = $popular_items->shuffle();
 
-        $paid_items = $paid_items->shuffle();
+            /**
+             * get first 6 latest items
+             */
+            $latest_items = Item::latest('created_at')
+                ->where(function ($query) use ($site_prefer_country_id) {
+                    $query->where('items.country_id', $site_prefer_country_id)
+                        ->orWhereNull('items.country_id');
+                })
+                ->where('item_status', Item::ITEM_PUBLISHED)
+                ->with('state')
+                ->with('city')
+                ->with('user')
+                ->take(6)
+                ->get();
 
-        /**
-         * get nearest 9 popular items by device lat and lng
-         */
-        if(!empty(session('user_device_location_lat', '')) && !empty(session('user_device_location_lng', '')))
-        {
-            $latitude = session('user_device_location_lat', '');
-            $longitude = session('user_device_location_lng', '');
-        }
-        else
-        {
-            $latitude = $settings->setting_site_location_lat;
-            $longitude = $settings->setting_site_location_lng;
-        }
+            /**
+             * testimonials
+             */
+            $all_testimonials = Testimonial::latest('created_at')->get();
 
-        $popular_items = Item::selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
-            ->where('country_id', $site_prefer_country_id)
-            ->where('item_status', Item::ITEM_PUBLISHED)
-            ->orderBy('distance')
-            ->orderBy('created_at', 'DESC')
-            ->with('state')
-            ->with('city')
-            ->with('user')
-            ->take(9)->get();
+            /**
+             * get latest 3 blog posts
+             */
+            $recent_blog = \Canvas\Post::published()->orderByDesc('published_at')->take(3)->get();
 
-        $popular_items = $popular_items->shuffle();
+            /**
+             * Start homepage header customization
+             */
+            $site_homepage_header_background_type = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        /**
-         * get first 6 latest items
-         */
-        $latest_items = Item::latest('created_at')
-            ->where(function ($query) use ($site_prefer_country_id) {
-                $query->where('items.country_id', $site_prefer_country_id)
-                    ->orWhereNull('items.country_id');
-            })
-            ->where('item_status', Item::ITEM_PUBLISHED)
-            ->with('state')
-            ->with('city')
-            ->with('user')
-            ->take(6)
-            ->get();
+            $site_homepage_header_background_color = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_COLOR)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        /**
-         * testimonials
-         */
-        $all_testimonials = Testimonial::latest('created_at')->get();
+            $site_homepage_header_background_image = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_IMAGE)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        /**
-         * get latest 3 blog posts
-         */
-        $recent_blog = \Canvas\Post::published()->orderByDesc('published_at')->take(3)->get();
+            $site_homepage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        /**
-         * Start homepage header customization
-         */
-        $site_homepage_header_background_type = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+            $site_homepage_header_title_font_color = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_TITLE_FONT_COLOR)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        $site_homepage_header_background_color = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_COLOR)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+            $site_homepage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_PARAGRAPH_FONT_COLOR)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+            /**
+             * End homepage header customization
+             */
 
-        $site_homepage_header_background_image = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_IMAGE)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+            /**
+             * Start initial blade view file path
+             */
+            $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
+            $theme_view_path = $theme_view_path->getViewPath();
+            /**
+             * End initial blade view file path
+             */
 
-        $site_homepage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-        $site_homepage_header_title_font_color = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_TITLE_FONT_COLOR)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-        $site_homepage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_HOMEPAGE_HEADER_PARAGRAPH_FONT_COLOR)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-        /**
-         * End homepage header customization
-         */
-
-        /**
-         * Start initial blade view file path
-         */
-        $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
-        $theme_view_path = $theme_view_path->getViewPath();
-        /**
-         * End initial blade view file path
-         */
-
-        return response()->view($theme_view_path . 'index',
+            return response()->view($theme_view_path . 'index',
             compact('categories', 'paid_items', 'popular_items', 'latest_items',
                 'all_testimonials', 'recent_blog',
                 'site_homepage_header_background_type', 'site_homepage_header_background_color',
                 'site_homepage_header_background_image', 'site_homepage_header_background_youtube_video',
                 'site_homepage_header_title_font_color', 'site_homepage_header_paragraph_font_color',
                 'site_prefer_country_id'));
+
+        } else {
+            
+            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+        }
+
+        
     }
 
     public function search(Request $request)
