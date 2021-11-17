@@ -30,6 +30,8 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
      */
     Auth::routes(['verify' => true]);
 
+    // Route::get('/register', 'Auth\RegisterController@showRegistrationForm')->name('auth.register');
+
     /**
      * Social login routes
      */

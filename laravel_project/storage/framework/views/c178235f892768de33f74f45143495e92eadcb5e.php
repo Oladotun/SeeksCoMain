@@ -9,7 +9,7 @@
 
 <?php $__env->startSection('content'); ?>
 
-    <!-- Filter Begin -->
+    <!-- Filter Begin Changed to previous examples -->
     <div class="container-fluid">
         <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
             <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-4 col-lg-2">

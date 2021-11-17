@@ -231,380 +231,386 @@ class PagesController extends Controller
 
     public function search(Request $request)
     {
-        $settings = app('site_global_settings');
-        $site_prefer_country_id = app('site_prefer_country_id');
-
-        /**
-         * Start SEO
-         */
-        SEOMeta::setTitle(__('seo.frontend.search', ['site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
-        SEOMeta::setDescription('');
-        SEOMeta::setCanonical(URL::current());
-        SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
-        /**
-         * End SEO
-         */
-
-        /**
-         * Start filter
-         */
-        $search_query = empty($request->search_query) ? null : $request->search_query;
-        $search_values = !empty($search_query) ? preg_split('/\s+/', $search_query, -1, PREG_SPLIT_NO_EMPTY) : array();
-
-        // categories
-        $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
-
-        $category_obj = new Category();
-        $item_ids = $category_obj->getItemIdsByCategoryIds($filter_categories);
-
-        // state & city
-        $filter_state = empty($request->filter_state) ? null : $request->filter_state;
-        $filter_city = empty($request->filter_city) ? null : $request->filter_city;
-        /**
-         * End filter
-         */
-
-        /**
-         * Start paid search
-         */
-        $paid_items_query = Item::query();
-
-        // get paid users id array
-        $subscription_obj = new Subscription();
-        $paid_user_ids = $subscription_obj->getPaidUserIds();
-
-        if(count($item_ids) > 0)
+        if (Auth::check())
         {
-            $paid_items_query->whereIn('id', $item_ids);
-        }
+            $settings = app('site_global_settings');
+            $site_prefer_country_id = app('site_prefer_country_id');
 
-        if(is_array($search_values) && count($search_values) > 0)
-        {
-            $paid_items_query->where(function ($query) use ($search_values) {
-                foreach($search_values as $search_values_key => $search_value)
-                {
-                    $query->where('items.item_title', 'LIKE', "%".$search_value."%")
-                        ->orWhere('items.item_location_str', 'LIKE', "%".$search_value."%")
-                        ->orWhere('items.item_categories_string', 'LIKE', "%".$search_value."%")
-                        ->orWhere('items.item_description', 'LIKE', "%".$search_value."%")
-                        ->orWhere('items.item_features_string', 'LIKE', "%".$search_value."%");
-                }
-            });
-        }
+            /**
+             * Start SEO
+             */
+            SEOMeta::setTitle(__('seo.frontend.search', ['site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
+            SEOMeta::setDescription('');
+            SEOMeta::setCanonical(URL::current());
+            SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+            /**
+             * End SEO
+             */
 
-        $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-            ->where(function ($query) use ($site_prefer_country_id) {
-                $query->where('items.country_id', $site_prefer_country_id)
-                    ->orWhereNull('items.country_id');
-            })
-            ->where('items.item_featured', Item::ITEM_FEATURED)
-            ->where(function($query) use ($paid_user_ids) {
+            /**
+             * Start filter
+             */
+            $search_query = empty($request->search_query) ? null : $request->search_query;
+            $search_values = !empty($search_query) ? preg_split('/\s+/', $search_query, -1, PREG_SPLIT_NO_EMPTY) : array();
 
-                $query->whereIn('items.user_id', $paid_user_ids)
-                    ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
-            });
+            // categories
+            $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
 
-        // filter paid listings state
-        if(!empty($filter_state))
-        {
-            $paid_items_query->where('items.state_id', $filter_state);
-        }
+            $category_obj = new Category();
+            $item_ids = $category_obj->getItemIdsByCategoryIds($filter_categories);
 
-        // filter paid listings city
-        if(!empty($filter_city))
-        {
-            $paid_items_query->where('items.city_id', $filter_city);
-        }
+            // state & city
+            $filter_state = empty($request->filter_state) ? null : $request->filter_state;
+            $filter_city = empty($request->filter_city) ? null : $request->filter_city;
+            /**
+             * End filter
+             */
 
-        $paid_items_query->orderBy('items.created_at', 'DESC')
-            ->distinct('items.id')
-            ->with('state')
-            ->with('city')
-            ->with('user');
+            /**
+             * Start paid search
+             */
+            $paid_items_query = Item::query();
 
-        $total_paid_items = $paid_items_query->count();
-        /**
-         * End paid search
-         */
+            // get paid users id array
+            $subscription_obj = new Subscription();
+            $paid_user_ids = $subscription_obj->getPaidUserIds();
 
-        /**
-         * Start free search
-         */
-        $free_items_query = Item::query();
-
-        // get free users id array
-        //$free_user_ids = $subscription_obj->getFreeUserIds();
-        $free_user_ids = $subscription_obj->getActiveUserIds();
-
-        if(count($item_ids) > 0)
-        {
-            $free_items_query->whereIn('id', $item_ids);
-        }
-
-        if(is_array($search_values) && count($search_values) > 0)
-        {
-            $free_items_query->where(function ($query) use ($search_values) {
-                foreach($search_values as $search_values_key => $search_value)
-                {
-                    $query->where('items.item_title', 'LIKE', "%".$search_value."%")
-                        ->orWhere('items.item_location_str', 'LIKE', "%".$search_value."%")
-                        ->orWhere('items.item_categories_string', 'LIKE', "%".$search_value."%")
-                        ->orWhere('items.item_description', 'LIKE', "%".$search_value."%")
-                        ->orWhere('items.item_features_string', 'LIKE', "%".$search_value."%");
-                }
-            });
-        }
-
-        $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-            ->where(function ($query) use ($site_prefer_country_id) {
-                $query->where('items.country_id', $site_prefer_country_id)
-                    ->orWhereNull('items.country_id');
-            })
-            ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
-            ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
-            ->whereIn('items.user_id', $free_user_ids);
-
-        // filter free listings state
-        if(!empty($filter_state))
-        {
-            $free_items_query->where('items.state_id', $filter_state);
-        }
-
-        // filter free listings city
-        if(!empty($filter_city))
-        {
-            $free_items_query->where('items.city_id', $filter_city);
-        }
-
-        /**
-         * Start filter sort by for free listing
-         */
-        $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-        if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
-        {
-            $free_items_query->orderBy('items.created_at', 'DESC');
-        }
-        elseif($filter_sort_by == Item::ITEMS_SORT_BY_OLDEST_CREATED)
-        {
-            $free_items_query->orderBy('items.created_at', 'ASC');
-        }
-        elseif($filter_sort_by == Item::ITEMS_SORT_BY_HIGHEST_RATING)
-        {
-            $free_items_query->orderBy('items.item_average_rating', 'DESC');
-        }
-        elseif($filter_sort_by == Item::ITEMS_SORT_BY_LOWEST_RATING)
-        {
-            $free_items_query->orderBy('items.item_average_rating', 'ASC');
-        }
-        elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
-        {
-            $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
-                ->where('items.item_type', Item::ITEM_TYPE_REGULAR)
-                ->orderBy('distance', 'ASC');
-        }
-        /**
-         * End filter sort by for free listing
-         */
-
-        $free_items_query->distinct('items.id')
-            ->with('state')
-            ->with('city')
-            ->with('user');
-
-        $total_free_items = $free_items_query->count();
-        /**
-         * End free search
-         */
-
-        $querystringArray = [
-            'search_query' => $search_query,
-            'filter_categories' => $filter_categories,
-            'filter_sort_by' => $filter_sort_by,
-            'filter_state' => $filter_state,
-            'filter_city' => $filter_city,
-        ];
-
-        if($total_free_items == 0 || $total_paid_items == 0)
-        {
-            $paid_items = $paid_items_query->paginate(10);
-            $free_items = $free_items_query->paginate(10);
-
-            if($total_free_items == 0)
+            if(count($item_ids) > 0)
             {
-                $pagination = $paid_items->appends($querystringArray);
+                $paid_items_query->whereIn('id', $item_ids);
             }
-            if($total_paid_items == 0)
+
+            if(is_array($search_values) && count($search_values) > 0)
             {
-                $pagination = $free_items->appends($querystringArray);
+                $paid_items_query->where(function ($query) use ($search_values) {
+                    foreach($search_values as $search_values_key => $search_value)
+                    {
+                        $query->where('items.item_title', 'LIKE', "%".$search_value."%")
+                            ->orWhere('items.item_location_str', 'LIKE', "%".$search_value."%")
+                            ->orWhere('items.item_categories_string', 'LIKE', "%".$search_value."%")
+                            ->orWhere('items.item_description', 'LIKE', "%".$search_value."%")
+                            ->orWhere('items.item_features_string', 'LIKE', "%".$search_value."%");
+                    }
+                });
             }
-        }
-        else
-        {
-            $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
 
-            $paid_items_per_page = ceil($total_paid_items / $num_of_pages) > 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+            $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
+                ->where(function ($query) use ($site_prefer_country_id) {
+                    $query->where('items.country_id', $site_prefer_country_id)
+                        ->orWhereNull('items.country_id');
+                })
+                ->where('items.item_featured', Item::ITEM_FEATURED)
+                ->where(function($query) use ($paid_user_ids) {
 
-            $free_items_per_page = 10 - $paid_items_per_page;
+                    $query->whereIn('items.user_id', $paid_user_ids)
+                        ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
+                });
 
-            $paid_items = $paid_items_query->paginate($paid_items_per_page);
-            $free_items = $free_items_query->paginate($free_items_per_page);
-
-            if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
+            // filter paid listings state
+            if(!empty($filter_state))
             {
-                $pagination = $paid_items->appends($querystringArray);
+                $paid_items_query->where('items.state_id', $filter_state);
+            }
+
+            // filter paid listings city
+            if(!empty($filter_city))
+            {
+                $paid_items_query->where('items.city_id', $filter_city);
+            }
+
+            $paid_items_query->orderBy('items.created_at', 'DESC')
+                ->distinct('items.id')
+                ->with('state')
+                ->with('city')
+                ->with('user');
+
+            $total_paid_items = $paid_items_query->count();
+            /**
+             * End paid search
+             */
+
+            /**
+             * Start free search
+             */
+            $free_items_query = Item::query();
+
+            // get free users id array
+            //$free_user_ids = $subscription_obj->getFreeUserIds();
+            $free_user_ids = $subscription_obj->getActiveUserIds();
+
+            if(count($item_ids) > 0)
+            {
+                $free_items_query->whereIn('id', $item_ids);
+            }
+
+            if(is_array($search_values) && count($search_values) > 0)
+            {
+                $free_items_query->where(function ($query) use ($search_values) {
+                    foreach($search_values as $search_values_key => $search_value)
+                    {
+                        $query->where('items.item_title', 'LIKE', "%".$search_value."%")
+                            ->orWhere('items.item_location_str', 'LIKE', "%".$search_value."%")
+                            ->orWhere('items.item_categories_string', 'LIKE', "%".$search_value."%")
+                            ->orWhere('items.item_description', 'LIKE', "%".$search_value."%")
+                            ->orWhere('items.item_features_string', 'LIKE', "%".$search_value."%");
+                    }
+                });
+            }
+
+            $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
+                ->where(function ($query) use ($site_prefer_country_id) {
+                    $query->where('items.country_id', $site_prefer_country_id)
+                        ->orWhereNull('items.country_id');
+                })
+                ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
+                ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
+                ->whereIn('items.user_id', $free_user_ids);
+
+            // filter free listings state
+            if(!empty($filter_state))
+            {
+                $free_items_query->where('items.state_id', $filter_state);
+            }
+
+            // filter free listings city
+            if(!empty($filter_city))
+            {
+                $free_items_query->where('items.city_id', $filter_city);
+            }
+
+            /**
+             * Start filter sort by for free listing
+             */
+            $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
+            if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+            {
+                $free_items_query->orderBy('items.created_at', 'DESC');
+            }
+            elseif($filter_sort_by == Item::ITEMS_SORT_BY_OLDEST_CREATED)
+            {
+                $free_items_query->orderBy('items.created_at', 'ASC');
+            }
+            elseif($filter_sort_by == Item::ITEMS_SORT_BY_HIGHEST_RATING)
+            {
+                $free_items_query->orderBy('items.item_average_rating', 'DESC');
+            }
+            elseif($filter_sort_by == Item::ITEMS_SORT_BY_LOWEST_RATING)
+            {
+                $free_items_query->orderBy('items.item_average_rating', 'ASC');
+            }
+            elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
+            {
+                $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
+                    ->where('items.item_type', Item::ITEM_TYPE_REGULAR)
+                    ->orderBy('distance', 'ASC');
+            }
+            /**
+             * End filter sort by for free listing
+             */
+
+            $free_items_query->distinct('items.id')
+                ->with('state')
+                ->with('city')
+                ->with('user');
+
+            $total_free_items = $free_items_query->count();
+            /**
+             * End free search
+             */
+
+            $querystringArray = [
+                'search_query' => $search_query,
+                'filter_categories' => $filter_categories,
+                'filter_sort_by' => $filter_sort_by,
+                'filter_state' => $filter_state,
+                'filter_city' => $filter_city,
+            ];
+
+            if($total_free_items == 0 || $total_paid_items == 0)
+            {
+                $paid_items = $paid_items_query->paginate(10);
+                $free_items = $free_items_query->paginate(10);
+
+                if($total_free_items == 0)
+                {
+                    $pagination = $paid_items->appends($querystringArray);
+                }
+                if($total_paid_items == 0)
+                {
+                    $pagination = $free_items->appends($querystringArray);
+                }
             }
             else
             {
-                $pagination = $free_items->appends($querystringArray);
-            }
-        }
+                $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
 
-        /**
-         * Start sorting the results by relevance
-         */
-        $props = [
-            'item_title',
-            'item_location_str',
-            'item_categories_string',
-            'item_description',
-            'item_features_string',
-        ];
+                $paid_items_per_page = ceil($total_paid_items / $num_of_pages) > 4 ? 4 : ceil($total_paid_items / $num_of_pages);
 
-        $paid_items = $paid_items->sortByDesc(function($paid_collection, $paid_collection_key) use ($search_values, $props) {
+                $free_items_per_page = 10 - $paid_items_per_page;
 
-            // The bigger the weight, the higher the record
-            $weight = 0;
-            // Iterate through search terms
-            foreach($search_values as $search_values_key => $search_value)
-            {
-                // Iterate through $props
-                foreach($props as $prop)
+                $paid_items = $paid_items_query->paginate($paid_items_per_page);
+                $free_items = $free_items_query->paginate($free_items_per_page);
+
+                if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
                 {
-                    if(stripos($paid_collection->$prop, $search_value) !== false)
-                    {
-                        $weight += 1; // Increase weight if the search term is found
-                    }
-
+                    $pagination = $paid_items->appends($querystringArray);
+                }
+                else
+                {
+                    $pagination = $free_items->appends($querystringArray);
                 }
             }
-            return $weight;
-        });
 
-        $free_items = $free_items->sortByDesc(function($free_collection, $free_collection_key) use ($search_values, $props) {
+            /**
+             * Start sorting the results by relevance
+             */
+            $props = [
+                'item_title',
+                'item_location_str',
+                'item_categories_string',
+                'item_description',
+                'item_features_string',
+            ];
 
-            // The bigger the weight, the higher the record
-            $weight = 0;
-            // Iterate through search terms
-            foreach($search_values as $search_values_key => $search_value)
-            {
-                // Iterate through $props
-                foreach($props as $prop)
+            $paid_items = $paid_items->sortByDesc(function($paid_collection, $paid_collection_key) use ($search_values, $props) {
+
+                // The bigger the weight, the higher the record
+                $weight = 0;
+                // Iterate through search terms
+                foreach($search_values as $search_values_key => $search_value)
                 {
-                    if(stripos($free_collection->$prop, $search_value) !== false)
+                    // Iterate through $props
+                    foreach($props as $prop)
                     {
-                        $weight += 1; // Increase weight if the search term is found
+                        if(stripos($paid_collection->$prop, $search_value) !== false)
+                        {
+                            $weight += 1; // Increase weight if the search term is found
+                        }
+
                     }
-
                 }
+                return $weight;
+            });
+
+            $free_items = $free_items->sortByDesc(function($free_collection, $free_collection_key) use ($search_values, $props) {
+
+                // The bigger the weight, the higher the record
+                $weight = 0;
+                // Iterate through search terms
+                foreach($search_values as $search_values_key => $search_value)
+                {
+                    // Iterate through $props
+                    foreach($props as $prop)
+                    {
+                        if(stripos($free_collection->$prop, $search_value) !== false)
+                        {
+                            $weight += 1; // Increase weight if the search term is found
+                        }
+
+                    }
+                }
+                return $weight;
+            });
+            /**
+             * End sorting the results by relevance
+             */
+
+            /**
+             * Start fetch ads blocks
+             */
+            $advertisement = new Advertisement();
+
+            $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
+                Advertisement::AD_PLACE_LISTING_SEARCH_PAGE,
+                Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
+                Advertisement::AD_STATUS_ENABLE
+            );
+
+            $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
+                Advertisement::AD_PLACE_LISTING_SEARCH_PAGE,
+                Advertisement::AD_POSITION_AFTER_BREADCRUMB,
+                Advertisement::AD_STATUS_ENABLE
+            );
+
+            $ads_before_content = $advertisement->fetchAdvertisements(
+                Advertisement::AD_PLACE_LISTING_SEARCH_PAGE,
+                Advertisement::AD_POSITION_BEFORE_CONTENT,
+                Advertisement::AD_STATUS_ENABLE
+            );
+
+            $ads_after_content = $advertisement->fetchAdvertisements(
+                Advertisement::AD_PLACE_LISTING_SEARCH_PAGE,
+                Advertisement::AD_POSITION_AFTER_CONTENT,
+                Advertisement::AD_STATUS_ENABLE
+            );
+            /**
+             * End fetch ads blocks
+             */
+
+            /**
+             * Start initial filter
+             */
+            $all_printable_categories = $category_obj->getPrintableCategoriesNoDash();
+
+            $all_states = Country::find($site_prefer_country_id)
+                ->states()->orderBy('state_name')->get();
+
+            $all_cities = collect([]);
+            if(!empty($filter_state))
+            {
+                $state = State::find($filter_state);
+                $all_cities = $state->cities()->orderBy('city_name')->get();
             }
-            return $weight;
-        });
-        /**
-         * End sorting the results by relevance
-         */
 
-        /**
-         * Start fetch ads blocks
-         */
-        $advertisement = new Advertisement();
+            $total_results = $total_paid_items + $total_free_items;
+            /**
+             * End initial filter
+             */
 
-        $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
-            Advertisement::AD_PLACE_LISTING_SEARCH_PAGE,
-            Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
-            Advertisement::AD_STATUS_ENABLE
-        );
+            /**
+             * Start homepage header customization
+             */
+            $site_innerpage_header_background_type = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
-            Advertisement::AD_PLACE_LISTING_SEARCH_PAGE,
-            Advertisement::AD_POSITION_AFTER_BREADCRUMB,
-            Advertisement::AD_STATUS_ENABLE
-        );
+            $site_innerpage_header_background_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_COLOR)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        $ads_before_content = $advertisement->fetchAdvertisements(
-            Advertisement::AD_PLACE_LISTING_SEARCH_PAGE,
-            Advertisement::AD_POSITION_BEFORE_CONTENT,
-            Advertisement::AD_STATUS_ENABLE
-        );
+            $site_innerpage_header_background_image = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_IMAGE)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        $ads_after_content = $advertisement->fetchAdvertisements(
-            Advertisement::AD_PLACE_LISTING_SEARCH_PAGE,
-            Advertisement::AD_POSITION_AFTER_CONTENT,
-            Advertisement::AD_STATUS_ENABLE
-        );
-        /**
-         * End fetch ads blocks
-         */
+            $site_innerpage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        /**
-         * Start initial filter
-         */
-        $all_printable_categories = $category_obj->getPrintableCategoriesNoDash();
+            $site_innerpage_header_title_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_TITLE_FONT_COLOR)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
 
-        $all_states = Country::find($site_prefer_country_id)
-            ->states()->orderBy('state_name')->get();
+            $site_innerpage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_PARAGRAPH_FONT_COLOR)
+                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+            /**
+             * End homepage header customization
+             */
 
-        $all_cities = collect([]);
-        if(!empty($filter_state))
-        {
-            $state = State::find($filter_state);
-            $all_cities = $state->cities()->orderBy('city_name')->get();
+            /**
+             * Start initial blade view file path
+             */
+            $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
+            $theme_view_path = $theme_view_path->getViewPath();
+            /**
+             * End initial blade view file path
+             */
+
+            return response()->view($theme_view_path . 'search',
+                compact('ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
+                        'site_innerpage_header_background_type', 'site_innerpage_header_background_color',
+                        'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
+                        'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color',
+                        'search_query', 'filter_categories', 'filter_state', 'filter_city', 'filter_sort_by', 'paid_items',
+                        'free_items', 'pagination', 'all_printable_categories', 'all_states', 'all_cities', 'total_results'));
+        }else {
+            
+            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
         }
-
-        $total_results = $total_paid_items + $total_free_items;
-        /**
-         * End initial filter
-         */
-
-        /**
-         * Start homepage header customization
-         */
-        $site_innerpage_header_background_type = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-        $site_innerpage_header_background_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_COLOR)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-        $site_innerpage_header_background_image = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_IMAGE)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-        $site_innerpage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-        $site_innerpage_header_title_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_TITLE_FONT_COLOR)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-        $site_innerpage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_PARAGRAPH_FONT_COLOR)
-            ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-        /**
-         * End homepage header customization
-         */
-
-        /**
-         * Start initial blade view file path
-         */
-        $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
-        $theme_view_path = $theme_view_path->getViewPath();
-        /**
-         * End initial blade view file path
-         */
-
-        return response()->view($theme_view_path . 'search',
-            compact('ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
-                    'site_innerpage_header_background_type', 'site_innerpage_header_background_color',
-                    'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
-                    'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color',
-                    'search_query', 'filter_categories', 'filter_state', 'filter_city', 'filter_sort_by', 'paid_items',
-                    'free_items', 'pagination', 'all_printable_categories', 'all_states', 'all_cities', 'total_results'));
     }
 
 
@@ -837,6 +843,8 @@ class PagesController extends Controller
 
     public function categories(Request $request)
     {
+
+        if(Auth::check()){
         $settings = app('site_global_settings');
         $site_prefer_country_id = app('site_prefer_country_id');
 
@@ -1156,63 +1164,389 @@ class PagesController extends Controller
                 'site_innerpage_header_paragraph_font_color', 'filter_sort_by', 'all_printable_categories',
                 'filter_categories', 'site_prefer_country_id', 'filter_state', 'filter_city', 'all_cities',
                 'total_results'));
+        }
+        else {
+            
+            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+        }
+
     }
 
     public function category(Request $request, string $category_slug)
     {
-        $category = Category::where('category_slug', $category_slug)->first();
-
-        if($category)
-        {
-            $settings = app('site_global_settings');
-            $site_prefer_country_id = app('site_prefer_country_id');
-
-            /**
-             * Start SEO
-             */
-            SEOMeta::setTitle($category->category_name . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-            SEOMeta::setDescription('');
-            SEOMeta::setCanonical(URL::current());
-            SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
-            /**
-             * End SEO
-             */
-
-            /**
-             * Get parent and children categories
-             */
-            $parent_categories = $category->allParents();
-
-            // get one level down sub-categories
-            $children_categories = $category->children()->orderBy('category_name')->get();
-
-            // need to give a root category for each item in a category listing page
-            $parent_category_id = $category->id;
-
-            /**
-             * Do listing query
-             * 1. get paid listings and free listings.
-             * 2. decide how many paid and free listings per page and total pages.
-             * 3. decide the pagination to paid or free listings
-             * 4. run query and render
-             */
-
-            // paid listing
-            $paid_items_query = Item::query();
-
-            /**
-             * Start filter for paid listing
-             */
-            // categories
-            $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
-            $category_obj = new Category();
-
-            if(count($filter_categories) > 0)
+        if(Auth::check())
             {
-                $item_ids = $category_obj->getItemIdsByCategoryIds($filter_categories);
-            }
-            else
+                $category = Category::where('category_slug', $category_slug)->first();
+
+                if($category)
+                {
+                    $settings = app('site_global_settings');
+                    $site_prefer_country_id = app('site_prefer_country_id');
+
+                    /**
+                     * Start SEO
+                     */
+                    SEOMeta::setTitle($category->category_name . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+                    SEOMeta::setDescription('');
+                    SEOMeta::setCanonical(URL::current());
+                    SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+                    /**
+                     * End SEO
+                     */
+
+                    /**
+                     * Get parent and children categories
+                     */
+                    $parent_categories = $category->allParents();
+
+                    // get one level down sub-categories
+                    $children_categories = $category->children()->orderBy('category_name')->get();
+
+                    // need to give a root category for each item in a category listing page
+                    $parent_category_id = $category->id;
+
+                    /**
+                     * Do listing query
+                     * 1. get paid listings and free listings.
+                     * 2. decide how many paid and free listings per page and total pages.
+                     * 3. decide the pagination to paid or free listings
+                     * 4. run query and render
+                     */
+
+                    // paid listing
+                    $paid_items_query = Item::query();
+
+                    /**
+                     * Start filter for paid listing
+                     */
+                    // categories
+                    $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
+                    $category_obj = new Category();
+
+                    if(count($filter_categories) > 0)
+                    {
+                        $item_ids = $category_obj->getItemIdsByCategoryIds($filter_categories);
+                    }
+                    else
+                    {
+                        // Get all child categories of this category
+                        $all_child_categories = collect();
+                        $all_child_categories_ids = array();
+                        $category->allChildren($category, $all_child_categories);
+                        foreach($all_child_categories as $key => $all_child_category)
+                        {
+                            $all_child_categories_ids[] = $all_child_category->id;
+                        }
+
+                        $item_ids = $category_obj->getItemIdsByCategoryIds($all_child_categories_ids);
+                    }
+
+                    // state & city
+                    $filter_state = empty($request->filter_state) ? null : $request->filter_state;
+                    $filter_city = empty($request->filter_city) ? null : $request->filter_city;
+                    /**
+                     * End filter for paid listing
+                     */
+
+                    // get paid users id array
+                    $subscription_obj = new Subscription();
+                    $paid_user_ids = $subscription_obj->getPaidUserIds();
+
+                    $paid_items_query->whereIn('id', $item_ids);
+
+                    $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
+                        ->where(function ($query) use ($site_prefer_country_id) {
+                            $query->where('items.country_id', $site_prefer_country_id)
+                                ->orWhereNull('items.country_id');
+                        })
+                        ->where('items.item_featured', Item::ITEM_FEATURED)
+                        ->where(function($query) use ($paid_user_ids) {
+
+                            $query->whereIn('items.user_id', $paid_user_ids)
+                                ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
+                        });
+
+                    // filter paid listings state
+                    if(!empty($filter_state))
+                    {
+                        $paid_items_query->where('items.state_id', $filter_state);
+                    }
+
+                    // filter paid listings city
+                    if(!empty($filter_city))
+                    {
+                        $paid_items_query->where('items.city_id', $filter_city);
+                    }
+
+                    $paid_items_query->orderBy('items.created_at', 'DESC')
+                        ->distinct('items.id')
+                        ->with('state')
+                        ->with('city')
+                        ->with('user');
+
+                    $total_paid_items = $paid_items_query->count();
+
+                    // free listing
+                    $free_items_query = Item::query();
+
+                    // get free users id array
+                    //$free_user_ids = $subscription_obj->getFreeUserIds();
+                    $free_user_ids = $subscription_obj->getActiveUserIds();
+
+                    $free_items_query->whereIn('id', $item_ids);
+
+                    $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
+                        ->where(function ($query) use ($site_prefer_country_id) {
+                            $query->where('items.country_id', $site_prefer_country_id)
+                                ->orWhereNull('items.country_id');
+                        })
+                        ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
+                        ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
+                        ->whereIn('items.user_id', $free_user_ids);
+
+                    // filter free listings state
+                    if(!empty($filter_state))
+                    {
+                        $free_items_query->where('items.state_id', $filter_state);
+                    }
+
+                    // filter free listings city
+                    if(!empty($filter_city))
+                    {
+                        $free_items_query->where('items.city_id', $filter_city);
+                    }
+
+                    /**
+                     * Start filter sort by for free listing
+                     */
+                    $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
+                    if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+                    {
+                        $free_items_query->orderBy('items.created_at', 'DESC');
+                    }
+                    elseif($filter_sort_by == Item::ITEMS_SORT_BY_OLDEST_CREATED)
+                    {
+                        $free_items_query->orderBy('items.created_at', 'ASC');
+                    }
+                    elseif($filter_sort_by == Item::ITEMS_SORT_BY_HIGHEST_RATING)
+                    {
+                        $free_items_query->orderBy('items.item_average_rating', 'DESC');
+                    }
+                    elseif($filter_sort_by == Item::ITEMS_SORT_BY_LOWEST_RATING)
+                    {
+                        $free_items_query->orderBy('items.item_average_rating', 'ASC');
+                    }
+                    elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
+                    {
+                        $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
+                            ->where('items.item_type', Item::ITEM_TYPE_REGULAR)
+                            ->orderBy('distance', 'ASC');
+                    }
+                    /**
+                     * End filter sort by for free listing
+                     */
+
+                    $free_items_query->distinct('items.id')
+                        ->with('state')
+                        ->with('city')
+                        ->with('user');
+
+                    $total_free_items = $free_items_query->count();
+
+                    $querystringArray = [
+                        'filter_categories' => $filter_categories,
+                        'filter_sort_by' => $filter_sort_by,
+                        'filter_state' => $filter_state,
+                        'filter_city' => $filter_city,
+                    ];
+
+                    if($total_free_items == 0 || $total_paid_items == 0)
+                    {
+                        $paid_items = $paid_items_query->paginate(10);
+                        $free_items = $free_items_query->paginate(10);
+
+                        if($total_free_items == 0)
+                        {
+                            $pagination = $paid_items->appends($querystringArray);
+                        }
+                        if($total_paid_items == 0)
+                        {
+                            $pagination = $free_items->appends($querystringArray);
+                        }
+                    }
+                    else
+                    {
+                        $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
+                        $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                        $free_items_per_page = 10 - $paid_items_per_page;
+
+                        $paid_items = $paid_items_query->paginate($paid_items_per_page);
+                        $free_items = $free_items_query->paginate($free_items_per_page);
+
+                        if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
+                        {
+                            $pagination = $paid_items->appends($querystringArray);
+                        }
+                        else
+                        {
+                            $pagination = $free_items->appends($querystringArray);
+                        }
+                    }
+                    /**
+                     * End do listing query
+                     */
+
+                    /**
+                     * Start fetch ads blocks
+                     */
+                    $advertisement = new Advertisement();
+
+                    $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_AFTER_BREADCRUMB,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_BEFORE_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_after_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_AFTER_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+                    /**
+                     * End fetch ads blocks
+                     */
+
+
+                    /**
+                     * Start initial filter
+                     */
+                    $all_states = Country::find($site_prefer_country_id)
+                        ->states()
+                        ->orderBy('state_name')->get();
+
+                    $all_cities = collect([]);
+                    if(!empty($filter_state))
+                    {
+                        $state = State::find($filter_state);
+                        $all_cities = $state->cities()->orderBy('city_name')->get();
+                    }
+
+                    $total_results = $total_paid_items + $total_free_items;
+                    /**
+                     * End initial filter
+                     */
+
+
+                    /**
+                     * Start inner page header customization
+                     */
+                    $site_innerpage_header_background_type = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_background_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_COLOR)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_background_image = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_IMAGE)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_title_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_TITLE_FONT_COLOR)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_PARAGRAPH_FONT_COLOR)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+                    /**
+                     * End inner page header customization
+                     */
+
+                    /**
+                     * Start initial blade view file path
+                     */
+                    $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
+                    $theme_view_path = $theme_view_path->getViewPath();
+                    /**
+                     * End initial blade view file path
+                     */
+
+                    return response()->view($theme_view_path . 'category',
+                        compact('category', 'paid_items', 'free_items', 'pagination', 'all_states',
+                            'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
+                            'ads_before_sidebar_content', 'ads_after_sidebar_content', 'parent_categories', 'children_categories',
+                            'parent_category_id', 'site_innerpage_header_background_type', 'site_innerpage_header_background_color',
+                            'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
+                            'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color', 'filter_sort_by',
+                            'filter_categories', 'filter_state', 'filter_city', 'all_cities', 'total_results'));
+                }
+                else
+                {
+                    abort(404);
+                }
+        }
+        else {
+            
+            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+        }
+    }
+
+    public function categoryByState(Request $request, string $category_slug, string $state_slug)
+    {   
+        if(Auth::check()){    
+            $category = Category::where('category_slug', $category_slug)->first();
+            $state = State::where('state_slug', $state_slug)->first();
+
+            if($category && $state)
             {
+                $settings = app('site_global_settings');
+                $site_prefer_country_id = app('site_prefer_country_id');
+
+                /**
+                 * Start SEO
+                 */
+                SEOMeta::setTitle($category->category_name . ' of ' . $state->state_name . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+                SEOMeta::setDescription('');
+                SEOMeta::setCanonical(URL::current());
+                SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+                /**
+                 * End SEO
+                 */
+
+                /**
+                 * Get parent and children categories
+                 */
+                $parent_categories = $category->allParents();
+
+                // get one level down sub-categories
+                $children_categories = $category->children()->orderBy('category_name')->get();
+
+                // need to give a root category for each item in a category listing page
+                $parent_category_id = $category->id;
+
                 // Get all child categories of this category
                 $all_child_categories = collect();
                 $all_child_categories_ids = array();
@@ -1222,601 +1556,294 @@ class PagesController extends Controller
                     $all_child_categories_ids[] = $all_child_category->id;
                 }
 
-                $item_ids = $category_obj->getItemIdsByCategoryIds($all_child_categories_ids);
-            }
+                /**
+                 * Do listing query
+                 * 1. get paid listings and free listings.
+                 * 2. decide how many paid and free listings per page and total pages.
+                 * 3. decide the pagination to paid or free listings
+                 * 4. run query and render
+                 */
 
-            // state & city
-            $filter_state = empty($request->filter_state) ? null : $request->filter_state;
-            $filter_city = empty($request->filter_city) ? null : $request->filter_city;
-            /**
-             * End filter for paid listing
-             */
+                // paid listing
+                $paid_items_query = Item::query();
 
-            // get paid users id array
-            $subscription_obj = new Subscription();
-            $paid_user_ids = $subscription_obj->getPaidUserIds();
+                /**
+                 * Start filter for paid listing
+                 */
+                // categories
+                $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
+                $category_obj = new Category();
 
-            $paid_items_query->whereIn('id', $item_ids);
+                $all_item_ids = $category_obj->getItemIdsByCategoryIds($all_child_categories_ids);
 
-            $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-                ->where(function ($query) use ($site_prefer_country_id) {
-                    $query->where('items.country_id', $site_prefer_country_id)
-                        ->orWhereNull('items.country_id');
-                })
-                ->where('items.item_featured', Item::ITEM_FEATURED)
-                ->where(function($query) use ($paid_user_ids) {
-
-                    $query->whereIn('items.user_id', $paid_user_ids)
-                        ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
-                });
-
-            // filter paid listings state
-            if(!empty($filter_state))
-            {
-                $paid_items_query->where('items.state_id', $filter_state);
-            }
-
-            // filter paid listings city
-            if(!empty($filter_city))
-            {
-                $paid_items_query->where('items.city_id', $filter_city);
-            }
-
-            $paid_items_query->orderBy('items.created_at', 'DESC')
-                ->distinct('items.id')
-                ->with('state')
-                ->with('city')
-                ->with('user');
-
-            $total_paid_items = $paid_items_query->count();
-
-            // free listing
-            $free_items_query = Item::query();
-
-            // get free users id array
-            //$free_user_ids = $subscription_obj->getFreeUserIds();
-            $free_user_ids = $subscription_obj->getActiveUserIds();
-
-            $free_items_query->whereIn('id', $item_ids);
-
-            $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-                ->where(function ($query) use ($site_prefer_country_id) {
-                    $query->where('items.country_id', $site_prefer_country_id)
-                        ->orWhereNull('items.country_id');
-                })
-                ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
-                ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
-                ->whereIn('items.user_id', $free_user_ids);
-
-            // filter free listings state
-            if(!empty($filter_state))
-            {
-                $free_items_query->where('items.state_id', $filter_state);
-            }
-
-            // filter free listings city
-            if(!empty($filter_city))
-            {
-                $free_items_query->where('items.city_id', $filter_city);
-            }
-
-            /**
-             * Start filter sort by for free listing
-             */
-            $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-            if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
-            {
-                $free_items_query->orderBy('items.created_at', 'DESC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_OLDEST_CREATED)
-            {
-                $free_items_query->orderBy('items.created_at', 'ASC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_HIGHEST_RATING)
-            {
-                $free_items_query->orderBy('items.item_average_rating', 'DESC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_LOWEST_RATING)
-            {
-                $free_items_query->orderBy('items.item_average_rating', 'ASC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
-            {
-                $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
-                    ->where('items.item_type', Item::ITEM_TYPE_REGULAR)
-                    ->orderBy('distance', 'ASC');
-            }
-            /**
-             * End filter sort by for free listing
-             */
-
-            $free_items_query->distinct('items.id')
-                ->with('state')
-                ->with('city')
-                ->with('user');
-
-            $total_free_items = $free_items_query->count();
-
-            $querystringArray = [
-                'filter_categories' => $filter_categories,
-                'filter_sort_by' => $filter_sort_by,
-                'filter_state' => $filter_state,
-                'filter_city' => $filter_city,
-            ];
-
-            if($total_free_items == 0 || $total_paid_items == 0)
-            {
-                $paid_items = $paid_items_query->paginate(10);
-                $free_items = $free_items_query->paginate(10);
-
-                if($total_free_items == 0)
+                if(count($filter_categories) > 0)
                 {
-                    $pagination = $paid_items->appends($querystringArray);
-                }
-                if($total_paid_items == 0)
-                {
-                    $pagination = $free_items->appends($querystringArray);
-                }
-            }
-            else
-            {
-                $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
-                $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
-                $free_items_per_page = 10 - $paid_items_per_page;
-
-                $paid_items = $paid_items_query->paginate($paid_items_per_page);
-                $free_items = $free_items_query->paginate($free_items_per_page);
-
-                if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
-                {
-                    $pagination = $paid_items->appends($querystringArray);
+                    $item_ids = $category_obj->getItemIdsByCategoryIds($filter_categories);
                 }
                 else
                 {
-                    $pagination = $free_items->appends($querystringArray);
+                    $item_ids = $all_item_ids;
                 }
-            }
-            /**
-             * End do listing query
-             */
 
-            /**
-             * Start fetch ads blocks
-             */
-            $advertisement = new Advertisement();
+                // city
+                $filter_city = empty($request->filter_city) ? null : $request->filter_city;
+                /**
+                 * End filter for paid listing
+                 */
 
-            $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
-                Advertisement::AD_STATUS_ENABLE
-            );
+                // get paid users id array
+                $subscription_obj = new Subscription();
+                $paid_user_ids = $subscription_obj->getPaidUserIds();
 
-            $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_AFTER_BREADCRUMB,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_BEFORE_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_AFTER_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-            /**
-             * End fetch ads blocks
-             */
-
-
-            /**
-             * Start initial filter
-             */
-            $all_states = Country::find($site_prefer_country_id)
-                ->states()
-                ->orderBy('state_name')->get();
-
-            $all_cities = collect([]);
-            if(!empty($filter_state))
-            {
-                $state = State::find($filter_state);
-                $all_cities = $state->cities()->orderBy('city_name')->get();
-            }
-
-            $total_results = $total_paid_items + $total_free_items;
-            /**
-             * End initial filter
-             */
-
-
-            /**
-             * Start inner page header customization
-             */
-            $site_innerpage_header_background_type = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_background_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_COLOR)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_background_image = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_IMAGE)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_title_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_TITLE_FONT_COLOR)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_PARAGRAPH_FONT_COLOR)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-            /**
-             * End inner page header customization
-             */
-
-            /**
-             * Start initial blade view file path
-             */
-            $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
-            $theme_view_path = $theme_view_path->getViewPath();
-            /**
-             * End initial blade view file path
-             */
-
-            return response()->view($theme_view_path . 'category',
-                compact('category', 'paid_items', 'free_items', 'pagination', 'all_states',
-                    'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
-                    'ads_before_sidebar_content', 'ads_after_sidebar_content', 'parent_categories', 'children_categories',
-                    'parent_category_id', 'site_innerpage_header_background_type', 'site_innerpage_header_background_color',
-                    'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
-                    'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color', 'filter_sort_by',
-                    'filter_categories', 'filter_state', 'filter_city', 'all_cities', 'total_results'));
-        }
-        else
-        {
-            abort(404);
-        }
-    }
-
-    public function categoryByState(Request $request, string $category_slug, string $state_slug)
-    {
-        $category = Category::where('category_slug', $category_slug)->first();
-        $state = State::where('state_slug', $state_slug)->first();
-
-        if($category && $state)
-        {
-            $settings = app('site_global_settings');
-            $site_prefer_country_id = app('site_prefer_country_id');
-
-            /**
-             * Start SEO
-             */
-            SEOMeta::setTitle($category->category_name . ' of ' . $state->state_name . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-            SEOMeta::setDescription('');
-            SEOMeta::setCanonical(URL::current());
-            SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
-            /**
-             * End SEO
-             */
-
-            /**
-             * Get parent and children categories
-             */
-            $parent_categories = $category->allParents();
-
-            // get one level down sub-categories
-            $children_categories = $category->children()->orderBy('category_name')->get();
-
-            // need to give a root category for each item in a category listing page
-            $parent_category_id = $category->id;
-
-            // Get all child categories of this category
-            $all_child_categories = collect();
-            $all_child_categories_ids = array();
-            $category->allChildren($category, $all_child_categories);
-            foreach($all_child_categories as $key => $all_child_category)
-            {
-                $all_child_categories_ids[] = $all_child_category->id;
-            }
-
-            /**
-             * Do listing query
-             * 1. get paid listings and free listings.
-             * 2. decide how many paid and free listings per page and total pages.
-             * 3. decide the pagination to paid or free listings
-             * 4. run query and render
-             */
-
-            // paid listing
-            $paid_items_query = Item::query();
-
-            /**
-             * Start filter for paid listing
-             */
-            // categories
-            $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
-            $category_obj = new Category();
-
-            $all_item_ids = $category_obj->getItemIdsByCategoryIds($all_child_categories_ids);
-
-            if(count($filter_categories) > 0)
-            {
-                $item_ids = $category_obj->getItemIdsByCategoryIds($filter_categories);
-            }
-            else
-            {
-                $item_ids = $all_item_ids;
-            }
-
-            // city
-            $filter_city = empty($request->filter_city) ? null : $request->filter_city;
-            /**
-             * End filter for paid listing
-             */
-
-            // get paid users id array
-            $subscription_obj = new Subscription();
-            $paid_user_ids = $subscription_obj->getPaidUserIds();
-
-            if(count($item_ids) > 0)
-            {
-                $paid_items_query->whereIn('id', $item_ids);
-            }
-
-            $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-                ->where('items.country_id', $site_prefer_country_id)
-                ->where('items.state_id', $state->id)
-                ->where('items.item_featured', Item::ITEM_FEATURED)
-                ->where(function($query) use ($paid_user_ids) {
-
-                    $query->whereIn('items.user_id', $paid_user_ids)
-                        ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
-                });
-
-            // filter paid listings city
-            if(!empty($filter_city))
-            {
-                $paid_items_query->where('items.city_id', $filter_city);
-            }
-
-            $paid_items_query->orderBy('items.created_at', 'DESC')
-                ->distinct('items.id')
-                ->with('state')
-                ->with('city')
-                ->with('user');
-
-            $total_paid_items = $paid_items_query->count();
-
-            // free listing
-            $free_items_query = Item::query();
-
-            // get free users id array
-            //$free_user_ids = $subscription_obj->getFreeUserIds();
-            $free_user_ids = $subscription_obj->getActiveUserIds();
-
-            if(count($item_ids) > 0)
-            {
-                $free_items_query->whereIn('id', $item_ids);
-            }
-
-            $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-                ->where('items.country_id', $site_prefer_country_id)
-                ->where('items.state_id', $state->id)
-                ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
-                ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
-                ->whereIn('items.user_id', $free_user_ids);
-
-            // filter free listings city
-            if(!empty($filter_city))
-            {
-                $free_items_query->where('items.city_id', $filter_city);
-            }
-
-            /**
-             * Start filter sort by for free listing
-             */
-            $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-            if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
-            {
-                $free_items_query->orderBy('items.created_at', 'DESC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_OLDEST_CREATED)
-            {
-                $free_items_query->orderBy('items.created_at', 'ASC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_HIGHEST_RATING)
-            {
-                $free_items_query->orderBy('items.item_average_rating', 'DESC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_LOWEST_RATING)
-            {
-                $free_items_query->orderBy('items.item_average_rating', 'ASC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
-            {
-                $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
-                    ->orderBy('distance', 'ASC');
-            }
-            /**
-             * End filter sort by for free listing
-             */
-
-            $free_items_query->distinct('items.id')
-                ->with('state')
-                ->with('city')
-                ->with('user');
-
-            $total_free_items = $free_items_query->count();
-
-            $querystringArray = [
-                'filter_categories' => $filter_categories,
-                'filter_sort_by' => $filter_sort_by,
-                'filter_city' => $filter_city,
-            ];
-
-            if($total_free_items == 0 || $total_paid_items == 0)
-            {
-                $paid_items = $paid_items_query->paginate(10);
-                $free_items = $free_items_query->paginate(10);
-
-                if($total_free_items == 0)
+                if(count($item_ids) > 0)
                 {
-                    $pagination = $paid_items->appends($querystringArray);
+                    $paid_items_query->whereIn('id', $item_ids);
                 }
-                if($total_paid_items == 0)
+
+                $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
+                    ->where('items.country_id', $site_prefer_country_id)
+                    ->where('items.state_id', $state->id)
+                    ->where('items.item_featured', Item::ITEM_FEATURED)
+                    ->where(function($query) use ($paid_user_ids) {
+
+                        $query->whereIn('items.user_id', $paid_user_ids)
+                            ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
+                    });
+
+                // filter paid listings city
+                if(!empty($filter_city))
                 {
-                    $pagination = $free_items->appends($querystringArray);
+                    $paid_items_query->where('items.city_id', $filter_city);
                 }
-            }
-            else
-            {
-                $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
-                $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
-                $free_items_per_page = 10 - $paid_items_per_page;
 
-                $paid_items = $paid_items_query->paginate($paid_items_per_page);
-                $free_items = $free_items_query->paginate($free_items_per_page);
+                $paid_items_query->orderBy('items.created_at', 'DESC')
+                    ->distinct('items.id')
+                    ->with('state')
+                    ->with('city')
+                    ->with('user');
 
-                if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
+                $total_paid_items = $paid_items_query->count();
+
+                // free listing
+                $free_items_query = Item::query();
+
+                // get free users id array
+                //$free_user_ids = $subscription_obj->getFreeUserIds();
+                $free_user_ids = $subscription_obj->getActiveUserIds();
+
+                if(count($item_ids) > 0)
                 {
-                    $pagination = $paid_items->appends($querystringArray);
+                    $free_items_query->whereIn('id', $item_ids);
+                }
+
+                $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
+                    ->where('items.country_id', $site_prefer_country_id)
+                    ->where('items.state_id', $state->id)
+                    ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
+                    ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
+                    ->whereIn('items.user_id', $free_user_ids);
+
+                // filter free listings city
+                if(!empty($filter_city))
+                {
+                    $free_items_query->where('items.city_id', $filter_city);
+                }
+
+                /**
+                 * Start filter sort by for free listing
+                 */
+                $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
+                if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+                {
+                    $free_items_query->orderBy('items.created_at', 'DESC');
+                }
+                elseif($filter_sort_by == Item::ITEMS_SORT_BY_OLDEST_CREATED)
+                {
+                    $free_items_query->orderBy('items.created_at', 'ASC');
+                }
+                elseif($filter_sort_by == Item::ITEMS_SORT_BY_HIGHEST_RATING)
+                {
+                    $free_items_query->orderBy('items.item_average_rating', 'DESC');
+                }
+                elseif($filter_sort_by == Item::ITEMS_SORT_BY_LOWEST_RATING)
+                {
+                    $free_items_query->orderBy('items.item_average_rating', 'ASC');
+                }
+                elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
+                {
+                    $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
+                        ->orderBy('distance', 'ASC');
+                }
+                /**
+                 * End filter sort by for free listing
+                 */
+
+                $free_items_query->distinct('items.id')
+                    ->with('state')
+                    ->with('city')
+                    ->with('user');
+
+                $total_free_items = $free_items_query->count();
+
+                $querystringArray = [
+                    'filter_categories' => $filter_categories,
+                    'filter_sort_by' => $filter_sort_by,
+                    'filter_city' => $filter_city,
+                ];
+
+                if($total_free_items == 0 || $total_paid_items == 0)
+                {
+                    $paid_items = $paid_items_query->paginate(10);
+                    $free_items = $free_items_query->paginate(10);
+
+                    if($total_free_items == 0)
+                    {
+                        $pagination = $paid_items->appends($querystringArray);
+                    }
+                    if($total_paid_items == 0)
+                    {
+                        $pagination = $free_items->appends($querystringArray);
+                    }
                 }
                 else
                 {
-                    $pagination = $free_items->appends($querystringArray);
+                    $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
+                    $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                    $free_items_per_page = 10 - $paid_items_per_page;
+
+                    $paid_items = $paid_items_query->paginate($paid_items_per_page);
+                    $free_items = $free_items_query->paginate($free_items_per_page);
+
+                    if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
+                    {
+                        $pagination = $paid_items->appends($querystringArray);
+                    }
+                    else
+                    {
+                        $pagination = $free_items->appends($querystringArray);
+                    }
                 }
+                /**
+                 * End do listing query
+                 */
+
+                /**
+                 * Start fetch ads blocks
+                 */
+                $advertisement = new Advertisement();
+
+                $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
+                    Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                    Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
+                    Advertisement::AD_STATUS_ENABLE
+                );
+
+                $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
+                    Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                    Advertisement::AD_POSITION_AFTER_BREADCRUMB,
+                    Advertisement::AD_STATUS_ENABLE
+                );
+
+                $ads_before_content = $advertisement->fetchAdvertisements(
+                    Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                    Advertisement::AD_POSITION_BEFORE_CONTENT,
+                    Advertisement::AD_STATUS_ENABLE
+                );
+
+                $ads_after_content = $advertisement->fetchAdvertisements(
+                    Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                    Advertisement::AD_POSITION_AFTER_CONTENT,
+                    Advertisement::AD_STATUS_ENABLE
+                );
+
+                $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
+                    Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                    Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
+                    Advertisement::AD_STATUS_ENABLE
+                );
+
+                $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
+                    Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                    Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
+                    Advertisement::AD_STATUS_ENABLE
+                );
+                /**
+                 * End fetch ads blocks
+                 */
+
+                $active_user_ids = $subscription_obj->getActiveUserIds();
+
+                $item_select_city_query = Item::query();
+                $item_select_city_query->select('items.city_id')
+                    ->whereIn('id', $all_item_ids)
+                    ->where("items.item_status", Item::ITEM_PUBLISHED)
+                    ->where('items.country_id', $site_prefer_country_id)
+                    ->where("items.state_id", $state->id)
+                    ->whereIn('items.user_id', $active_user_ids)
+                    ->groupBy('items.city_id')
+                    ->with('city');
+
+                $all_item_cities = $item_select_city_query->get();
+
+                /**
+                 * Start initial filter
+                 */
+                $filter_all_cities = $state->cities()->orderBy('city_name')->get();
+                $total_results = $total_paid_items + $total_free_items;
+                /**
+                 * End initial filter
+                 */
+
+                /**
+                 * Start inner page header customization
+                 */
+                $site_innerpage_header_background_type = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE)
+                    ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                $site_innerpage_header_background_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_COLOR)
+                    ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                $site_innerpage_header_background_image = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_IMAGE)
+                    ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                $site_innerpage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
+                    ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                $site_innerpage_header_title_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_TITLE_FONT_COLOR)
+                    ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                $site_innerpage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_PARAGRAPH_FONT_COLOR)
+                    ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+                /**
+                 * End inner page header customization
+                 */
+
+                /**
+                 * Start initial blade view file path
+                 */
+                $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
+                $theme_view_path = $theme_view_path->getViewPath();
+                /**
+                 * End initial blade view file path
+                 */
+
+                return response()->view($theme_view_path . 'category.state',
+                    compact('category', 'state', 'paid_items', 'free_items', 'pagination',
+                        'all_item_cities', 'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
+                        'ads_before_sidebar_content', 'ads_after_sidebar_content', 'parent_categories', 'children_categories',
+                        'parent_category_id', 'site_innerpage_header_background_type', 'site_innerpage_header_background_color',
+                        'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
+                        'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color',
+                        'filter_sort_by', 'filter_categories', 'filter_city', 'filter_all_cities', 'total_results'));
             }
-            /**
-             * End do listing query
-             */
-
-            /**
-             * Start fetch ads blocks
-             */
-            $advertisement = new Advertisement();
-
-            $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_AFTER_BREADCRUMB,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_BEFORE_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_AFTER_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-            /**
-             * End fetch ads blocks
-             */
-
-            $active_user_ids = $subscription_obj->getActiveUserIds();
-
-            $item_select_city_query = Item::query();
-            $item_select_city_query->select('items.city_id')
-                ->whereIn('id', $all_item_ids)
-                ->where("items.item_status", Item::ITEM_PUBLISHED)
-                ->where('items.country_id', $site_prefer_country_id)
-                ->where("items.state_id", $state->id)
-                ->whereIn('items.user_id', $active_user_ids)
-                ->groupBy('items.city_id')
-                ->with('city');
-
-            $all_item_cities = $item_select_city_query->get();
-
-            /**
-             * Start initial filter
-             */
-            $filter_all_cities = $state->cities()->orderBy('city_name')->get();
-            $total_results = $total_paid_items + $total_free_items;
-            /**
-             * End initial filter
-             */
-
-            /**
-             * Start inner page header customization
-             */
-            $site_innerpage_header_background_type = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_background_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_COLOR)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_background_image = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_IMAGE)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_title_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_TITLE_FONT_COLOR)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_PARAGRAPH_FONT_COLOR)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-            /**
-             * End inner page header customization
-             */
-
-            /**
-             * Start initial blade view file path
-             */
-            $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
-            $theme_view_path = $theme_view_path->getViewPath();
-            /**
-             * End initial blade view file path
-             */
-
-            return response()->view($theme_view_path . 'category.state',
-                compact('category', 'state', 'paid_items', 'free_items', 'pagination',
-                    'all_item_cities', 'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
-                    'ads_before_sidebar_content', 'ads_after_sidebar_content', 'parent_categories', 'children_categories',
-                    'parent_category_id', 'site_innerpage_header_background_type', 'site_innerpage_header_background_color',
-                    'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
-                    'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color',
-                    'filter_sort_by', 'filter_categories', 'filter_city', 'filter_all_cities', 'total_results'));
+            else
+            {
+                abort(404);
+            }
         }
-        else
-        {
-            abort(404);
+        else {
+            
+            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
         }
     }
 
@@ -2151,313 +2178,11 @@ class PagesController extends Controller
 
     public function state(Request $request, string $state_slug)
     {
-        $state = State::where('state_slug', $state_slug)->first();
-
-        if($state)
+        if(Auth::check())
         {
-            $settings = app('site_global_settings');
-            $site_prefer_country_id = app('site_prefer_country_id');
+            $state = State::where('state_slug', $state_slug)->first();
 
-            /**
-             * Start SEO
-             */
-            SEOMeta::setTitle(__('seo.frontend.categories-state', ['state_name' => $state->state_name, 'site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
-            SEOMeta::setDescription('');
-            SEOMeta::setCanonical(URL::current());
-            SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
-            /**
-             * End SEO
-             */
-
-            /**
-             * Do listing query
-             * 1. get paid listings and free listings.
-             * 2. decide how many paid and free listings per page and total pages.
-             * 3. decide the pagination to paid or free listings
-             * 4. run query and render
-             */
-
-            // paid listing
-            $paid_items_query = Item::query();
-
-            /**
-             * Start filter for paid listing
-             */
-            // categories
-            $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
-
-            $category_obj = new Category();
-            $item_ids = $category_obj->getItemIdsByCategoryIds($filter_categories);
-
-            // city
-            $filter_city = empty($request->filter_city) ? null : $request->filter_city;
-            /**
-             * End filter for paid listing
-             */
-
-            // get paid users id array
-            $subscription_obj = new Subscription();
-            $paid_user_ids = $subscription_obj->getPaidUserIds();
-
-            if(count($item_ids) > 0)
-            {
-                $paid_items_query->whereIn('id', $item_ids);
-            }
-
-            $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-                ->where('items.country_id', $site_prefer_country_id)
-                ->where("items.state_id", $state->id)
-                ->where('items.item_featured', Item::ITEM_FEATURED)
-                ->where(function($query) use ($paid_user_ids) {
-
-                    $query->whereIn('items.user_id', $paid_user_ids)
-                        ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
-                });
-
-
-            // filter paid listings city
-            if(!empty($filter_city))
-            {
-                $paid_items_query->where('items.city_id', $filter_city);
-            }
-
-            $paid_items_query->orderBy('items.created_at', 'DESC')
-                ->distinct('items.id')
-                ->with('state')
-                ->with('city')
-                ->with('user');
-
-            $total_paid_items = $paid_items_query->count();
-
-            // free listing
-            $free_items_query = Item::query();
-
-            // get free users id array
-            //$free_user_ids = $subscription_obj->getFreeUserIds();
-            $free_user_ids = $subscription_obj->getActiveUserIds();
-
-            if(count($item_ids) > 0)
-            {
-                $free_items_query->whereIn('id', $item_ids);
-            }
-
-            $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
-                ->where('items.country_id', $site_prefer_country_id)
-                ->where("items.state_id", $state->id)
-                ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
-                ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
-                ->whereIn('items.user_id', $free_user_ids);
-
-            // filter free listings city
-            if(!empty($filter_city))
-            {
-                $free_items_query->where('items.city_id', $filter_city);
-            }
-
-            /**
-             * Start filter sort by for free listing
-             */
-            $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-            if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
-            {
-                $free_items_query->orderBy('items.created_at', 'DESC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_OLDEST_CREATED)
-            {
-                $free_items_query->orderBy('items.created_at', 'ASC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_HIGHEST_RATING)
-            {
-                $free_items_query->orderBy('items.item_average_rating', 'DESC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_LOWEST_RATING)
-            {
-                $free_items_query->orderBy('items.item_average_rating', 'ASC');
-            }
-            elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
-            {
-                $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
-                    ->orderBy('distance', 'ASC');
-            }
-            /**
-             * End filter sort by for free listing
-             */
-
-            $free_items_query->distinct('items.id')
-                ->with('state')
-                ->with('city')
-                ->with('user');
-
-            $total_free_items = $free_items_query->count();
-
-            $querystringArray = [
-                'filter_categories' => $filter_categories,
-                'filter_sort_by' => $filter_sort_by,
-                'filter_city' => $filter_city,
-            ];
-
-            if($total_free_items == 0 || $total_paid_items == 0)
-            {
-                $paid_items = $paid_items_query->paginate(10);
-                $free_items = $free_items_query->paginate(10);
-
-                if($total_free_items == 0)
-                {
-                    $pagination = $paid_items->appends($querystringArray);
-                }
-                if($total_paid_items == 0)
-                {
-                    $pagination = $free_items->appends($querystringArray);
-                }
-            }
-            else
-            {
-                $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
-                $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
-                $free_items_per_page = 10 - $paid_items_per_page;
-
-                $paid_items = $paid_items_query->paginate($paid_items_per_page);
-                $free_items = $free_items_query->paginate($free_items_per_page);
-
-                if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
-                {
-                    $pagination = $paid_items->appends($querystringArray);
-                }
-                else
-                {
-                    $pagination = $free_items->appends($querystringArray);
-                }
-            }
-            /**
-             * End do listing query
-             */
-
-            /**
-             * Start fetch ads blocks
-             */
-            $advertisement = new Advertisement();
-
-            $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_AFTER_BREADCRUMB,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_BEFORE_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_AFTER_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-
-            $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
-                Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
-                Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
-                Advertisement::AD_STATUS_ENABLE
-            );
-            /**
-             * End fetch ads blocks
-             */
-
-            $active_user_ids = $subscription_obj->getActiveUserIds();
-
-            $item_select_city_query = Item::query();
-            $item_select_city_query->select('items.city_id')
-                ->where("items.item_status", Item::ITEM_PUBLISHED)
-                ->where('items.country_id', $site_prefer_country_id)
-                ->where("items.state_id", $state->id)
-                ->whereIn('items.user_id', $active_user_ids)
-                ->groupBy('items.city_id')
-                ->with('city');
-
-            $all_item_cities = $item_select_city_query->get();
-
-            /**
-             * Start inner page header customization
-             */
-            $site_innerpage_header_background_type = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_background_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_COLOR)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_background_image = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_IMAGE)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_title_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_TITLE_FONT_COLOR)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-
-            $site_innerpage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_PARAGRAPH_FONT_COLOR)
-                ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
-            /**
-             * End inner page header customization
-             */
-
-            /**
-             * Start initial filter
-             */
-            $all_printable_categories = $category_obj->getPrintableCategoriesNoDash();
-
-            $filter_all_cities = $state->cities()->orderBy('city_name')->get();
-
-            $total_results = $total_paid_items + $total_free_items;
-            /**
-             * End initial filter
-             */
-
-            /**
-             * Start initial blade view file path
-             */
-            $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
-            $theme_view_path = $theme_view_path->getViewPath();
-            /**
-             * End initial blade view file path
-             */
-
-            return response()->view($theme_view_path . 'state',
-                compact('state', 'paid_items', 'free_items', 'pagination', 'all_item_cities',
-                    'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
-                    'ads_before_sidebar_content', 'ads_after_sidebar_content', 'site_innerpage_header_background_type',
-                    'site_innerpage_header_background_color', 'site_innerpage_header_background_image',
-                    'site_innerpage_header_background_youtube_video', 'site_innerpage_header_title_font_color',
-                    'site_innerpage_header_paragraph_font_color', 'filter_categories', 'filter_all_cities', 'filter_city',
-                    'filter_sort_by', 'total_results', 'all_printable_categories'));
-        }
-        else
-        {
-            abort(404);
-        }
-    }
-
-    public function city(Request $request, string $state_slug, string $city_slug)
-    {
-        $state = State::where('state_slug', $state_slug)->first();
-
-        if($state)
-        {
-            $city = $state->cities()->where('city_slug', $city_slug)->first();
-
-            if($city)
+            if($state)
             {
                 $settings = app('site_global_settings');
                 $site_prefer_country_id = app('site_prefer_country_id');
@@ -2465,7 +2190,7 @@ class PagesController extends Controller
                 /**
                  * Start SEO
                  */
-                SEOMeta::setTitle(__('seo.frontend.categories-state-city', ['state_name' => $state->state_name, 'city_name' => $city->city_name, 'site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
+                SEOMeta::setTitle(__('seo.frontend.categories-state', ['state_name' => $state->state_name, 'site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
                 SEOMeta::setDescription('');
                 SEOMeta::setCanonical(URL::current());
                 SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
@@ -2492,6 +2217,9 @@ class PagesController extends Controller
 
                 $category_obj = new Category();
                 $item_ids = $category_obj->getItemIdsByCategoryIds($filter_categories);
+
+                // city
+                $filter_city = empty($request->filter_city) ? null : $request->filter_city;
                 /**
                  * End filter for paid listing
                  */
@@ -2508,13 +2236,19 @@ class PagesController extends Controller
                 $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
                     ->where('items.country_id', $site_prefer_country_id)
                     ->where("items.state_id", $state->id)
-                    ->where("items.city_id", $city->id)
                     ->where('items.item_featured', Item::ITEM_FEATURED)
                     ->where(function($query) use ($paid_user_ids) {
 
                         $query->whereIn('items.user_id', $paid_user_ids)
                             ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
                     });
+
+
+                // filter paid listings city
+                if(!empty($filter_city))
+                {
+                    $paid_items_query->where('items.city_id', $filter_city);
+                }
 
                 $paid_items_query->orderBy('items.created_at', 'DESC')
                     ->distinct('items.id')
@@ -2539,10 +2273,15 @@ class PagesController extends Controller
                 $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
                     ->where('items.country_id', $site_prefer_country_id)
                     ->where("items.state_id", $state->id)
-                    ->where("items.city_id", $city->id)
                     ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
                     ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
                     ->whereIn('items.user_id', $free_user_ids);
+
+                // filter free listings city
+                if(!empty($filter_city))
+                {
+                    $free_items_query->where('items.city_id', $filter_city);
+                }
 
                 /**
                  * Start filter sort by for free listing
@@ -2583,6 +2322,7 @@ class PagesController extends Controller
                 $querystringArray = [
                     'filter_categories' => $filter_categories,
                     'filter_sort_by' => $filter_sort_by,
+                    'filter_city' => $filter_city,
                 ];
 
                 if($total_free_items == 0 || $total_paid_items == 0)
@@ -2707,6 +2447,8 @@ class PagesController extends Controller
                  */
                 $all_printable_categories = $category_obj->getPrintableCategoriesNoDash();
 
+                $filter_all_cities = $state->cities()->orderBy('city_name')->get();
+
                 $total_results = $total_paid_items + $total_free_items;
                 /**
                  * End initial filter
@@ -2721,23 +2463,322 @@ class PagesController extends Controller
                  * End initial blade view file path
                  */
 
-                return response()->view($theme_view_path . 'city',
-                    compact('state','city', 'paid_items', 'free_items', 'pagination', 'all_item_cities',
+                return response()->view($theme_view_path . 'state',
+                    compact('state', 'paid_items', 'free_items', 'pagination', 'all_item_cities',
                         'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
                         'ads_before_sidebar_content', 'ads_after_sidebar_content', 'site_innerpage_header_background_type',
                         'site_innerpage_header_background_color', 'site_innerpage_header_background_image',
                         'site_innerpage_header_background_youtube_video', 'site_innerpage_header_title_font_color',
-                        'site_innerpage_header_paragraph_font_color', 'filter_categories', 'filter_sort_by', 'total_results',
-                        'all_printable_categories'));
+                        'site_innerpage_header_paragraph_font_color', 'filter_categories', 'filter_all_cities', 'filter_city',
+                        'filter_sort_by', 'total_results', 'all_printable_categories'));
             }
             else
             {
                 abort(404);
             }
+        }else {
+            
+            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
         }
-        else
+    }
+
+    public function city(Request $request, string $state_slug, string $city_slug)
+    {
+        
+        if(Auth::check())
         {
-            abort(404);
+            $state = State::where('state_slug', $state_slug)->first();
+
+            if($state)
+            {
+                $city = $state->cities()->where('city_slug', $city_slug)->first();
+
+                if($city)
+                {
+                    $settings = app('site_global_settings');
+                    $site_prefer_country_id = app('site_prefer_country_id');
+
+                    /**
+                     * Start SEO
+                     */
+                    SEOMeta::setTitle(__('seo.frontend.categories-state-city', ['state_name' => $state->state_name, 'city_name' => $city->city_name, 'site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
+                    SEOMeta::setDescription('');
+                    SEOMeta::setCanonical(URL::current());
+                    SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+                    /**
+                     * End SEO
+                     */
+
+                    /**
+                     * Do listing query
+                     * 1. get paid listings and free listings.
+                     * 2. decide how many paid and free listings per page and total pages.
+                     * 3. decide the pagination to paid or free listings
+                     * 4. run query and render
+                     */
+
+                    // paid listing
+                    $paid_items_query = Item::query();
+
+                    /**
+                     * Start filter for paid listing
+                     */
+                    // categories
+                    $filter_categories = empty($request->filter_categories) ? array() : $request->filter_categories;
+
+                    $category_obj = new Category();
+                    $item_ids = $category_obj->getItemIdsByCategoryIds($filter_categories);
+                    /**
+                     * End filter for paid listing
+                     */
+
+                    // get paid users id array
+                    $subscription_obj = new Subscription();
+                    $paid_user_ids = $subscription_obj->getPaidUserIds();
+
+                    if(count($item_ids) > 0)
+                    {
+                        $paid_items_query->whereIn('id', $item_ids);
+                    }
+
+                    $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
+                        ->where('items.country_id', $site_prefer_country_id)
+                        ->where("items.state_id", $state->id)
+                        ->where("items.city_id", $city->id)
+                        ->where('items.item_featured', Item::ITEM_FEATURED)
+                        ->where(function($query) use ($paid_user_ids) {
+
+                            $query->whereIn('items.user_id', $paid_user_ids)
+                                ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
+                        });
+
+                    $paid_items_query->orderBy('items.created_at', 'DESC')
+                        ->distinct('items.id')
+                        ->with('state')
+                        ->with('city')
+                        ->with('user');
+
+                    $total_paid_items = $paid_items_query->count();
+
+                    // free listing
+                    $free_items_query = Item::query();
+
+                    // get free users id array
+                    //$free_user_ids = $subscription_obj->getFreeUserIds();
+                    $free_user_ids = $subscription_obj->getActiveUserIds();
+
+                    if(count($item_ids) > 0)
+                    {
+                        $free_items_query->whereIn('id', $item_ids);
+                    }
+
+                    $free_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
+                        ->where('items.country_id', $site_prefer_country_id)
+                        ->where("items.state_id", $state->id)
+                        ->where("items.city_id", $city->id)
+                        ->where('items.item_featured', Item::ITEM_NOT_FEATURED)
+                        ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
+                        ->whereIn('items.user_id', $free_user_ids);
+
+                    /**
+                     * Start filter sort by for free listing
+                     */
+                    $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
+                    if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+                    {
+                        $free_items_query->orderBy('items.created_at', 'DESC');
+                    }
+                    elseif($filter_sort_by == Item::ITEMS_SORT_BY_OLDEST_CREATED)
+                    {
+                        $free_items_query->orderBy('items.created_at', 'ASC');
+                    }
+                    elseif($filter_sort_by == Item::ITEMS_SORT_BY_HIGHEST_RATING)
+                    {
+                        $free_items_query->orderBy('items.item_average_rating', 'DESC');
+                    }
+                    elseif($filter_sort_by == Item::ITEMS_SORT_BY_LOWEST_RATING)
+                    {
+                        $free_items_query->orderBy('items.item_average_rating', 'ASC');
+                    }
+                    elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
+                    {
+                        $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
+                            ->orderBy('distance', 'ASC');
+                    }
+                    /**
+                     * End filter sort by for free listing
+                     */
+
+                    $free_items_query->distinct('items.id')
+                        ->with('state')
+                        ->with('city')
+                        ->with('user');
+
+                    $total_free_items = $free_items_query->count();
+
+                    $querystringArray = [
+                        'filter_categories' => $filter_categories,
+                        'filter_sort_by' => $filter_sort_by,
+                    ];
+
+                    if($total_free_items == 0 || $total_paid_items == 0)
+                    {
+                        $paid_items = $paid_items_query->paginate(10);
+                        $free_items = $free_items_query->paginate(10);
+
+                        if($total_free_items == 0)
+                        {
+                            $pagination = $paid_items->appends($querystringArray);
+                        }
+                        if($total_paid_items == 0)
+                        {
+                            $pagination = $free_items->appends($querystringArray);
+                        }
+                    }
+                    else
+                    {
+                        $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
+                        $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                        $free_items_per_page = 10 - $paid_items_per_page;
+
+                        $paid_items = $paid_items_query->paginate($paid_items_per_page);
+                        $free_items = $free_items_query->paginate($free_items_per_page);
+
+                        if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
+                        {
+                            $pagination = $paid_items->appends($querystringArray);
+                        }
+                        else
+                        {
+                            $pagination = $free_items->appends($querystringArray);
+                        }
+                    }
+                    /**
+                     * End do listing query
+                     */
+
+                    /**
+                     * Start fetch ads blocks
+                     */
+                    $advertisement = new Advertisement();
+
+                    $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_AFTER_BREADCRUMB,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_BEFORE_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_after_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_AFTER_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+
+                    $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
+                        Advertisement::AD_PLACE_LISTING_RESULTS_PAGES,
+                        Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
+                        Advertisement::AD_STATUS_ENABLE
+                    );
+                    /**
+                     * End fetch ads blocks
+                     */
+
+                    $active_user_ids = $subscription_obj->getActiveUserIds();
+
+                    $item_select_city_query = Item::query();
+                    $item_select_city_query->select('items.city_id')
+                        ->where("items.item_status", Item::ITEM_PUBLISHED)
+                        ->where('items.country_id', $site_prefer_country_id)
+                        ->where("items.state_id", $state->id)
+                        ->whereIn('items.user_id', $active_user_ids)
+                        ->groupBy('items.city_id')
+                        ->with('city');
+
+                    $all_item_cities = $item_select_city_query->get();
+
+                    /**
+                     * Start inner page header customization
+                     */
+                    $site_innerpage_header_background_type = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_TYPE)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_background_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_COLOR)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_background_image = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_IMAGE)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_background_youtube_video = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_BACKGROUND_YOUTUBE_VIDEO)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_title_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_TITLE_FONT_COLOR)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+
+                    $site_innerpage_header_paragraph_font_color = Customization::where('customization_key', Customization::SITE_INNERPAGE_HEADER_PARAGRAPH_FONT_COLOR)
+                        ->where('theme_id', $settings->setting_site_active_theme_id)->first()->customization_value;
+                    /**
+                     * End inner page header customization
+                     */
+
+                    /**
+                     * Start initial filter
+                     */
+                    $all_printable_categories = $category_obj->getPrintableCategoriesNoDash();
+
+                    $total_results = $total_paid_items + $total_free_items;
+                    /**
+                     * End initial filter
+                     */
+
+                    /**
+                     * Start initial blade view file path
+                     */
+                    $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
+                    $theme_view_path = $theme_view_path->getViewPath();
+                    /**
+                     * End initial blade view file path
+                     */
+
+                    return response()->view($theme_view_path . 'city',
+                        compact('state','city', 'paid_items', 'free_items', 'pagination', 'all_item_cities',
+                            'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
+                            'ads_before_sidebar_content', 'ads_after_sidebar_content', 'site_innerpage_header_background_type',
+                            'site_innerpage_header_background_color', 'site_innerpage_header_background_image',
+                            'site_innerpage_header_background_youtube_video', 'site_innerpage_header_title_font_color',
+                            'site_innerpage_header_paragraph_font_color', 'filter_categories', 'filter_sort_by', 'total_results',
+                            'all_printable_categories'));
+                }
+                else
+                {
+                    abort(404);
+                }
+            }
+            else
+            {
+                abort(404);
+            }
+        }else {
+            
+            return redirect()->route('page.home');
+            // \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
         }
     }
 
@@ -3022,415 +3063,423 @@ class PagesController extends Controller
      */
     public function item(Request $request, string $item_slug)
     {
-        $settings = app('site_global_settings');
+        
+        if (Auth::check()) {
+        
+            $settings = app('site_global_settings');
 
-        $item = Item::where('item_slug', $item_slug)
-            ->where('item_status', Item::ITEM_PUBLISHED)
-            ->first();
+            $item = Item::where('item_slug', $item_slug)
+                ->where('item_status', Item::ITEM_PUBLISHED)
+                ->first();
 
-        if($item)
-        {
-            $item_user = $item->user()->first();
-
-            if($item_user)
+            if($item)
             {
-                if($item_user->hasActive())
+                $item_user = $item->user()->first();
+
+                if($item_user)
                 {
-                    /**
-                     * Start SEO
-                     */
-                    SEOMeta::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-                    SEOMeta::setDescription($item->item_description);
-                    SEOMeta::setCanonical(URL::current());
-                    SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
-
-                    // OpenGraph
-                    OpenGraph::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-                    OpenGraph::setDescription($item->item_description);
-                    OpenGraph::setUrl(URL::current());
-                    if(empty($item->item_image))
+                    if($item_user->hasActive())
                     {
-                        OpenGraph::addImage(asset('frontend/images/placeholder/full_item_feature_image.webp'));
-                    }
-                    else
-                    {
-                        OpenGraph::addImage(Storage::disk('public')->url('item/' . $item->item_image));
-                    }
+                        /**
+                         * Start SEO
+                         */
+                        SEOMeta::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+                        SEOMeta::setDescription($item->item_description);
+                        SEOMeta::setCanonical(URL::current());
+                        SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
 
-                    // Twitter
-                    TwitterCard::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
-                    /**
-                     * End SEO
-                     */
-
-                    $item_display_categories = $item->getAllCategories(Item::ITEM_TOTAL_SHOW_CATEGORY);
-                    $item_total_categories = $item->allCategories()->count();
-                    $item_all_categories = $item->getAllCategories();
-
-                    /**
-                     * Start initla item features
-                     */
-                    $item_features = $item->features()->where('item_feature_value', '<>', '')
-                        ->whereNotNull('item_feature_value')
-                        ->get();
-                    /**
-                     * End initial item features
-                     */
-
-                    /**
-                     * Start initial opening hours
-                     */
-                    $opening_hours_array_monday = array();
-                    $opening_hours_array_tuesday = array();
-                    $opening_hours_array_wednesday = array();
-                    $opening_hours_array_thursday = array();
-                    $opening_hours_array_friday = array();
-                    $opening_hours_array_saturday = array();
-                    $opening_hours_array_sunday = array();
-                    $opening_hour_exceptions_array = array();
-
-                    $item_hours = $item->itemHours()->get();
-                    foreach($item_hours as $item_hours_key => $item_hour)
-                    {
-                        $item_hour_open_time = substr($item_hour->item_hour_open_time, 0, -3);
-                        $item_hour_close_time = substr($item_hour->item_hour_close_time, 0, -3);
-
-                        if($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_MONDAY)
+                        // OpenGraph
+                        OpenGraph::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+                        OpenGraph::setDescription($item->item_description);
+                        OpenGraph::setUrl(URL::current());
+                        if(empty($item->item_image))
                         {
-                            $opening_hours_array_monday[] = $item_hour_open_time . "-" . $item_hour_close_time;
-                        }
-                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_TUESDAY)
-                        {
-                            $opening_hours_array_tuesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
-                        }
-                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_WEDNESDAY)
-                        {
-                            $opening_hours_array_wednesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
-                        }
-                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_THURSDAY)
-                        {
-                            $opening_hours_array_thursday[] = $item_hour_open_time . "-" . $item_hour_close_time;
-                        }
-                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_FRIDAY)
-                        {
-                            $opening_hours_array_friday[] = $item_hour_open_time . "-" . $item_hour_close_time;
-                        }
-                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SATURDAY)
-                        {
-                            $opening_hours_array_saturday[] = $item_hour_open_time . "-" . $item_hour_close_time;
-                        }
-                        elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SUNDAY)
-                        {
-                            $opening_hours_array_sunday[] = $item_hour_open_time . "-" . $item_hour_close_time;
-                        }
-                    }
-
-                    $item_hour_exceptions = $item->itemHourExceptions()->get();
-                    foreach($item_hour_exceptions as $item_hour_exceptions_key => $item_hour_exception)
-                    {
-                        $item_hour_exception_open_time = empty($item_hour_exception->item_hour_exception_open_time) ? null : substr($item_hour_exception->item_hour_exception_open_time, 0, -3);
-                        $item_hour_exception_close_time = empty($item_hour_exception->item_hour_exception_close_time) ? null : substr($item_hour_exception->item_hour_exception_close_time, 0, -3);
-
-                        if(!empty($item_hour_exception_open_time) && !empty($item_hour_exception_close_time))
-                        {
-                            $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date][] = $item_hour_exception_open_time . "-" . $item_hour_exception_close_time;
+                            OpenGraph::addImage(asset('frontend/images/placeholder/full_item_feature_image.webp'));
                         }
                         else
                         {
-                            $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date] = [];
+                            OpenGraph::addImage(Storage::disk('public')->url('item/' . $item->item_image));
                         }
-                    }
 
-                    $opening_hours_obj = OpeningHours::createAndMergeOverlappingRanges([
-                        'monday' => $opening_hours_array_monday,
-                        'tuesday' => $opening_hours_array_tuesday,
-                        'wednesday' => $opening_hours_array_wednesday,
-                        'thursday' => $opening_hours_array_thursday,
-                        'friday' => $opening_hours_array_friday,
-                        'saturday' => $opening_hours_array_saturday,
-                        'sunday' => $opening_hours_array_sunday,
-                        'exceptions' => $opening_hour_exceptions_array,
-                    ], $item->item_hour_time_zone);
+                        // Twitter
+                        TwitterCard::setTitle($item->item_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+                        /**
+                         * End SEO
+                         */
 
-                    $datetime_now = new DateTime('now');
-                    $current_open_range = $opening_hours_obj->currentOpenRange($datetime_now);
+                        $item_display_categories = $item->getAllCategories(Item::ITEM_TOTAL_SHOW_CATEGORY);
+                        $item_total_categories = $item->allCategories()->count();
+                        $item_all_categories = $item->getAllCategories();
 
-                    $opening_hours_week = $opening_hours_obj->forWeek();
-                    $opening_hours_week_monday = $opening_hours_week['monday'];
-                    $opening_hours_week_tuesday = $opening_hours_week['tuesday'];
-                    $opening_hours_week_wednesday = $opening_hours_week['wednesday'];
-                    $opening_hours_week_thursday = $opening_hours_week['thursday'];
-                    $opening_hours_week_friday = $opening_hours_week['friday'];
-                    $opening_hours_week_saturday = $opening_hours_week['saturday'];
-                    $opening_hours_week_sunday = $opening_hours_week['sunday'];
+                        /**
+                         * Start initla item features
+                         */
+                        $item_features = $item->features()->where('item_feature_value', '<>', '')
+                            ->whereNotNull('item_feature_value')
+                            ->get();
+                        /**
+                         * End initial item features
+                         */
 
-                    $item_hours_monday = $opening_hours_week_monday->getIterator();
-                    $item_hours_tuesday = $opening_hours_week_tuesday->getIterator();
-                    $item_hours_wednesday = $opening_hours_week_wednesday->getIterator();
-                    $item_hours_thursday = $opening_hours_week_thursday->getIterator();
-                    $item_hours_friday = $opening_hours_week_friday->getIterator();
-                    $item_hours_saturday = $opening_hours_week_saturday->getIterator();
-                    $item_hours_sunday = $opening_hours_week_sunday->getIterator();
+                        /**
+                         * Start initial opening hours
+                         */
+                        $opening_hours_array_monday = array();
+                        $opening_hours_array_tuesday = array();
+                        $opening_hours_array_wednesday = array();
+                        $opening_hours_array_thursday = array();
+                        $opening_hours_array_friday = array();
+                        $opening_hours_array_saturday = array();
+                        $opening_hours_array_sunday = array();
+                        $opening_hour_exceptions_array = array();
 
-                    $item_hour_exceptions_obj = $opening_hours_obj->exceptions();
-                    /**
-                     * End initial opening hours
-                     */
+                        $item_hours = $item->itemHours()->get();
+                        foreach($item_hours as $item_hours_key => $item_hour)
+                        {
+                            $item_hour_open_time = substr($item_hour->item_hour_open_time, 0, -3);
+                            $item_hour_close_time = substr($item_hour->item_hour_close_time, 0, -3);
 
-                    /**
-                     * get 4 nearby items by current item lat and lng
-                     */
-                    $latitude = $item->item_lat;
-                    $longitude = $item->item_lng;
+                            if($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_MONDAY)
+                            {
+                                $opening_hours_array_monday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                            }
+                            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_TUESDAY)
+                            {
+                                $opening_hours_array_tuesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                            }
+                            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_WEDNESDAY)
+                            {
+                                $opening_hours_array_wednesday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                            }
+                            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_THURSDAY)
+                            {
+                                $opening_hours_array_thursday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                            }
+                            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_FRIDAY)
+                            {
+                                $opening_hours_array_friday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                            }
+                            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SATURDAY)
+                            {
+                                $opening_hours_array_saturday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                            }
+                            elseif($item_hour->item_hour_day_of_week == ItemHour::DAY_OF_WEEK_SUNDAY)
+                            {
+                                $opening_hours_array_sunday[] = $item_hour_open_time . "-" . $item_hour_close_time;
+                            }
+                        }
 
-                    $nearby_items = Item::selectRaw('items.*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
-                        ->where('id', '!=', $item->id)
-                        ->where('item_status', Item::ITEM_PUBLISHED)
-                        ->where('item_type', Item::ITEM_TYPE_REGULAR)
-                        ->orderBy('distance', 'ASC')
-                        ->with('state')
-                        ->with('city')
-                        ->with('user')
-                        ->take(4)->get();
+                        $item_hour_exceptions = $item->itemHourExceptions()->get();
+                        foreach($item_hour_exceptions as $item_hour_exceptions_key => $item_hour_exception)
+                        {
+                            $item_hour_exception_open_time = empty($item_hour_exception->item_hour_exception_open_time) ? null : substr($item_hour_exception->item_hour_exception_open_time, 0, -3);
+                            $item_hour_exception_close_time = empty($item_hour_exception->item_hour_exception_close_time) ? null : substr($item_hour_exception->item_hour_exception_close_time, 0, -3);
 
-                    /**
-                     * get 4 similar items by current item lat and lng
-                     */
-                    $item_category_ids = array();
-                    foreach($item_all_categories as $item_all_categories_key => $category)
-                    {
-                        $item_category_ids[] = $category->id;
-                    }
+                            if(!empty($item_hour_exception_open_time) && !empty($item_hour_exception_close_time))
+                            {
+                                $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date][] = $item_hour_exception_open_time . "-" . $item_hour_exception_close_time;
+                            }
+                            else
+                            {
+                                $opening_hour_exceptions_array[$item_hour_exception->item_hour_exception_date] = [];
+                            }
+                        }
 
-                    $category_obj = new Category();
-                    $similar_item_ids = $category_obj->getItemIdsByCategoryIds($item_category_ids);
+                        $opening_hours_obj = OpeningHours::createAndMergeOverlappingRanges([
+                            'monday' => $opening_hours_array_monday,
+                            'tuesday' => $opening_hours_array_tuesday,
+                            'wednesday' => $opening_hours_array_wednesday,
+                            'thursday' => $opening_hours_array_thursday,
+                            'friday' => $opening_hours_array_friday,
+                            'saturday' => $opening_hours_array_saturday,
+                            'sunday' => $opening_hours_array_sunday,
+                            'exceptions' => $opening_hour_exceptions_array,
+                        ], $item->item_hour_time_zone);
 
-                    $similar_item_ids_length = count($similar_item_ids);
-                    if($similar_item_ids_length > Item::ITEM_SIMILAR_SHOW_MAX)
-                    {
-                        $similar_item_ids = array_slice($similar_item_ids, rand(0, $similar_item_ids_length-Item::ITEM_SIMILAR_SHOW_MAX), Item::ITEM_SIMILAR_SHOW_MAX);
-                    }
+                        $datetime_now = new DateTime('now');
+                        $current_open_range = $opening_hours_obj->currentOpenRange($datetime_now);
 
-                    $similar_items = Item::whereIn('items.id', $similar_item_ids)
-                        ->where('items.id', '!=', $item->id)
-                        ->where('items.item_status', Item::ITEM_PUBLISHED)
-                        ->distinct('items.id')
-                        ->inRandomOrder()
-                        ->limit(Item::ITEM_SIMILAR_SHOW_MAX)
-                        ->get();
+                        $opening_hours_week = $opening_hours_obj->forWeek();
+                        $opening_hours_week_monday = $opening_hours_week['monday'];
+                        $opening_hours_week_tuesday = $opening_hours_week['tuesday'];
+                        $opening_hours_week_wednesday = $opening_hours_week['wednesday'];
+                        $opening_hours_week_thursday = $opening_hours_week['thursday'];
+                        $opening_hours_week_friday = $opening_hours_week['friday'];
+                        $opening_hours_week_saturday = $opening_hours_week['saturday'];
+                        $opening_hours_week_sunday = $opening_hours_week['sunday'];
 
-                    /**
-                     * Start get all item approved reviews
-                     */
-                    $item_count_rating = $item->getCountRating();
-                    $item_average_rating = $item->getAverageRating();
+                        $item_hours_monday = $opening_hours_week_monday->getIterator();
+                        $item_hours_tuesday = $opening_hours_week_tuesday->getIterator();
+                        $item_hours_wednesday = $opening_hours_week_wednesday->getIterator();
+                        $item_hours_thursday = $opening_hours_week_thursday->getIterator();
+                        $item_hours_friday = $opening_hours_week_friday->getIterator();
+                        $item_hours_saturday = $opening_hours_week_saturday->getIterator();
+                        $item_hours_sunday = $opening_hours_week_sunday->getIterator();
 
-                    $rating_sort_by = empty($request->rating_sort_by) ? Item::ITEM_RATING_SORT_BY_NEWEST : $request->rating_sort_by;
-                    $reviews = $item->getApprovedRatingsSortBy($rating_sort_by);
+                        $item_hour_exceptions_obj = $opening_hours_obj->exceptions();
+                        /**
+                         * End initial opening hours
+                         */
 
-                    if($item_count_rating > 0)
-                    {
-                        $item_one_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_ONE);
-                        $item_two_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_TWO);
-                        $item_three_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_THREE);
-                        $item_four_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_FOUR);
-                        $item_five_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_FIVE);
+                        /**
+                         * get 4 nearby items by current item lat and lng
+                         */
+                        $latitude = $item->item_lat;
+                        $longitude = $item->item_lng;
 
-                        $item_one_star_percentage = ($item_one_star_count_rating / $item_count_rating) * 100;
-                        $item_two_star_percentage = ($item_two_star_count_rating / $item_count_rating) * 100;
-                        $item_three_star_percentage = ($item_three_star_count_rating / $item_count_rating) * 100;
-                        $item_four_star_percentage = ($item_four_star_count_rating / $item_count_rating) * 100;
-                        $item_five_star_percentage = ($item_five_star_count_rating / $item_count_rating) * 100;
+                        $nearby_items = Item::selectRaw('items.*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+                            ->where('id', '!=', $item->id)
+                            ->where('item_status', Item::ITEM_PUBLISHED)
+                            ->where('item_type', Item::ITEM_TYPE_REGULAR)
+                            ->orderBy('distance', 'ASC')
+                            ->with('state')
+                            ->with('city')
+                            ->with('user')
+                            ->take(4)->get();
+
+                        /**
+                         * get 4 similar items by current item lat and lng
+                         */
+                        $item_category_ids = array();
+                        foreach($item_all_categories as $item_all_categories_key => $category)
+                        {
+                            $item_category_ids[] = $category->id;
+                        }
+
+                        $category_obj = new Category();
+                        $similar_item_ids = $category_obj->getItemIdsByCategoryIds($item_category_ids);
+
+                        $similar_item_ids_length = count($similar_item_ids);
+                        if($similar_item_ids_length > Item::ITEM_SIMILAR_SHOW_MAX)
+                        {
+                            $similar_item_ids = array_slice($similar_item_ids, rand(0, $similar_item_ids_length-Item::ITEM_SIMILAR_SHOW_MAX), Item::ITEM_SIMILAR_SHOW_MAX);
+                        }
+
+                        $similar_items = Item::whereIn('items.id', $similar_item_ids)
+                            ->where('items.id', '!=', $item->id)
+                            ->where('items.item_status', Item::ITEM_PUBLISHED)
+                            ->distinct('items.id')
+                            ->inRandomOrder()
+                            ->limit(Item::ITEM_SIMILAR_SHOW_MAX)
+                            ->get();
+
+                        /**
+                         * Start get all item approved reviews
+                         */
+                        $item_count_rating = $item->getCountRating();
+                        $item_average_rating = $item->getAverageRating();
+
+                        $rating_sort_by = empty($request->rating_sort_by) ? Item::ITEM_RATING_SORT_BY_NEWEST : $request->rating_sort_by;
+                        $reviews = $item->getApprovedRatingsSortBy($rating_sort_by);
+
+                        if($item_count_rating > 0)
+                        {
+                            $item_one_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_ONE);
+                            $item_two_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_TWO);
+                            $item_three_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_THREE);
+                            $item_four_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_FOUR);
+                            $item_five_star_count_rating = $item->getStarsCountRating(Item::ITEM_REVIEW_RATING_FIVE);
+
+                            $item_one_star_percentage = ($item_one_star_count_rating / $item_count_rating) * 100;
+                            $item_two_star_percentage = ($item_two_star_count_rating / $item_count_rating) * 100;
+                            $item_three_star_percentage = ($item_three_star_count_rating / $item_count_rating) * 100;
+                            $item_four_star_percentage = ($item_four_star_count_rating / $item_count_rating) * 100;
+                            $item_five_star_percentage = ($item_five_star_count_rating / $item_count_rating) * 100;
+                        }
+                        else
+                        {
+                            $item_one_star_percentage = 0;
+                            $item_two_star_percentage = 0;
+                            $item_three_star_percentage = 0;
+                            $item_four_star_percentage = 0;
+                            $item_five_star_percentage = 0;
+                        }
+                        /**
+                         * End get all item approved reviews
+                         */
+
+                        /**
+                         * Start item claim
+                         */
+                        $item_has_claimed = $item->hasClaimed();
+                        /**
+                         * End item claim
+                         */
+
+                        /**
+                         * Start fetch ads blocks
+                         */
+                        $advertisement = new Advertisement();
+
+                        $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_AFTER_BREADCRUMB,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_before_gallery = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_BEFORE_GALLERY,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_before_description = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_BEFORE_DESCRIPTION,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_before_location = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_BEFORE_LOCATION,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_before_features = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_BEFORE_FEATURES,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_before_reviews = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_BEFORE_REVIEWS,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_before_comments = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_BEFORE_COMMENTS,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_before_share = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_BEFORE_SHARE,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_after_share = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_AFTER_SHARE,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+
+                        $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
+                            Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
+                            Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
+                            Advertisement::AD_STATUS_ENABLE
+                        );
+                        /**
+                         * End fetch ads blocks
+                         */
+
+                        /**
+                         * Start fetch item sections
+                         */
+                        $item_sections_after_breadcrumb = $item->itemSections()
+                            ->where('item_section_position', ItemSection::POSITION_AFTER_BREADCRUMB)
+                            ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                            ->orderBy('item_section_order')
+                            ->get();
+
+                        $item_sections_after_gallery = $item->itemSections()
+                            ->where('item_section_position', ItemSection::POSITION_AFTER_GALLERY)
+                            ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                            ->orderBy('item_section_order')
+                            ->get();
+
+                        $item_sections_after_description = $item->itemSections()
+                            ->where('item_section_position', ItemSection::POSITION_AFTER_DESCRIPTION)
+                            ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                            ->orderBy('item_section_order')
+                            ->get();
+
+                        $item_sections_after_location_map = $item->itemSections()
+                            ->where('item_section_position', ItemSection::POSITION_AFTER_LOCATION_MAP)
+                            ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                            ->orderBy('item_section_order')
+                            ->get();
+
+                        $item_sections_after_features = $item->itemSections()
+                            ->where('item_section_position', ItemSection::POSITION_AFTER_FEATURES)
+                            ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                            ->orderBy('item_section_order')
+                            ->get();
+
+                        $item_sections_after_reviews = $item->itemSections()
+                            ->where('item_section_position', ItemSection::POSITION_AFTER_REVIEWS)
+                            ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                            ->orderBy('item_section_order')
+                            ->get();
+
+                        $item_sections_after_comments = $item->itemSections()
+                            ->where('item_section_position', ItemSection::POSITION_AFTER_COMMENTS)
+                            ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                            ->orderBy('item_section_order')
+                            ->get();
+
+                        $item_sections_after_share = $item->itemSections()
+                            ->where('item_section_position', ItemSection::POSITION_AFTER_SHARE)
+                            ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
+                            ->orderBy('item_section_order')
+                            ->get();
+                        /**
+                         * End fetch item sections
+                         */
+
+
+                        /**
+                         * Start initial blade view file path
+                         */
+                        $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
+                        $theme_view_path = $theme_view_path->getViewPath();
+                        /**
+                         * End initial blade view file path
+                         */
+
+                        /**
+                         * Start initial Google reCAPTCHA version 2
+                         */
+                        if($settings->setting_site_recaptcha_item_lead_enable == Setting::SITE_RECAPTCHA_ITEM_LEAD_ENABLE)
+                        {
+                            config_re_captcha($settings->setting_site_recaptcha_site_key, $settings->setting_site_recaptcha_secret_key);
+                        }
+                        /**
+                         * End initial Google reCAPTCHA version 2
+                         */
+
+                        return response()->view($theme_view_path . 'item',
+                            compact('item', 'nearby_items', 'similar_items',
+                                'reviews', 'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_gallery', 'ads_before_description',
+                                'ads_before_location', 'ads_before_features', 'ads_before_reviews', 'ads_before_comments',
+                                'ads_before_share', 'ads_after_share', 'ads_before_sidebar_content', 'ads_after_sidebar_content',
+                                'item_display_categories', 'item_total_categories', 'item_all_categories', 'item_count_rating',
+                                'item_average_rating', 'item_one_star_percentage', 'item_two_star_percentage', 'item_three_star_percentage',
+                                'item_four_star_percentage', 'item_five_star_percentage', 'rating_sort_by', 'item_has_claimed',
+                                'item_sections_after_breadcrumb', 'item_sections_after_gallery', 'item_sections_after_description',
+                                'item_sections_after_location_map', 'item_sections_after_features', 'item_sections_after_reviews',
+                                'item_sections_after_comments', 'item_sections_after_share', 'item_features', 'opening_hours_obj', 'datetime_now',
+                                'current_open_range', 'item_hours_monday', 'item_hours_tuesday', 'item_hours_wednesday', 'item_hours_thursday',
+                                'item_hours_friday', 'item_hours_saturday', 'item_hours_sunday', 'item_hour_exceptions_obj', 'item_hours',
+                                'item_hour_exceptions'));
                     }
                     else
                     {
-                        $item_one_star_percentage = 0;
-                        $item_two_star_percentage = 0;
-                        $item_three_star_percentage = 0;
-                        $item_four_star_percentage = 0;
-                        $item_five_star_percentage = 0;
+                        abort(404);
                     }
-                    /**
-                     * End get all item approved reviews
-                     */
-
-                    /**
-                     * Start item claim
-                     */
-                    $item_has_claimed = $item->hasClaimed();
-                    /**
-                     * End item claim
-                     */
-
-                    /**
-                     * Start fetch ads blocks
-                     */
-                    $advertisement = new Advertisement();
-
-                    $ads_before_breadcrumb = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_BEFORE_BREADCRUMB,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_after_breadcrumb = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_AFTER_BREADCRUMB,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_before_gallery = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_BEFORE_GALLERY,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_before_description = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_BEFORE_DESCRIPTION,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_before_location = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_BEFORE_LOCATION,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_before_features = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_BEFORE_FEATURES,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_before_reviews = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_BEFORE_REVIEWS,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_before_comments = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_BEFORE_COMMENTS,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_before_share = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_BEFORE_SHARE,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_after_share = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_AFTER_SHARE,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_before_sidebar_content = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_SIDEBAR_BEFORE_CONTENT,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-
-                    $ads_after_sidebar_content = $advertisement->fetchAdvertisements(
-                        Advertisement::AD_PLACE_BUSINESS_LISTING_PAGE,
-                        Advertisement::AD_POSITION_SIDEBAR_AFTER_CONTENT,
-                        Advertisement::AD_STATUS_ENABLE
-                    );
-                    /**
-                     * End fetch ads blocks
-                     */
-
-                    /**
-                     * Start fetch item sections
-                     */
-                    $item_sections_after_breadcrumb = $item->itemSections()
-                        ->where('item_section_position', ItemSection::POSITION_AFTER_BREADCRUMB)
-                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                        ->orderBy('item_section_order')
-                        ->get();
-
-                    $item_sections_after_gallery = $item->itemSections()
-                        ->where('item_section_position', ItemSection::POSITION_AFTER_GALLERY)
-                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                        ->orderBy('item_section_order')
-                        ->get();
-
-                    $item_sections_after_description = $item->itemSections()
-                        ->where('item_section_position', ItemSection::POSITION_AFTER_DESCRIPTION)
-                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                        ->orderBy('item_section_order')
-                        ->get();
-
-                    $item_sections_after_location_map = $item->itemSections()
-                        ->where('item_section_position', ItemSection::POSITION_AFTER_LOCATION_MAP)
-                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                        ->orderBy('item_section_order')
-                        ->get();
-
-                    $item_sections_after_features = $item->itemSections()
-                        ->where('item_section_position', ItemSection::POSITION_AFTER_FEATURES)
-                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                        ->orderBy('item_section_order')
-                        ->get();
-
-                    $item_sections_after_reviews = $item->itemSections()
-                        ->where('item_section_position', ItemSection::POSITION_AFTER_REVIEWS)
-                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                        ->orderBy('item_section_order')
-                        ->get();
-
-                    $item_sections_after_comments = $item->itemSections()
-                        ->where('item_section_position', ItemSection::POSITION_AFTER_COMMENTS)
-                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                        ->orderBy('item_section_order')
-                        ->get();
-
-                    $item_sections_after_share = $item->itemSections()
-                        ->where('item_section_position', ItemSection::POSITION_AFTER_SHARE)
-                        ->where('item_section_status', ItemSection::STATUS_PUBLISHED)
-                        ->orderBy('item_section_order')
-                        ->get();
-                    /**
-                     * End fetch item sections
-                     */
-
-
-                    /**
-                     * Start initial blade view file path
-                     */
-                    $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
-                    $theme_view_path = $theme_view_path->getViewPath();
-                    /**
-                     * End initial blade view file path
-                     */
-
-                    /**
-                     * Start initial Google reCAPTCHA version 2
-                     */
-                    if($settings->setting_site_recaptcha_item_lead_enable == Setting::SITE_RECAPTCHA_ITEM_LEAD_ENABLE)
-                    {
-                        config_re_captcha($settings->setting_site_recaptcha_site_key, $settings->setting_site_recaptcha_secret_key);
-                    }
-                    /**
-                     * End initial Google reCAPTCHA version 2
-                     */
-
-                    return response()->view($theme_view_path . 'item',
-                        compact('item', 'nearby_items', 'similar_items',
-                            'reviews', 'ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_gallery', 'ads_before_description',
-                            'ads_before_location', 'ads_before_features', 'ads_before_reviews', 'ads_before_comments',
-                            'ads_before_share', 'ads_after_share', 'ads_before_sidebar_content', 'ads_after_sidebar_content',
-                            'item_display_categories', 'item_total_categories', 'item_all_categories', 'item_count_rating',
-                            'item_average_rating', 'item_one_star_percentage', 'item_two_star_percentage', 'item_three_star_percentage',
-                            'item_four_star_percentage', 'item_five_star_percentage', 'rating_sort_by', 'item_has_claimed',
-                            'item_sections_after_breadcrumb', 'item_sections_after_gallery', 'item_sections_after_description',
-                            'item_sections_after_location_map', 'item_sections_after_features', 'item_sections_after_reviews',
-                            'item_sections_after_comments', 'item_sections_after_share', 'item_features', 'opening_hours_obj', 'datetime_now',
-                            'current_open_range', 'item_hours_monday', 'item_hours_tuesday', 'item_hours_wednesday', 'item_hours_thursday',
-                            'item_hours_friday', 'item_hours_saturday', 'item_hours_sunday', 'item_hour_exceptions_obj', 'item_hours',
-                            'item_hour_exceptions'));
                 }
                 else
                 {
@@ -3442,9 +3491,9 @@ class PagesController extends Controller
                 abort(404);
             }
         }
-        else
-        {
-            abort(404);
+        else {
+            
+            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
         }
     }
 
