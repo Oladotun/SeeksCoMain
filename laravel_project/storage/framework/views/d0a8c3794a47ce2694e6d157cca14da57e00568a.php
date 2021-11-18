@@ -45,13 +45,24 @@
 
             <div class = "collapse navbar-collapse" id='seekscoNav'>
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.home')); ?>"><?php echo e(__('frontend.header.home')); ?></a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.categories')); ?>"><?php echo e(__('frontend.header.listings')); ?></a></li>
+                   </a></li>
+
+                   <?php if(Auth::check()): ?>
+                      <!-- //show logged in navbar -->
+
+                      <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.home')); ?>"><?php echo e(__('frontend.header.home')); ?></a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.categories')); ?>"><?php echo e(__('frontend.header.listings')); ?>
+
+        
+                    <?php endif; ?>
+                    
                     <?php if($site_global_settings->setting_page_about_enable == \App\Setting::ABOUT_PAGE_ENABLED): ?>
                         <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.about')); ?>"><?php echo e(__('frontend.header.about')); ?></a></li>
                     <?php endif; ?>
+
+
                     <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.blog')); ?>"><?php echo e(__('frontend.header.blog')); ?></a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.contact')); ?>"><?php echo e(__('frontend.header.contact')); ?></a></li>
+                    <!-- <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.contact')); ?>"><?php echo e(__('frontend.header.contact')); ?></a></li> -->
                     <li class="nav-item"><span class="border-left"></span></li>
                     <?php if(auth()->guard()->guest()): ?>
                         <li class="nav-item"><a class="nav-link" href="<?php echo e(route('login')); ?>"><?php echo e(__('frontend.header.login')); ?></a></li>
@@ -59,6 +70,7 @@
                             <li class="nav-item"><a class="nav-link" href="<?php echo e(route('register')); ?>"><?php echo e(__('frontend.header.register')); ?></a></li>
                         <?php endif; ?>
                     <?php else: ?>
+                         
                         <li class="has-children">
                             
                             <li class="nav-item dropdown">

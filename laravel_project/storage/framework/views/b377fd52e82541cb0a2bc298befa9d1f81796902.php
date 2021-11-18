@@ -26,13 +26,21 @@
                 <div class="header__nav">
                     <nav class="header__menu mobile-menu">
                         <ul>
-                            <li><a href="<?php echo e(route('page.home')); ?>"><?php echo e(__('frontend.header.home')); ?></a></li>
-                            <li><a href="<?php echo e(route('page.categories')); ?>"><?php echo e(__('frontend.header.listings')); ?></a></li>
+
+                            <?php if(Auth::check()): ?>
+                              <!-- //show logged in navbar -->
+
+                              <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.home')); ?>"><?php echo e(__('frontend.header.home')); ?></a></li>
+                                <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.categories')); ?>"><?php echo e(__('frontend.header.listings')); ?>
+
+                
+                            <?php endif; ?>
+                            
                             <?php if($site_global_settings->setting_page_about_enable == \App\Setting::ABOUT_PAGE_ENABLED): ?>
                                 <li><a href="<?php echo e(route('page.about')); ?>"><?php echo e(__('frontend.header.about')); ?></a></li>
                             <?php endif; ?>
                             <li><a href="<?php echo e(route('page.blog')); ?>"><?php echo e(__('frontend.header.blog')); ?></a></li>
-                            <li><a href="<?php echo e(route('page.contact')); ?>"><?php echo e(__('frontend.header.contact')); ?></a></li>
+                            <!-- <li><a href="<?php echo e(route('page.contact')); ?>"><?php echo e(__('frontend.header.contact')); ?></a></li> -->
                             <li><span class="border-left"></span></li>
                             <?php if(auth()->guard()->guest()): ?>
                                 <li class="login"><a href="<?php echo e(route('login')); ?>"><?php echo e(__('frontend.header.login')); ?></a></li>
@@ -40,6 +48,8 @@
                                     <li><a href="<?php echo e(route('register')); ?>"><?php echo e(__('frontend.header.register')); ?></a></li>
                                 <?php endif; ?>
                             <?php else: ?>
+                            <!-- <li><a href="<?php echo e(route('page.home')); ?>"><?php echo e(__('frontend.header.home')); ?></a></li>
+                            <li><a href="<?php echo e(route('page.categories')); ?>"><?php echo e(__('frontend.header.listings')); ?></a></li> -->
                                 <li class="has-children">
                                     <a href="#"><?php echo e(Auth::user()->name); ?></a>
                                     <ul class="dropdown">
