@@ -32,6 +32,8 @@
                     <div class="breadcrumb__text">
                         <h2 style="color: {{ $site_innerpage_header_title_font_color }};">{{ __('auth.login') }}</h2>
                     </div>
+
+                    @include('frontend_views.lduruo10_dh_frontend_city_path.partials.first-page-words')
                 </div>
             </div>
         </div>

@@ -31,6 +31,9 @@
                         <div class="breadcrumb__text">
                             <h2 style="color: <?php echo e($site_innerpage_header_title_font_color); ?>;"><?php echo e(__('auth.register')); ?></h2>
                         </div>
+
+                        <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.first-page-words', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                        
                     </div>
                 </div>
             </div>
