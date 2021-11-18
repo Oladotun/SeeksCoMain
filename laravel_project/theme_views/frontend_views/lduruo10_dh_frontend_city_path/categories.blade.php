@@ -16,7 +16,8 @@
     <div class="container-fluid">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
         <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
-        <div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-4 col-lg-2">
+            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter')
+        <!-- <div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-4 col-lg-2">
             <form method="GET" action="{{ route('page.categories') }}">
                 <div class="filter__title">
                     <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
@@ -95,7 +96,7 @@
             <hr>
 
             @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width')
-        </div>
+        </div> -->
         <!-- Filter End -->
 
         <!-- Listing Section Begin -->
@@ -403,27 +404,27 @@
              * Start show more/less
              */
             //this will execute on page load(to be more specific when document ready event occurs)
-            @if(count($filter_categories) == 0)
-            if ($(".filter_category_div").length > 7)
-            {
-                $(".filter_category_div:gt(7)").hide();
-                $(".show_more").show();
-            }
-            else
-            {
-                $(".show_more").hide();
-            }
-            @else
-            if ($(".filter_category_div").length > 7)
-            {
-                $(".show_more").text("{{ __('listings_filter.show-less') }}");
-                $(".show_more").show();
-            }
-            else
-            {
-                $(".show_more").hide();
-            }
-            @endif
+            // @if(count($filter_categories) == 0)
+            // if ($(".filter_category_div").length > 7)
+            // {
+            //     $(".filter_category_div:gt(7)").hide();
+            //     $(".show_more").show();
+            // }
+            // else
+            // {
+            //     $(".show_more").hide();
+            // }
+            // @else
+            // if ($(".filter_category_div").length > 7)
+            // {
+            //     $(".show_more").text("{{ __('listings_filter.show-less') }}");
+            //     $(".show_more").show();
+            // }
+            // else
+            // {
+            //     $(".show_more").hide();
+            // }
+            // @endif
 
 
             $(".show_more").on('click', function() {
@@ -521,47 +522,47 @@
                 @endif
                 @endforeach
 
-                if(locations.length === 0)
-                {
-                    // Destroy mapid-box DOM since no regular listings found
-                    $("#mapid-box").remove();
-                }
-                else
-                {
-                    var map = new google.maps.Map(document.getElementById('mapid-box'), {
-                        zoom: 12,
-                        //center: new google.maps.LatLng(-33.92, 151.25),
-                        mapTypeId: google.maps.MapTypeId.ROADMAP
-                    });
+                // if(locations.length === 0)
+                // {
+                //     // Destroy mapid-box DOM since no regular listings found
+                //     $("#mapid-box").remove();
+                // }
+                // else
+                // {
+                //     var map = new google.maps.Map(document.getElementById('mapid-box'), {
+                //         zoom: 12,
+                //         //center: new google.maps.LatLng(-33.92, 151.25),
+                //         mapTypeId: google.maps.MapTypeId.ROADMAP
+                //     });
 
-                    //create empty LatLngBounds object
-                    var bounds = new google.maps.LatLngBounds();
-                    var infowindow = new google.maps.InfoWindow();
+                //     //create empty LatLngBounds object
+                //     var bounds = new google.maps.LatLngBounds();
+                //     var infowindow = new google.maps.InfoWindow();
 
-                    var marker, i;
+                //     var marker, i;
 
-                    for (i = 0; i < locations.length; i++) {
-                        marker = new google.maps.Marker({
-                            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-                            map: map
-                        });
+                //     for (i = 0; i < locations.length; i++) {
+                //         marker = new google.maps.Marker({
+                //             position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                //             map: map
+                //         });
 
-                        //extend the bounds to include each marker's position
-                        bounds.extend(marker.position);
+                //         //extend the bounds to include each marker's position
+                //         bounds.extend(marker.position);
 
-                        google.maps.event.addListener(marker, 'click', (function(marker, i) {
-                            return function() {
-                                infowindow.setContent(locations[i][0]);
-                                infowindow.open(map, marker);
-                            }
-                        })(marker, i));
-                    }
+                //         google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                //             return function() {
+                //                 infowindow.setContent(locations[i][0]);
+                //                 infowindow.open(map, marker);
+                //             }
+                //         })(marker, i));
+                //     }
 
-                    //now fit the map to the newly inclusive bounds
-                    map.fitBounds(bounds);
-                }
+                //     //now fit the map to the newly inclusive bounds
+                //     map.fitBounds(bounds);
+                // }
 
-                @endif
+                // @endif
             }
 
         </script>
