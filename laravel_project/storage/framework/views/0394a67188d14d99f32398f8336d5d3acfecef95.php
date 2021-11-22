@@ -11,7 +11,11 @@
 <?php $__env->startSection('content'); ?>
 
     <!-- Filter Begin -->
-    <div class="filter nice-scroll">
+    <div class="container-fluid">
+        <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
+        <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
+            <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <!-- <div class="filter nice-scroll">
         <form method="GET" action="<?php echo e(route('page.search')); ?>">
         <div class="filter__title">
             <h5><i class="fas fa-filter"></i> <?php echo e(__('theme_directory_hub.filter-filter-by')); ?></h5>
@@ -141,13 +145,13 @@ unset($__errorArgs, $__bag); ?>
         </form>
         <hr>
 
-        <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+        <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> -->
 
-    </div>
+    <!-- </div> -->
     <!-- Filter End -->
 
     <!-- Listing Section Begin -->
-    <section class="listing nice-scroll">
+    <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-left: 10%;">
 
         <?php if($ads_before_breadcrumb->count() > 0): ?>
             <?php $__currentLoopData = $ads_before_breadcrumb; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_breadcrumb_key => $ad_before_breadcrumb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -340,10 +344,13 @@ unset($__errorArgs, $__bag); ?>
     <!-- Listing Section End -->
 
     <!-- Map Begin -->
-    <div class="listing__map">
+    <!-- <div class="listing__map">
         <div id="mapid-box"></div>
-    </div>
+    </div> -->
     <!-- Map End -->
+
+    </div>
+    </div>
 
 <?php $__env->stopSection(); ?>
 

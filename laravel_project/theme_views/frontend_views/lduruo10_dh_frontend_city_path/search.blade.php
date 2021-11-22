@@ -13,7 +13,11 @@
 @section('content')
 
     <!-- Filter Begin -->
-    <div class="filter nice-scroll">
+    <div class="container-fluid">
+        <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
+        <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
+            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter')
+    <!-- <div class="filter nice-scroll">
         <form method="GET" action="{{ route('page.search') }}">
         <div class="filter__title">
             <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
@@ -93,13 +97,13 @@
         </form>
         <hr>
 
-        @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width')
+        @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width') -->
 
-    </div>
+    <!-- </div> -->
     <!-- Filter End -->
 
     <!-- Listing Section Begin -->
-    <section class="listing nice-scroll">
+    <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-left: 10%;">
 
         @if($ads_before_breadcrumb->count() > 0)
             @foreach($ads_before_breadcrumb as $ads_before_breadcrumb_key => $ad_before_breadcrumb)
@@ -273,10 +277,13 @@
     <!-- Listing Section End -->
 
     <!-- Map Begin -->
-    <div class="listing__map">
+    <!-- <div class="listing__map">
         <div id="mapid-box"></div>
-    </div>
+    </div> -->
     <!-- Map End -->
+
+    </div>
+    </div>
 
 @endsection
 
