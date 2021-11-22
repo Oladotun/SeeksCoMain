@@ -16384,7 +16384,7 @@ form label {
 /**
 * Start website footer
 */
-.footer__about__logo img {
+. img {
     max-height: 35px;
 }
 .footer .custom-column-title {

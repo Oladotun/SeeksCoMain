@@ -8,9 +8,9 @@
                     <?php if(empty($site_global_settings->setting_site_logo)): ?>
                         <p class="custom-column-title"><strong><?php echo e(__('frontend.footer.about')); ?></strong></p>
                     <?php else: ?>
-                        <div class="footer__about__logo">
+                        <div class="footer__about__logo ">
                             <a href="<?php echo e(route('page.home')); ?>">
-                                <img src="<?php echo e(Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo)); ?>" alt="<?php echo e(empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name); ?>">
+                                <img class="shadow rounded-circle"src="<?php echo e(Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo)); ?>" alt="<?php echo e(empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name); ?>">
                             </a>
                         </div>
                     <?php endif; ?>

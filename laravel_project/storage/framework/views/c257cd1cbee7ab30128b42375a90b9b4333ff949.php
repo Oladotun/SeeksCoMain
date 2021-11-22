@@ -149,6 +149,9 @@
         color: <?php echo e($customization_site_footer_font_color); ?>;
         border-color: <?php echo e($customization_site_footer_font_color); ?>;
     }
+
+    .footer__about__logo img { max-height: 150px; }
+    /*.footer__about__logo{border: border-dark;}*/
     /**
     * End website footer
     */

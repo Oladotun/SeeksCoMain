@@ -2,9 +2,9 @@
 
 @section('styles')
 
-    @if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP)
+    <!-- @if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP)
         <link href="{{ asset('frontend/vendor/leaflet/leaflet.css') }}" rel="stylesheet" />
-    @endif
+    @endif -->
 
     <link href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.css') }}" rel="stylesheet" />
 
@@ -305,62 +305,62 @@
             /**
              * Start initial map box with OpenStreetMap
              */
-            @if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP)
+            // @if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP)
 
-            @if(count($paid_items) || count($free_items))
+            // @if(count($paid_items) || count($free_items))
 
-            var window_height = $(window).height() - 105;
-            $('#mapid-box').css('height', window_height + 'px');
+            // var window_height = $(window).height() - 105;
+            // $('#mapid-box').css('height', window_height + 'px');
 
-            var map = L.map('mapid-box', {
-                zoom: 15,
-                scrollWheelZoom: true,
-            });
+            // var map = L.map('mapid-box', {
+            //     zoom: 15,
+            //     scrollWheelZoom: true,
+            // });
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            // }).addTo(map);
 
-            var bounds = [];
-            @foreach($paid_items as $key => $paid_item)
-            @if($paid_item->item_type == \App\Item::ITEM_TYPE_REGULAR)
-            bounds.push([ {{ $paid_item->item_lat }}, {{ $paid_item->item_lng }} ]);
-            var marker = L.marker([{{ $paid_item->item_lat }}, {{ $paid_item->item_lng }}]).addTo(map);
+            // var bounds = [];
+            // @foreach($paid_items as $key => $paid_item)
+            // @if($paid_item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+            // bounds.push([ {{ $paid_item->item_lat }}, {{ $paid_item->item_lng }} ]);
+            // var marker = L.marker([{{ $paid_item->item_lat }}, {{ $paid_item->item_lng }}]).addTo(map);
 
-            @if($paid_item->item_address_hide)
-            marker.bindPopup("{{ $paid_item->item_title . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code }}");
-            @else
-            marker.bindPopup("{{ $paid_item->item_title . ', ' . $paid_item->item_address . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code }}");
-            @endif
-            @endif
-            @endforeach
+            // @if($paid_item->item_address_hide)
+            // marker.bindPopup("{{ $paid_item->item_title . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code }}");
+            // @else
+            // marker.bindPopup("{{ $paid_item->item_title . ', ' . $paid_item->item_address . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code }}");
+            // @endif
+            // @endif
+            // @endforeach
 
-            @foreach($free_items as $key => $free_item)
-            @if($free_item->item_type == \App\Item::ITEM_TYPE_REGULAR)
-            bounds.push([ {{ $free_item->item_lat }}, {{ $free_item->item_lng }} ]);
-            var marker = L.marker([{{ $free_item->item_lat }}, {{ $free_item->item_lng }}]).addTo(map);
+            // @foreach($free_items as $key => $free_item)
+            // @if($free_item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+            // bounds.push([ {{ $free_item->item_lat }}, {{ $free_item->item_lng }} ]);
+            // var marker = L.marker([{{ $free_item->item_lat }}, {{ $free_item->item_lng }}]).addTo(map);
 
-            @if($free_item->item_address_hide)
-            marker.bindPopup("{{ $free_item->item_title . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code }}");
-            @else
-            marker.bindPopup("{{ $free_item->item_title . ', ' . $free_item->item_address . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code }}");
-            @endif
-            @endif
-            @endforeach
+            // @if($free_item->item_address_hide)
+            // marker.bindPopup("{{ $free_item->item_title . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code }}");
+            // @else
+            // marker.bindPopup("{{ $free_item->item_title . ', ' . $free_item->item_address . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code }}");
+            // @endif
+            // @endif
+            // @endforeach
 
-            if(bounds.length === 0)
-            {
-                // Destroy mapid-box DOM since no regular listings found
-                $("#mapid-box").remove();
-            }
-            else
-            {
-                map.fitBounds(bounds);
-            }
+            // if(bounds.length === 0)
+            // {
+            //     // Destroy mapid-box DOM since no regular listings found
+            //     $("#mapid-box").remove();
+            // }
+            // else
+            // {
+            //     map.fitBounds(bounds);
+            // }
 
-            @endif
+            // @endif
 
-            @endif
+            // @endif
             /**
              * End initial map box with OpenStreetMap
              */
@@ -461,7 +461,7 @@
         });
     </script>
 
-    @if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_GOOGLE_MAP)
+   <!--  @if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_GOOGLE_MAP)
         <script>
             // Initial the google map
             function initMap() {
@@ -530,8 +530,8 @@
                 @endif
             }
 
-        </script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js??v=quarterly&key={{ $site_global_settings->setting_site_map_google_api_key }}&callback=initMap"></script>
+        </script> -->
+      <!--   <script async defer src="https://maps.googleapis.com/maps/api/js??v=quarterly&key={{ $site_global_settings->setting_site_map_google_api_key }}&callback=initMap"></script>
     @endif
-
+ -->
 @endsection
