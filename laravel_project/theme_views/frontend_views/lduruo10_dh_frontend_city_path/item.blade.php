@@ -633,7 +633,7 @@
                                 @endforeach
                             @endif
 
-                            <div class="row mb-3 listing__details__map">
+                           <!--  <div class="row mb-3 listing__details__map">
                                 <div class="col-12">
                                     <h4>{{ __('frontend.item.location') }}</h4>
                                     <div class="row pt-2 pb-2">
@@ -660,7 +660,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- start item section after location map -->
                             @if($item_sections_after_location_map->count() > 0)
@@ -1651,6 +1651,7 @@
                         <div class="listing__sidebar__contact">
                             @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
                             <div class="listing__sidebar__contact__map">
+                                <div hidden id="mapid-item"></div>
                                 <div id="mapid-item-sidebar"></div>
                             </div>
                             @endif
