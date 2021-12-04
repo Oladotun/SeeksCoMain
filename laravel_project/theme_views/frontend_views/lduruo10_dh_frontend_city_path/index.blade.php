@@ -110,11 +110,12 @@
 
 
     <!-- Categories Section End -->
-
+<section id ="section1">
     <!-- Featured Listings Section Begin -->
+
     @if($paid_items->count() > 0)
-    <section class="most-search spad" id ="section1">
-        <div class="container">
+    <div class="most-search">
+        <div class="container" >
             <div class="row">
                 <div class="col-lg-12">
                     <div class="section-title">
@@ -202,13 +203,13 @@
 
             </div>
         </div>
-    </section>
+    </div>
     @endif
     <!-- Featured Listings Section End -->
 
     <!-- Nearby Listings Section Begin -->
     @if($popular_items->count() > 0)
-    <section class="feature-location spad custom-bg-light">
+    <div class="custom-bg-light" style="padding-bottom: 50px;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -928,13 +929,14 @@
                     </div>
                 </div>
         </div>
-    </section>
+    </div>
     @endif
+</section>
     <!-- Nearby Listings Section End -->
 
     <!-- Latest Listings Section Begin -->
     @if($latest_items->count() > 0)
-    <section class="most-search spad">
+    <section class="most-search" style="padding-bottom: 50px">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
@@ -1049,7 +1051,7 @@
 
     <!-- Testimonial Section Begin -->
     @if($all_testimonials->count() > 0)
-    <section class="testimonial spad set-bg" data-setbg="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/testimonial_bg.webp') }}">
+    <section class="testimonial set-bg" data-setbg="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/testimonial_bg.webp') }}">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -1094,7 +1096,7 @@
 
     <!-- Blog Section Begin -->
     @if($recent_blog->count() > 0)
-    <section class="news-post spad">
+    <section class="news-post">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">

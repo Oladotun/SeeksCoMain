@@ -20,6 +20,15 @@
     .header__menu ul li a {
         color: #323232;
     }
+    .custom-index-area {
+        padding: 200px 0 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+
 
     /*body {
       padding-top: 20px;
