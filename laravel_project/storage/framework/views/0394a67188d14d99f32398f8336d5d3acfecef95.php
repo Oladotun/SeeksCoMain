@@ -1,8 +1,8 @@
 <?php $__env->startSection('styles'); ?>
 
-    <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
+    <!-- <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
         <link href="<?php echo e(asset('frontend/vendor/leaflet/leaflet.css')); ?>" rel="stylesheet" />
-    <?php endif; ?>
+    <?php endif; ?> -->
 
     <link href="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.css')); ?>" rel="stylesheet" />
 
@@ -372,62 +372,62 @@ unset($__errorArgs, $__bag); ?>
             /**
              * Start initial map box with OpenStreetMap
              */
-            <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
+            // <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
 
-            <?php if(count($paid_items) || count($free_items)): ?>
+            // <?php if(count($paid_items) || count($free_items)): ?>
 
-            var window_height = $(window).height() - 105;
-            $('#mapid-box').css('height', window_height + 'px');
+            // var window_height = $(window).height() - 105;
+            // $('#mapid-box').css('height', window_height + 'px');
 
-            var map = L.map('mapid-box', {
-                zoom: 15,
-                scrollWheelZoom: true,
-            });
+            // var map = L.map('mapid-box', {
+            //     zoom: 15,
+            //     scrollWheelZoom: true,
+            // });
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            // }).addTo(map);
 
-            var bounds = [];
-            <?php $__currentLoopData = $paid_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $paid_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <?php if($paid_item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
-            bounds.push([ <?php echo e($paid_item->item_lat); ?>, <?php echo e($paid_item->item_lng); ?> ]);
-            var marker = L.marker([<?php echo e($paid_item->item_lat); ?>, <?php echo e($paid_item->item_lng); ?>]).addTo(map);
+            // var bounds = [];
+            // <?php $__currentLoopData = $paid_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $paid_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            // <?php if($paid_item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
+            // bounds.push([ <?php echo e($paid_item->item_lat); ?>, <?php echo e($paid_item->item_lng); ?> ]);
+            // var marker = L.marker([<?php echo e($paid_item->item_lat); ?>, <?php echo e($paid_item->item_lng); ?>]).addTo(map);
 
-            <?php if($paid_item->item_address_hide): ?>
-            marker.bindPopup("<?php echo e($paid_item->item_title . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code); ?>");
-            <?php else: ?>
-            marker.bindPopup("<?php echo e($paid_item->item_title . ', ' . $paid_item->item_address . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code); ?>");
-            <?php endif; ?>
-            <?php endif; ?>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            // <?php if($paid_item->item_address_hide): ?>
+            // marker.bindPopup("<?php echo e($paid_item->item_title . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code); ?>");
+            // <?php else: ?>
+            // marker.bindPopup("<?php echo e($paid_item->item_title . ', ' . $paid_item->item_address . ', ' . $paid_item->city->city_name . ', ' . $paid_item->state->state_name . ' ' . $paid_item->item_postal_code); ?>");
+            // <?php endif; ?>
+            // <?php endif; ?>
+            // <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-            <?php $__currentLoopData = $free_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $free_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <?php if($free_item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
-            bounds.push([ <?php echo e($free_item->item_lat); ?>, <?php echo e($free_item->item_lng); ?> ]);
-            var marker = L.marker([<?php echo e($free_item->item_lat); ?>, <?php echo e($free_item->item_lng); ?>]).addTo(map);
+            // <?php $__currentLoopData = $free_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $free_item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            // <?php if($free_item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
+            // bounds.push([ <?php echo e($free_item->item_lat); ?>, <?php echo e($free_item->item_lng); ?> ]);
+            // var marker = L.marker([<?php echo e($free_item->item_lat); ?>, <?php echo e($free_item->item_lng); ?>]).addTo(map);
 
-            <?php if($free_item->item_address_hide): ?>
-            marker.bindPopup("<?php echo e($free_item->item_title . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code); ?>");
-            <?php else: ?>
-            marker.bindPopup("<?php echo e($free_item->item_title . ', ' . $free_item->item_address . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code); ?>");
-            <?php endif; ?>
-            <?php endif; ?>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            // <?php if($free_item->item_address_hide): ?>
+            // marker.bindPopup("<?php echo e($free_item->item_title . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code); ?>");
+            // <?php else: ?>
+            // marker.bindPopup("<?php echo e($free_item->item_title . ', ' . $free_item->item_address . ', ' . $free_item->city->city_name . ', ' . $free_item->state->state_name . ' ' . $free_item->item_postal_code); ?>");
+            // <?php endif; ?>
+            // <?php endif; ?>
+            // <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-            if(bounds.length === 0)
-            {
-                // Destroy mapid-box DOM since no regular listings found
-                $("#mapid-box").remove();
-            }
-            else
-            {
-                map.fitBounds(bounds);
-            }
+            // if(bounds.length === 0)
+            // {
+            //     // Destroy mapid-box DOM since no regular listings found
+            //     $("#mapid-box").remove();
+            // }
+            // else
+            // {
+            //     map.fitBounds(bounds);
+            // }
 
-            <?php endif; ?>
+            // <?php endif; ?>
 
-            <?php endif; ?>
+            // <?php endif; ?>
             /**
              * End initial map box with OpenStreetMap
              */
@@ -528,7 +528,7 @@ unset($__errorArgs, $__bag); ?>
         });
     </script>
 
-    <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_GOOGLE_MAP): ?>
+   <!--  <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_GOOGLE_MAP): ?>
         <script>
             // Initial the google map
             function initMap() {
@@ -597,10 +597,10 @@ unset($__errorArgs, $__bag); ?>
                 <?php endif; ?>
             }
 
-        </script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js??v=quarterly&key=<?php echo e($site_global_settings->setting_site_map_google_api_key); ?>&callback=initMap"></script>
+        </script> -->
+      <!--   <script async defer src="https://maps.googleapis.com/maps/api/js??v=quarterly&key=<?php echo e($site_global_settings->setting_site_map_google_api_key); ?>&callback=initMap"></script>
     <?php endif; ?>
-
+ -->
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.layouts.app-full-width', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /var/www/seekscodirectory/laravel_project/theme_views/frontend_views/lduruo10_dh_frontend_city_path/search.blade.php ENDPATH**/ ?>

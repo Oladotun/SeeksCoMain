@@ -15,89 +15,95 @@
     @elseif($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
     <div class="set-bg" data-setbg="" style="background-color: #333333;">
     @endif
-        <section class="hero hero-grey-bg-cover set-bg" data-setbg="">
+        <section>
+            <div class="custom-index-area hero hero-grey-bg-cover set-bg" data-setbg="">
 
-            @if($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
-                <div data-youtube="{{ $site_homepage_header_background_youtube_video }}"></div>
-            @endif
+                @if($site_homepage_header_background_type == \App\Customization::SITE_HOMEPAGE_HEADER_BACKGROUND_TYPE_YOUTUBE_VIDEO)
+                    <div data-youtube="{{ $site_homepage_header_background_youtube_video }}"></div>
+                @endif
 
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="hero__text">
-                            <div class="section-title">
-                                <h2 style="color: {{ $site_homepage_header_title_font_color }};">{{ __('frontend.homepage.title') }}</h2>
-                                <p style="color: {{ $site_homepage_header_paragraph_font_color }};">{{ __('frontend.homepage.description') }}</p>
-                            </div>
-                            <div class="hero__search__form">
-                                @include('frontend_views.lduruo10_dh_frontend_city_path.partials.search.head')
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="hero__text">
+                                <div class="section-title">
+                                    <h2 style="color: {{ $site_homepage_header_title_font_color }};">{{ __('frontend.homepage.title') }}</h2>
+                                    <p style="color: {{ $site_homepage_header_paragraph_font_color }};">{{ __('frontend.homepage.description') }}</p>
+                                </div>
+                                <div class="hero__search__form">
+                                    @include('frontend_views.lduruo10_dh_frontend_city_path.partials.search.head')
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
-    <!-- Hero Section End -->
+        </div>
+        <!-- Categories Section Begin -->
+        @if($categories->count() > 0)
+        <div class="categories">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="categories__item__list">
 
-    <!-- Categories Section Begin -->
-    @if($categories->count() > 0)
-    <section class="categories">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="categories__item__list">
+                            @foreach($categories as $categories_key => $category)
+                                <div class="categories__item">
+                                    <a href="{{ route('page.category', $category->category_slug) }}">
 
-                        @foreach($categories as $categories_key => $category)
-                            <div class="categories__item">
-                                <a href="{{ route('page.category', $category->category_slug) }}">
+                                    @if($category->category_icon)
+                                        <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="{{ $category->category_icon }}"></i></span>
+                                    @else
+                                        <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="fas fa-heart"></i></span>
+                                    @endif
 
-                                @if($category->category_icon)
-                                    <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="{{ $category->category_icon }}"></i></span>
-                                @else
-                                    <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="fas fa-heart"></i></span>
-                                @endif
+                                    <h5>{{ $category->category_name }}</h5>
+                                    <span class="number">{{ number_format(count($category->getItemIdsByCategoryIds([$category->id]))) }}</span>
+                                    </a>
+                                </div>
+                            @endforeach
 
-                                <h5>{{ $category->category_name }}</h5>
-                                <span class="number">{{ number_format(count($category->getItemIdsByCategoryIds([$category->id]))) }}</span>
+                            <!-- <div class="categories__item custom-all-categories-div">
+                                <a href="{{ route('page.categories') }}">
+                                    <span class="custom-icon">
+                                        <i class="fas fa-th"></i>
+                                    </span>
+                                    <h5>{{ __('frontend.homepage.all-categories') }}</h5>
                                 </a>
-                            </div>
-                        @endforeach
-
-                        <!-- <div class="categories__item custom-all-categories-div">
-                            <a href="{{ route('page.categories') }}">
-                                <span class="custom-icon">
-                                    <i class="fas fa-th"></i>
-                                </span>
-                                <h5>{{ __('frontend.homepage.all-categories') }}</h5>
-                            </a>
-                        </div> -->
+                            </div> -->
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row mt-3">
-                <div class="col-lg-12 text-center">
-                    <a href="{{ route('page.categories') }}" class="primary-btn pl-3 pr-3 pt-2 pb-2">
-                        <i class="fas fa-th mr-2"></i>
-                        {{ __('frontend.homepage.all-categories') }}
-                    </a>
+                <div class="row mt-3">
+                    <div class="col-lg-12 text-center">
+                        <a href="{{ route('page.categories') }}" class="primary-btn pl-3 pr-3 pt-2 pb-2">
+                            <i class="fas fa-th mr-2"></i>
+                            {{ __('frontend.homepage.all-categories') }}
+                        </a>
+                    </div>
                 </div>
-            </div>
-        <!-- <div class="row mt-3">
-                <div class="col-12 text-center">
-                    <a href="{{ route('page.categories') }}" class="btn btn-primary rounded text-white">
-                        <span class="custom-icon">
-                                    <i class="fas fa-th"></i>
-                                </span>
-                        {{ __('frontend.homepage.all-categories') }}
-                    </a>
-                </div>
-            </div> -->
+            <!-- <div class="row mt-3">
+                    <div class="col-12 text-center">
+                        <a href="{{ route('page.categories') }}" class="btn btn-primary rounded text-white">
+                            <span class="custom-icon">
+                                        <i class="fas fa-th"></i>
+                                    </span>
+                            {{ __('frontend.homepage.all-categories') }}
+                        </a>
+                    </div>
+                </div> -->
 
+            </div>
         </div>
-    </section>
-    @endif
+        @endif
+
+        
+         </section>
+        
+    <!-- Hero Section End -->
+
+
     <!-- Categories Section End -->
 
     <!-- Featured Listings Section Begin -->

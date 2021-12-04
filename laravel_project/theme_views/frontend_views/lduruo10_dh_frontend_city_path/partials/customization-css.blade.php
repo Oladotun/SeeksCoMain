@@ -5,6 +5,15 @@
     a {
         color: {{ $customization_site_primary_color }};
     }
+    /*section {
+       transform: scale(100);
+       transform-origin: 0 0;
+       /*height: 80%;*/
+       /*// add prefixed versions too
+    }*/
+     .custom-index-area {
+        padding: 200px 0 0;
+    }
     .custom-site-logo img { max-height: 200px; }
     .primary-btn {
         background: {{ $customization_site_primary_color }};

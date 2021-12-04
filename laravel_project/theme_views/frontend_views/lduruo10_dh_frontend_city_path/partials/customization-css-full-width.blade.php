@@ -20,6 +20,11 @@
     .header__menu ul li a {
         color: #323232;
     }
+    .custom-index-area {
+        padding: 200px 0 0;
+    }
+
+
 
     /*body {
       padding-top: 20px;

@@ -660,7 +660,7 @@
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             <?php endif; ?>
 
-                            <div class="row mb-3 listing__details__map">
+                           <!--  <div class="row mb-3 listing__details__map">
                                 <div class="col-12">
                                     <h4><?php echo e(__('frontend.item.location')); ?></h4>
                                     <div class="row pt-2 pb-2">
@@ -690,7 +690,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- start item section after location map -->
                             <?php if($item_sections_after_location_map->count() > 0): ?>
@@ -1741,6 +1741,7 @@ unset($__errorArgs, $__bag); ?>
                         <div class="listing__sidebar__contact">
                             <?php if($item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
                             <div class="listing__sidebar__contact__map">
+                                <div hidden id="mapid-item"></div>
                                 <div id="mapid-item-sidebar"></div>
                             </div>
                             <?php endif; ?>
