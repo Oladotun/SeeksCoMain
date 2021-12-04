@@ -75,10 +75,15 @@
 
                 <div class="row mt-3">
                     <div class="col-lg-12 text-center">
-                        <a href="<?php echo e(route('page.categories')); ?>" class="primary-btn pl-3 pr-3 pt-2 pb-2">
+                        <!-- <a href="<?php echo e(route('page.categories')); ?>" class="primary-btn pl-3 pr-3 pt-2 pb-2">
                             <i class="fas fa-th mr-2"></i>
                             <?php echo e(__('frontend.homepage.all-categories')); ?>
 
+                        </a> -->
+
+                        <a href="#section1" class="primary-btn pl-3 pr-3 pt-2 pb-2">
+                            <i class="fas fa-angle-double-down mr-2"></i>
+                                Click to View More Below
                         </a>
                     </div>
                 </div>
@@ -108,7 +113,7 @@
 
     <!-- Featured Listings Section Begin -->
     <?php if($paid_items->count() > 0): ?>
-    <section class="most-search spad">
+    <section class="most-search spad" id ="section1">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">

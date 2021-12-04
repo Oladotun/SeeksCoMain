@@ -24,6 +24,10 @@
         padding: 200px 0 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
 
 
     /*body {
