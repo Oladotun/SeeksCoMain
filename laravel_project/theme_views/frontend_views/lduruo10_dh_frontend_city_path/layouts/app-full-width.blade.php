@@ -35,6 +35,18 @@
 
     <link rel="stylesheet" href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/css/stylesheet.min.css') }}" type="text/css">
 
+    <!-- Hotjar Tracking Code for My site -->
+    <script>
+        (function(h,o,t,j,a,r){
+            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+            h._hjSettings={hjid:2732966,hjsv:6};
+            a=o.getElementsByTagName('head')[0];
+            r=o.createElement('script');r.async=1;
+            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>
+
     <!-- custom colors -->
     @include('frontend_views.lduruo10_dh_frontend_city_path.partials.customization-css')
     @include('frontend_views.lduruo10_dh_frontend_city_path.partials.customization-css-full-width')
