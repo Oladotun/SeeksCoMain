@@ -1,5 +1,5 @@
 <!-- Header Section Begin -->
-<header class="head">
+<header class="header">
     <!-- Image and text -->
     <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-white font-weight-bold justify-content-between justify-content-lg-between justify-content-xl-between">
       <!-- <a class="navbar-brand" href="#"> -->
@@ -19,7 +19,7 @@
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </a>
             <?php else: ?>
-                <a  class="navbar-brand header__logo custom-site-logo" href="<?php echo e(route('page.home')); ?>">
+                <a  class="navbar-brand custom-site-logo" href="<?php echo e(route('page.home')); ?>">
                     <img  src="<?php echo e(Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo)); ?>" alt="<?php echo e(empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name); ?>">
                 </a>
 

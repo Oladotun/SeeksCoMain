@@ -32,6 +32,13 @@
       scroll-behavior: smooth;
     }
 
+    .custom-index-area {
+        padding-top:calc(.18 * 100vh);
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
+    }
+
 
 
     /*body {
@@ -43,7 +50,7 @@
       }
     }*/
 
-    .custom-site-logo img { max-height: 200px; }
+    .custom-site-logo img { max-height: 130px; }
     .navbar {position: absolute;}
     .filter {padding-top: 15%; position: absolute; height: auto;}
     /*.listing {padding-top: 17%;}*/
