@@ -41,8 +41,7 @@
         </div>
         <!-- Categories Section Begin -->
         @if($categories->count() > 0)
-        <div class="categories">
-            <div class="container">
+          <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="categories__item__list">
@@ -75,7 +74,7 @@
                     </div>
                 </div>
 
-                <div class="row mt-3">
+                <div class="row">
                     <div class="col-lg-12 text-center">
                         <!-- <a href="{{ route('page.categories') }}" class="primary-btn pl-3 pr-3 pt-2 pb-2">
                             <i class="fas fa-th mr-2"></i>
@@ -114,7 +113,7 @@
     <!-- Featured Listings Section Begin -->
 
     @if($paid_items->count() > 0)
-    <div class="most-search">
+    <div class="most-search" style="padding-top:50px;">
         <div class="container" >
             <div class="row">
                 <div class="col-lg-12">

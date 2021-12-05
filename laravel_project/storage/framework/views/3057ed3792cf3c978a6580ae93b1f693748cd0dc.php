@@ -8,6 +8,7 @@
     .header {
 
         background-color: #ffffff;
+        top:  0px;
         /*position: sticky;*/
         /*top: 0;*/
     }
@@ -21,7 +22,10 @@
         color: #323232;
     }
     .custom-index-area {
-        padding: 200px 0 0;
+        padding-top:calc(.10 * 100vh);
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
     }
 
     html {

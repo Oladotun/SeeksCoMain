@@ -4,6 +4,7 @@
         <div class="row align-items-center">
             <div class="col-lg-2 col-md-12 text-center">
                 <div class="header__logo custom-site-logo">
+                    <!-- <div class="custom-site-logo"> -->
                     @if(empty($site_global_settings->setting_site_logo))
                         <a href="{{ route('page.home') }}" class="customization-header-font-color">
                             @foreach(explode(' ', empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name) as $key => $word)
@@ -22,7 +23,8 @@
                 </div>
             </div>
             <div class="col-lg-10 col-md-2">
-                <div class="header__nav">
+                <div class="header__nav" style="padding-top: 0px;">
+                    <div>
                     <nav class="header__menu mobile-menu">
                         <ul>
 

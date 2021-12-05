@@ -12,9 +12,12 @@
        /*// add prefixed versions too
     }*/
      .custom-index-area {
-        padding: 200px 0 0;
+        padding-top:calc(.18 * 100vh);
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
     }
-    .custom-site-logo img { max-height: 200px; }
+    .custom-site-logo img { max-height: 130px; }
     .primary-btn {
         background: {{ $customization_site_primary_color }};
         border: 1px solid {{ $customization_site_primary_color }};
@@ -70,7 +73,9 @@
      * Start website nav menu
      */
     .header {
+        top:  0px;
         background-color: {{ $customization_site_header_background_color }};
+
     }
     .customization-header-font-color {
         color: {{ $customization_site_header_font_color }};

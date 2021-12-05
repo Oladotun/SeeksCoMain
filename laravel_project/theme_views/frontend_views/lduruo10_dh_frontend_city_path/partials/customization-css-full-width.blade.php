@@ -8,6 +8,7 @@
     .header {
 
         background-color: #ffffff;
+        top:  0px;
         /*position: sticky;*/
         /*top: 0;*/
     }
@@ -21,11 +22,21 @@
         color: #323232;
     }
     .custom-index-area {
-        padding: 200px 0 0;
+        padding-top:calc(.10 * 100vh);
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
     }
 
     html {
       scroll-behavior: smooth;
+    }
+
+    .custom-index-area {
+        padding-top:calc(.18 * 100vh);
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
     }
 
 
@@ -39,7 +50,7 @@
       }
     }*/
 
-    .custom-site-logo img { max-height: 200px; }
+    .custom-site-logo img { max-height: 130px; }
     .navbar {position: absolute;}
     .filter {padding-top: 15%; position: absolute; height: auto;}
     /*.listing {padding-top: 17%;}*/
