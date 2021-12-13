@@ -49,7 +49,7 @@ class PagesController extends Controller
     {
         
 
-        if (Auth::check()){
+        // if (Auth::check()){
 
             $settings = app('site_global_settings');
             $site_prefer_country_id = app('site_prefer_country_id');
@@ -221,10 +221,10 @@ class PagesController extends Controller
                 'site_homepage_header_title_font_color', 'site_homepage_header_paragraph_font_color',
                 'site_prefer_country_id'));
 
-        } else {
+        // } else {
             
-            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
-        }
+        //     return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+        // }
 
         
     }
