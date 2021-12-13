@@ -151,6 +151,12 @@
                                 <form id="item-save-form-xl" action="<?php echo e(route('page.item.save', ['item_slug' => $item->item_slug])); ?>" method="POST" hidden="true">
                                     <?php echo csrf_field(); ?>
                                 </form>
+
+                                <!-- <a class="pl-1" target="_blank" href="<?php echo e(route('page.item.save', ['item_slug' => $item->item_slug])); ?>">
+                                                <i class="fas fa-external-link-alt"></i>
+                                                <?php echo e(__('page.item.save')); ?>
+
+                                            </a> -->
                             <?php endif; ?>
                         <?php endif; ?>
                         <a class="btn primary-btn" href="tel:<?php echo e($item->item_phone); ?>" data-toggle="tooltip" title="<?php echo e(__('frontend.item.call')); ?>"><i class="fas fa-phone-alt"></i></a>

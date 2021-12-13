@@ -3756,7 +3756,12 @@ class PagesController extends Controller
                 {
                     $login_user->savedItems()->attach($item->id);
 
-                    \Session::flash('flash_message', __('frontend.item.save-item-success'));
+                    // $routehomepage = '{ {route("page.home")}}';
+                    // $url = "Listings saved click to see it <a href='" + {{routehomepage +"'> here </a>";
+                    // $routehomepage = '{ {route("page.home")}}';
+                    $url = "Listings saved";
+                    \Session::flash('flash_message', $url);
+                    // \Session::flash('flash_message', __('frontend.item.save-item-success'));
                     \Session::flash('flash_type', 'success');
 
                     return redirect()->route('page.item', $item->item_slug);

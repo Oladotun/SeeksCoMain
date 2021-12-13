@@ -2,7 +2,7 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?php echo e(route('user.index')); ?>">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?php echo e(route('page.home')); ?>">
         <div class="sidebar-brand-icon">
             <i class="fas fa-th"></i>
         </div>

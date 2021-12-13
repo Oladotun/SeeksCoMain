@@ -26,26 +26,39 @@
         <?php endif; ?>
 
             <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <div class="breadcrumb__text">
-                            <h2 style="color: <?php echo e($site_innerpage_header_title_font_color); ?>;"><?php echo e(__('auth.register')); ?></h2>
-                        </div>
+            <!-- <div class="row"> -->
+                <div class="col-lg-12 text-center">
+                    
 
-                        <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.first-page-words', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-                        
+                    <div class="breadcrumb__text">
+                        <h2 style="color: <?php echo e($site_innerpage_header_title_font_color); ?>;"><?php echo e(__('frontend.header.title')); ?></h2>
                     </div>
+
+                    <!-- <div class="breadcrumb__text">
+                        <h3 style="color: <?php echo e($site_innerpage_header_title_font_color); ?>;"><?php echo e(__('auth.login')); ?></h3>
+                    </div> -->
+
+                    <!-- <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.first-page-words', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> -->
                 </div>
-            </div>
+            <!-- </div> -->
+
+        </div>
         </div>
     </div>
     <!-- Breadcrumb End -->
 
     <!-- About Section Begin -->
-    <section class="about spad custom-bg-light">
+    <!-- <section class="about spad custom-bg-light"> -->
+    <section class="about bg-light" style="padding-top: 20px;">
         <div class="container">
 
             <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.alert', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+            <div class="col-12 text-center">
+                    
+
+                        <h2 style="color: grey"><strong><?php echo e(__('auth.register')); ?></strong></h2>
+                    <!-- <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.first-page-words', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> -->
+                </div>
 
             <div class="row justify-content-center">
                 <div class="col-12 col-md-10 col-lg-6">

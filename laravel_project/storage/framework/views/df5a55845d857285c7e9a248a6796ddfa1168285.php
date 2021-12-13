@@ -2,7 +2,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="alert alert-<?php echo e(Session::get('flash_type')); ?> alert-dismissible fade show" role="alert">
-                <?php echo e(Session::get('flash_message')); ?>
+                <?php echo Session::get('flash_message'); ?>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>

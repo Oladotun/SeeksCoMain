@@ -146,6 +146,11 @@
                                 <form id="item-save-form-xl" action="{{ route('page.item.save', ['item_slug' => $item->item_slug]) }}" method="POST" hidden="true">
                                     @csrf
                                 </form>
+
+                                <!-- <a class="pl-1" target="_blank" href="{{ route('page.item.save', ['item_slug' => $item->item_slug]) }}">
+                                                <i class="fas fa-external-link-alt"></i>
+                                                {{ __('page.item.save') }}
+                                            </a> -->
                             @endif
                         @endguest
                         <a class="btn primary-btn" href="tel:{{ $item->item_phone }}" data-toggle="tooltip" title="{{ __('frontend.item.call') }}"><i class="fas fa-phone-alt"></i></a>

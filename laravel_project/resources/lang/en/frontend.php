@@ -3,7 +3,7 @@
 return array (
   'about' =>
   array (
-    'description' => 'A World Class Classified Company',
+    'description' => 'See and Explore Classic, New and Upcoming Attractions in Up-and-Coming Communities',
     'title' => 'About Us',
   ),
   'auth' =>
@@ -109,6 +109,7 @@ return array (
     'listings' => 'Listings',
     'login' => 'Log In',
     'register' => 'Sign Up',
+    'title' => 'See and Explore The Classic, New, and Upcoming Attractions in Town',
   ),
   'homepage' =>
   array (
@@ -123,7 +124,7 @@ return array (
     'popular-listings' => 'Popular listings around you',
     'recent-listings' => 'Recent Listings',
     'testimonials' => 'Testimonials',
-    'title' => 'Find the Best Businesses in Town',
+    'title' => 'See and Explore The Classic, New, and Upcoming Attractions in Town',
   ),
   'item' =>
   array (
