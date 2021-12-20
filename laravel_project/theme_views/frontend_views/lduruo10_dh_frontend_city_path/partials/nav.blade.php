@@ -28,13 +28,12 @@
                     <nav class="header__menu mobile-menu">
                         <ul>
 
-                            @if (Auth::check())
-                              <!-- //show logged in navbar -->
+                            
 
-                              <li class="nav-item"><a class="nav-link" href="{{ route('page.home') }}">{{ __('frontend.header.home') }}</a></li>
-                                <li class="nav-item"><a class="nav-link" href="{{ route('page.categories') }}">{{ __('frontend.header.listings') }}
+                            <li class="nav-item"><a class="nav-link" href="{{ route('page.home') }}">{{ __('frontend.header.home') }}</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('page.categories') }}">{{ __('frontend.header.listings') }}</a></li>
                 
-                            @endif
+                      
                             
                             @if($site_global_settings->setting_page_about_enable == \App\Setting::ABOUT_PAGE_ENABLED)
                                 <li><a href="{{ route('page.about') }}">{{ __('frontend.header.about') }}</a></li>
