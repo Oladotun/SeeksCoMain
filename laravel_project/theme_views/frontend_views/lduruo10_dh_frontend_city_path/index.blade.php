@@ -62,24 +62,38 @@
                                 </div>
                             @endforeach
 
-                            <!-- <div class="categories__item custom-all-categories-div">
-                                <a href="{{ route('page.categories') }}">
+                            <!-- <div class="categories__item custom-all-categories-div"> -->
+                                <!-- <a href="{{ route('page.categories') }}">
                                     <span class="custom-icon">
                                         <i class="fas fa-th"></i>
                                     </span>
-                                    <h5>{{ __('frontend.homepage.all-categories') }}</h5>
-                                </a>
-                            </div> -->
+                                     <h5>{{ __('frontend.homepage.all-categories') }}</h5> 
+                                    
+                                </a> -->
+
+
+
+                            <!-- </div> -->
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
+                    @foreach($cities_present as $cities_key => $city)
+                        <div class="col-lg-4 text-center">
+                            
+                            <h3> {{$city->city_name}} </h3> <span> {{$city->items}} attractions</span>
+                            
+                        </div>
+                    @endforeach
                     <div class="col-lg-12 text-center">
                         <!-- <a href="{{ route('page.categories') }}" class="primary-btn pl-3 pr-3 pt-2 pb-2">
                             <i class="fas fa-th mr-2"></i>
                             {{ __('frontend.homepage.all-categories') }}
                         </a> -->
+
+
+                        <!-- {{$cities_present}} -->
 
                         <a href="#section1" class="primary-btn pl-3 pr-3 pt-2 pb-2">
                             <i class="fas fa-angle-double-down mr-2"></i>
