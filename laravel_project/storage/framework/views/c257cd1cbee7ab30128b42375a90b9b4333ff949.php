@@ -11,6 +11,11 @@
        /*height: 80%;*/
        /*// add prefixed versions too
     }*/
+    .categories__item{
+        padding-bottom: 0px;
+        margin-bottom: 0px;
+
+    }
      .custom-index-area {
         padding-top:calc(.18 * 100vh);
         padding-right: 0;

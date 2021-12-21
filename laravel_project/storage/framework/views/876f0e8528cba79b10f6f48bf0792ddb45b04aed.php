@@ -60,25 +60,39 @@
                                 </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                            <!-- <div class="categories__item custom-all-categories-div">
-                                <a href="<?php echo e(route('page.categories')); ?>">
+                            <!-- <div class="categories__item custom-all-categories-div"> -->
+                                <!-- <a href="<?php echo e(route('page.categories')); ?>">
                                     <span class="custom-icon">
                                         <i class="fas fa-th"></i>
                                     </span>
-                                    <h5><?php echo e(__('frontend.homepage.all-categories')); ?></h5>
-                                </a>
-                            </div> -->
+                                     <h5><?php echo e(__('frontend.homepage.all-categories')); ?></h5> 
+                                    
+                                </a> -->
+
+
+
+                            <!-- </div> -->
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
+                    <?php $__currentLoopData = $cities_present; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cities_key => $city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="col-lg-4 text-center">
+                            
+                            <h3> <?php echo e($city->city_name); ?> </h3> <span> <?php echo e($city->items); ?> attractions</span>
+                            
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     <div class="col-lg-12 text-center">
                         <!-- <a href="<?php echo e(route('page.categories')); ?>" class="primary-btn pl-3 pr-3 pt-2 pb-2">
                             <i class="fas fa-th mr-2"></i>
                             <?php echo e(__('frontend.homepage.all-categories')); ?>
 
                         </a> -->
+
+
+                        <!-- <?php echo e($cities_present); ?> -->
 
                         <a href="#section1" class="primary-btn pl-3 pr-3 pt-2 pb-2">
                             <i class="fas fa-angle-double-down mr-2"></i>

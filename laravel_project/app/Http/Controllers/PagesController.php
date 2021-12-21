@@ -23,6 +23,7 @@ use App\Subscription;
 use App\Testimonial;
 use App\Theme;
 use App\User;
+use App\City;
 use Artesaos\SEOTools\Facades\OpenGraph;
 use Artesaos\SEOTools\Facades\TwitterCard;
 use DateTime;
@@ -82,6 +83,11 @@ class PagesController extends Controller
              */
 
             $subscription_obj = new Subscription();
+
+            ### Get Cities
+            // $cities_present = Cities::with('items')->all();
+
+            $cities_present = City::join('items', 'items.city_id', '=', 'cities.id')->orderByDesc('items')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
 
             /**
              * first 5 categories order by total listings
@@ -219,7 +225,7 @@ class PagesController extends Controller
                 'site_homepage_header_background_type', 'site_homepage_header_background_color',
                 'site_homepage_header_background_image', 'site_homepage_header_background_youtube_video',
                 'site_homepage_header_title_font_color', 'site_homepage_header_paragraph_font_color',
-                'site_prefer_country_id'));
+                'site_prefer_country_id','cities_present'));
 
         // } else {
             
