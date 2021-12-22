@@ -215,7 +215,7 @@
                     </div>
                 </div>
 
-                <div class="listing__list">
+                <div class="card-columns">
 
                     @if($ads_before_content->count() > 0)
                         @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)

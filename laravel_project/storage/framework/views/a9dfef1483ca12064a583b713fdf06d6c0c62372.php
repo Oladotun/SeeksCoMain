@@ -48,7 +48,7 @@
     <div class="listing__item__text__info__left">
                 <?php $__currentLoopData = $item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item_categories_key => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <a class="listing__item__text__info__left" style="padding-top: 0px" href="<?php echo e(route('page.category', $category->category_slug)); ?>">
-                        <span class="custom-color-schema-<?php echo e($paid_items_key%10); ?>">
+                       
                             <?php if(!empty($category->category_icon)): ?>
                                 <i class="<?php echo e($category->category_icon); ?>"></i>
                             <?php else: ?>
@@ -56,7 +56,7 @@
                             <?php endif; ?>
                             <?php echo e($category->category_name); ?>
 
-                        </span>
+                        <!-- </span> -->
                     </a>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>

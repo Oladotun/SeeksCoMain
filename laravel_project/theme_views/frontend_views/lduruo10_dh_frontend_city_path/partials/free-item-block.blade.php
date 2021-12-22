@@ -44,14 +44,14 @@
     <div class="listing__item__text__info__left">
                 @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
                     <a class="listing__item__text__info__left" style="padding-top: 0px" href="{{ route('page.category', $category->category_slug) }}">
-                        <span class="custom-color-schema-{{ $paid_items_key%10 }}">
+                       
                             @if(!empty($category->category_icon))
                                 <i class="{{ $category->category_icon }}"></i>
                             @else
                                 <i class="fas fa-heart"></i>
                             @endif
                             {{ $category->category_name }}
-                        </span>
+                        <!-- </span> -->
                     </a>
                 @endforeach
             </div>
