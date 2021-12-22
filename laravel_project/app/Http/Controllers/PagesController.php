@@ -850,23 +850,61 @@ class PagesController extends Controller
     public function categories(Request $request)
     {
 
-        if(Auth::check()){
+        // if(Auth::check()){
         $settings = app('site_global_settings');
         $site_prefer_country_id = app('site_prefer_country_id');
 
         /**
          * Start SEO
          */
-        SEOMeta::setTitle(__('seo.frontend.categories', ['site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
-        SEOMeta::setDescription('');
-        SEOMeta::setCanonical(URL::current());
-        SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+        // SEOMeta::setTitle(__('seo.frontend.categories', ['site_name' => empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name]));
+        // SEOMeta::setDescription('');
+        // SEOMeta::setCanonical(URL::current());
+        // SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+
+
         /**
          * End SEO
          */
+
+
+
+
+        /**
+         * Copied From Index
+         * Start SEO
+         */
+        SEOMeta::setTitle($settings->setting_site_seo_home_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+        SEOMeta::setDescription($settings->setting_site_seo_home_description);
+        SEOMeta::setCanonical(URL::current());
+        SEOMeta::addKeyword($settings->setting_site_seo_home_keywords);
+
+        // OpenGraph
+        OpenGraph::setTitle($settings->setting_site_seo_home_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
+        OpenGraph::setDescription($settings->setting_site_seo_home_description);
+        OpenGraph::setUrl(URL::current());
+        if(empty($settings->setting_site_logo))
+        {
+            OpenGraph::addImage(asset('favicon-96x96.ico'));
+        }
+        else
+        {
+            OpenGraph::addImage(Storage::disk('public')->url('setting/' . $settings->setting_site_logo));
+        }
+
+        // Twitter
+        TwitterCard::setTitle($settings->setting_site_seo_home_title . ' - ' . (empty($settings->setting_site_name) ? config('app.name', 'Laravel') : $settings->setting_site_name));
         $subscription_obj = new Subscription();
 
         $active_user_ids = $subscription_obj->getActiveUserIds();
+
+
+        ### Get Cities
+            // $cities_present = Cities::with('items')->all();
+
+        $cities_present = City::join('items', 'items.city_id', '=', 'cities.id')->orderByDesc('items')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
+
+
         $categories = Category::withCount(['allItems' => function ($query) use ($active_user_ids, $site_prefer_country_id) {
             $query->whereIn('items.user_id', $active_user_ids)
                 ->where('items.item_status', Item::ITEM_PUBLISHED)
@@ -1169,12 +1207,12 @@ class PagesController extends Controller
                 'site_innerpage_header_background_youtube_video', 'site_innerpage_header_title_font_color',
                 'site_innerpage_header_paragraph_font_color', 'filter_sort_by', 'all_printable_categories',
                 'filter_categories', 'site_prefer_country_id', 'filter_state', 'filter_city', 'all_cities',
-                'total_results'));
-        }
-        else {
+                'total_results', 'cities_present'));
+        // }
+        // else {
             
-            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
-        }
+        //     return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+        // }
 
     }
 

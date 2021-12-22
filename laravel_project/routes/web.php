@@ -59,7 +59,10 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
     /**
      * Public routes
      */
-    Route::get('/', 'PagesController@index')->name('page.home');
+
+    
+    // Route::get('/', 'PagesController@index')->name('page.home');
+    Route::get('/', 'PagesController@categories')->name('page.home');
 
     Route::get('/search', 'PagesController@search')->name('page.search')->middleware('verified');
 
@@ -67,7 +70,8 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
     Route::get('/contact', 'PagesController@contact')->name('page.contact');
     Route::post('/contact', 'PagesController@doContact')->name('page.contact.do');
 
-    Route::get('/categories', 'PagesController@categories')->name('page.categories')->middleware('verified');
+    // Route::get('/categories', 'PagesController@categories')->name('page.categories')->middleware('verified');
+    Route::get('/categories', 'PagesController@categories')->name('page.categories');
     Route::get('/category/{category_slug}', 'PagesController@category')->name('page.category')->middleware('verified');
     Route::get('/category/{category_slug}/state/{state_slug}', 'PagesController@categoryByState')->name('page.category.state');
     Route::get('/category/{category_slug}/state/{state_slug}/city/{city_slug}', 'PagesController@categoryByStateCity')->name('page.category.state.city');

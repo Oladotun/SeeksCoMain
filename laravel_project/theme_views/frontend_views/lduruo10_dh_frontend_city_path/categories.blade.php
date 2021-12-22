@@ -17,6 +17,15 @@
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
         <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
             @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter')
+        <!-- </div> -->
+
+        <!-- @foreach($cities_present as $cities_key => $city)
+            <div class="col-lg-4 text-center">
+                
+                <h3> {{$city->city_name}} </h3> <span> {{$city->items}} attractions</span>
+                
+            </div>
+        @endforeach -->
         <!-- <div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-4 col-lg-2">
             <form method="GET" action="{{ route('page.categories') }}">
                 <div class="filter__title">
@@ -95,14 +104,14 @@
             </form>
             <hr>
 
-            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width')
-        </div> -->
+            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width')-->
+        <!-- </div>  -->
         <!-- Filter End -->
 
         <!-- Listing Section Begin -->
         <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-left: 10%;">
 
-            @if($ads_before_breadcrumb->count() > 0)
+            <!-- @if($ads_before_breadcrumb->count() > 0)
                 @foreach($ads_before_breadcrumb as $ads_before_breadcrumb_key => $ad_before_breadcrumb)
                     <div class="row mb-5">
                         @if($ad_before_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
@@ -170,7 +179,7 @@
 
                     </div>
                 @endforeach
-            @endif
+            @endif -->
 
             @if($categories->count() > 0)
                 <div class="row mb-4">
