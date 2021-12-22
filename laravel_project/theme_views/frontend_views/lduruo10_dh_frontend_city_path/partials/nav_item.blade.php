@@ -22,10 +22,14 @@
                     <img  src="{{ Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo) }}" alt="{{ empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name }}">
                 </a>
 
-                <a  class="d-none d-sm-block d-lg-none " href="{{ route('page.home') }}">  <!--show only on medium screen SeeksCo -->
-                    <strong class="display-4">SeeksCo</strong>
-                </a>
+                <!-- <a  class="d-none d-sm-block d-lg-none " href="{{ route('page.home') }}">  --> <!--show only on medium screen SeeksCo -->
+                <a  class="d-none d-sm-block"   href="{{ route('page.home') }}"> 
+                    <div class="col-12" style="text-align: center;"><strong class="display-4" >SeeksCo</strong></div>
+                    <div class="col-12"><strong class="display-7" style="text-align: center;">{{ __('frontend.homepage.title') }}</strong>
+                        </div>
 
+                </a>
+                <!-- <p>{{ __('frontend.homepage.description') }}</p> -->
                 <a  class="d-block d-sm-none " href="{{ route('page.home') }}">
                     <strong class="lead">SeeksCo</strong>
                 </a>
@@ -48,7 +52,7 @@
 
                 
                       <!-- <li class="nav-item"><a class="nav-link" href="{{ route('page.home') }}">{{ __('frontend.header.home') }}</a></li> -->
-                        <li class="nav-item"><a class="nav-link" href="{{ route('page.categories') }}">{{ __('frontend.header.listings') }}</a></li>
+                        <!-- <li class="nav-item"><a class="nav-link" href="{{ route('page.categories') }}">{{ __('frontend.header.listings') }}</a></li> -->
         
                    
                     
@@ -59,15 +63,61 @@
 
                     <!-- <li class="nav-item"><a class="nav-link" href="{{ route('page.blog') }}">{{ __('frontend.header.blog') }}</a></li> -->
                     <!-- <li class="nav-item"><a class="nav-link" href="{{ route('page.contact') }}">{{ __('frontend.header.contact') }}</a></li> -->
-                    <li class="nav-item"><span class="border-left"></span></li>
-                    @guest
+                    <!-- <li class="nav-item"><span class="border-left"></span></li> -->
+                    <!-- @guest
                         <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">{{ __('frontend.header.login') }}</a></li>
                         @if (Route::has('register'))
                             <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">{{ __('frontend.header.register') }}</a></li>
                         @endif
                     @else
                          
-                        <li class="has-children">
+                        
+
+                    @endguest -->
+
+                    <!-- <li class="nav-item"> -->
+                        
+                        @guest
+                            <div>
+                                <li class="nav-item">
+                                        <a href="{{ route('page.pricing') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        {{ __('frontend.header.list-business') }}
+                                    </a>
+                                </li>
+                                <div>
+                                <li class="nav-item"><a  href="{{ route('login') }}">{{ __('frontend.header.login') }}</a>
+                                     <strong class="border-left" style="border-left: 3px; padding-right: 5px;"> </strong>
+                                @if (Route::has('register'))
+                                    <a  href="{{ route('register') }}">{{ __('frontend.header.register') }}</a>
+                                @endif
+                                </li>
+                            </div>
+                    
+
+                            </div>
+                            
+                        @else
+                            <div>
+                            @if(Auth::user()->isAdmin())
+                                <a href="{{ route('admin.items.create') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                    <i class="fas fa-plus mr-1"></i>
+                                    {{ __('frontend.header.list-business') }}
+                                </a>
+                            @else
+                                @if(Auth::user()->hasPaidSubscription())
+                                    <a href="{{ route('user.items.create') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        {{ __('frontend.header.list-business') }}
+                                    </a>
+                                @else
+                                    <a  href="{{ route('page.pricing') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        {{ __('frontend.header.list-business') }}
+                                    </a>
+                                @endif
+                            @endif
+                            <li class="has-children">
                             
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::user()->name }}</a>
@@ -111,34 +161,8 @@
                                 </li> -->
                             </li>
                         </li>
+                        </div>
 
-                    @endguest
-
-                    <!-- <li class="nav-item"> -->
-                        @guest
-                            <a href="{{ route('page.pricing') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
-                                <i class="fas fa-plus mr-1"></i>
-                                {{ __('frontend.header.list-business') }}
-                            </a>
-                        @else
-                            @if(Auth::user()->isAdmin())
-                                <a href="{{ route('admin.items.create') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
-                                    <i class="fas fa-plus mr-1"></i>
-                                    {{ __('frontend.header.list-business') }}
-                                </a>
-                            @else
-                                @if(Auth::user()->hasPaidSubscription())
-                                    <a href="{{ route('user.items.create') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
-                                        <i class="fas fa-plus mr-1"></i>
-                                        {{ __('frontend.header.list-business') }}
-                                    </a>
-                                @else
-                                    <a  href="{{ route('page.pricing') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
-                                        <i class="fas fa-plus mr-1"></i>
-                                        {{ __('frontend.header.list-business') }}
-                                    </a>
-                                @endif
-                            @endif
                         @endguest
                     <!-- </li> -->
                 </ul>
