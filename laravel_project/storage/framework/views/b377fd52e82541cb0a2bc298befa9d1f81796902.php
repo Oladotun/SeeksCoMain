@@ -31,15 +31,15 @@
 
                             
 
-                            <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.home')); ?>"><?php echo e(__('frontend.header.home')); ?></a></li>
+                            <!-- <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.home')); ?>"><?php echo e(__('frontend.header.home')); ?></a></li> -->
                             <li class="nav-item"><a class="nav-link" href="<?php echo e(route('page.categories')); ?>"><?php echo e(__('frontend.header.listings')); ?></a></li>
                 
                       
                             
-                            <?php if($site_global_settings->setting_page_about_enable == \App\Setting::ABOUT_PAGE_ENABLED): ?>
+                            <!-- <?php if($site_global_settings->setting_page_about_enable == \App\Setting::ABOUT_PAGE_ENABLED): ?>
                                 <li><a href="<?php echo e(route('page.about')); ?>"><?php echo e(__('frontend.header.about')); ?></a></li>
-                            <?php endif; ?>
-                            <li><a href="<?php echo e(route('page.blog')); ?>"><?php echo e(__('frontend.header.blog')); ?></a></li>
+                            <?php endif; ?> -->
+                            <!-- <li><a href="<?php echo e(route('page.blog')); ?>"><?php echo e(__('frontend.header.blog')); ?></a></li> -->
                             <!-- <li><a href="<?php echo e(route('page.contact')); ?>"><?php echo e(__('frontend.header.contact')); ?></a></li> -->
                             <li><span class="border-left"></span></li>
                             <?php if(auth()->guard()->guest()): ?>
@@ -76,7 +76,7 @@
 
                             <li>
                                 <?php if(auth()->guard()->guest()): ?>
-                                    <a href="<?php echo e(route('page.pricing')); ?>" class="primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                    <a href="<?php echo e(route('register')); ?>" class="primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
                                         <i class="fas fa-plus mr-1"></i>
                                         <?php echo e(__('frontend.header.list-business')); ?>
 
@@ -96,7 +96,7 @@
 
                                             </a>
                                         <?php else: ?>
-                                            <a href="<?php echo e(route('page.pricing')); ?>" class="primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                            <a href="<?php echo e(route('register')); ?>" class="primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
                                                 <i class="fas fa-plus mr-1"></i>
                                                 <?php echo e(__('frontend.header.list-business')); ?>
 

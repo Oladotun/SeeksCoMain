@@ -23,8 +23,8 @@
                 <div class="footer__widget">
                     <p class="custom-column-title"><strong><?php echo e(__('frontend.footer.navigations')); ?></strong></p>
                     <ul>
-                        <li><a href="<?php echo e(route('page.pricing')); ?>"><?php echo e(__('theme_directory_hub.pricing.footer.pricing')); ?></a></li>
-                        <li><a href="<?php echo e(route('page.about')); ?>"><?php echo e(__('frontend.footer.about-us')); ?></a></li>
+                        <!-- <li><a href="<?php echo e(route('page.pricing')); ?>"><?php echo e(__('theme_directory_hub.pricing.footer.pricing')); ?></a></li> -->
+                        <!-- <li><a href="<?php echo e(route('page.about')); ?>"><?php echo e(__('frontend.footer.about-us')); ?></a></li> -->
                         <li><a href="<?php echo e(route('page.contact')); ?>"><?php echo e(__('frontend.footer.contact-us')); ?></a></li>
                     </ul>
                 </div>
@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <div class="col-lg-3 col-md-6">
+            <!-- <div class="col-lg-3 col-md-6">
                 <div class="footer__widget">
                     <p class="custom-column-title"><strong><?php echo e(__('frontend.footer.posts')); ?></strong></p>
 
@@ -53,7 +53,7 @@
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-            </div>
+            </div> -->
 
         </div>
 

@@ -47,17 +47,17 @@
                    </a></li>
 
                 
-                      <li class="nav-item"><a class="nav-link" href="{{ route('page.home') }}">{{ __('frontend.header.home') }}</a></li>
+                      <!-- <li class="nav-item"><a class="nav-link" href="{{ route('page.home') }}">{{ __('frontend.header.home') }}</a></li> -->
                         <li class="nav-item"><a class="nav-link" href="{{ route('page.categories') }}">{{ __('frontend.header.listings') }}</a></li>
         
                    
                     
-                    @if($site_global_settings->setting_page_about_enable == \App\Setting::ABOUT_PAGE_ENABLED)
+                    <!-- @if($site_global_settings->setting_page_about_enable == \App\Setting::ABOUT_PAGE_ENABLED)
                         <li class="nav-item"><a class="nav-link" href="{{ route('page.about') }}">{{ __('frontend.header.about') }}</a></li>
-                    @endif
+                    @endif -->
 
 
-                    <li class="nav-item"><a class="nav-link" href="{{ route('page.blog') }}">{{ __('frontend.header.blog') }}</a></li>
+                    <!-- <li class="nav-item"><a class="nav-link" href="{{ route('page.blog') }}">{{ __('frontend.header.blog') }}</a></li> -->
                     <!-- <li class="nav-item"><a class="nav-link" href="{{ route('page.contact') }}">{{ __('frontend.header.contact') }}</a></li> -->
                     <li class="nav-item"><span class="border-left"></span></li>
                     @guest

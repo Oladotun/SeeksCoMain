@@ -23,8 +23,8 @@
                 <div class="footer__widget">
                     <p class="custom-column-title"><strong>{{ __('frontend.footer.navigations') }}</strong></p>
                     <ul>
-                        <li><a href="{{ route('page.pricing') }}">{{ __('theme_directory_hub.pricing.footer.pricing') }}</a></li>
-                        <li><a href="{{ route('page.about') }}">{{ __('frontend.footer.about-us') }}</a></li>
+                        <!-- <li><a href="{{ route('page.pricing') }}">{{ __('theme_directory_hub.pricing.footer.pricing') }}</a></li> -->
+                        <!-- <li><a href="{{ route('page.about') }}">{{ __('frontend.footer.about-us') }}</a></li> -->
                         <li><a href="{{ route('page.contact') }}">{{ __('frontend.footer.contact-us') }}</a></li>
                     </ul>
                 </div>
@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <div class="col-lg-3 col-md-6">
+            <!-- <div class="col-lg-3 col-md-6">
                 <div class="footer__widget">
                     <p class="custom-column-title"><strong>{{ __('frontend.footer.posts') }}</strong></p>
 
@@ -53,7 +53,7 @@
                         @endforeach
                     </ul>
                 </div>
-            </div>
+            </div> -->
 
         </div>
 
