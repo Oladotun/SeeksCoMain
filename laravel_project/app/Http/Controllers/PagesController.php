@@ -1080,10 +1080,11 @@ class PagesController extends Controller
             $num_of_pages = ceil(($total_paid_items + $total_free_items) / 12);
 
             $paid_items_per_page = ceil($total_paid_items / $num_of_pages) > 4 ? 4 : ceil($total_paid_items / $num_of_pages);
-
-            $free_items_per_page = 12 - $paid_items_per_page;
+            // $free_items_per_page = 12 - $paid_items_per_page;
 
             $paid_items = $paid_items_query->paginate($paid_items_per_page);
+
+            $free_items_per_page = 12 - $paid_items->count();
             $free_items = $free_items_query->paginate($free_items_per_page);
 
             if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
