@@ -13,17 +13,18 @@
     <!-- Filter Begin -->
     <div class="container-fluid">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
-        <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
+        <div class="row" >
+            <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
             <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-        <!-- </div> -->
+            </div>
 
-        <?php $__currentLoopData = $cities_present; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cities_key => $city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <!-- <?php $__currentLoopData = $cities_present; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cities_key => $city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="col-lg-4 text-center">
                 
                 <h3> <?php echo e($city->city_name); ?> </h3> <span> <?php echo e($city->items); ?> attractions</span>
                 
             </div>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?> -->
         <!-- <div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-4 col-lg-2">
             <form method="GET" action="<?php echo e(route('page.categories')); ?>">
                 <div class="filter__title">
@@ -156,8 +157,18 @@ unset($__errorArgs, $__bag); ?>
         <!-- </div>  -->
         <!-- Filter End -->
 
+
+
+
+
+
+
+
         <!-- Listing Section Begin -->
-        <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-left: 10%;">
+        <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-top: 15%;">
+
+
+
 
             <!-- <?php if($ads_before_breadcrumb->count() > 0): ?>
                 <?php $__currentLoopData = $ads_before_breadcrumb; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_breadcrumb_key => $ad_before_breadcrumb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -285,7 +296,7 @@ unset($__errorArgs, $__bag); ?>
 
             <div class="listing__list">
 
-                <?php if($ads_before_content->count() > 0): ?>
+                <!-- <?php if($ads_before_content->count() > 0): ?>
                     <?php $__currentLoopData = $ads_before_content; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_content_key => $ad_before_content): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="row mb-5">
                             <?php if($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT): ?>
@@ -313,8 +324,9 @@ unset($__errorArgs, $__bag); ?>
 
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                <?php endif; ?>
+                <?php endif; ?> -->
 
+                
                 <?php if($paid_items->count() > 0): ?>
                     <?php $__currentLoopData = $paid_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $paid_items_key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>

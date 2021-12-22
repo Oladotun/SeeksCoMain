@@ -52,8 +52,8 @@
     }*/
 
     .custom-site-logo img { max-height: 130px; }
-    .navbar {position: absolute;}
-    .filter {padding-top: 15%; position: absolute; height: auto;}
+    .nav {position: sticky}
+    .filter {padding-top: 15%; position: sticky; height: auto;}
     /*.listing {padding-top: 17%;}*/
     .h5{word-wrap: break-word;}
     @media only screen and (min-width: 768px) and (max-width: 1112px) {

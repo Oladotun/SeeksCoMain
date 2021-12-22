@@ -15,9 +15,10 @@
     <!-- Filter Begin -->
     <div class="container-fluid">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
-        <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
+        <div class="row" >
+            <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
             @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter')
-        <!-- </div> -->
+            </div>
 
         <!-- @foreach($cities_present as $cities_key => $city)
             <div class="col-lg-4 text-center">
@@ -108,8 +109,18 @@
         <!-- </div>  -->
         <!-- Filter End -->
 
+
+
+
+
+
+
+
         <!-- Listing Section Begin -->
-        <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-left: 10%;">
+        <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-top: 15%;">
+
+
+
 
             <!-- @if($ads_before_breadcrumb->count() > 0)
                 @foreach($ads_before_breadcrumb as $ads_before_breadcrumb_key => $ad_before_breadcrumb)
@@ -225,7 +236,7 @@
 
             <div class="listing__list">
 
-                @if($ads_before_content->count() > 0)
+                <!-- @if($ads_before_content->count() > 0)
                     @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)
                         <div class="row mb-5">
                             @if($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
@@ -250,8 +261,9 @@
 
                         </div>
                     @endforeach
-                @endif
+                @endif -->
 
+                
                 @if($paid_items->count() > 0)
                     @foreach($paid_items as $paid_items_key => $item)
                         @include('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block')

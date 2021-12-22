@@ -1,4 +1,4 @@
-<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-4 col-lg-2">
+<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <form method="GET" action="{{ route('page.categories') }}">
                 <div class="filter__title">
                     <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
@@ -22,8 +22,8 @@
                 <div class="filter__select">
                     <select class="selectpicker @error('filter_city') is-invalid @enderror" name="filter_city" id="filter_city" data-live-search="true">
                         <option value="0" {{ empty($filter_city) ? 'selected' : '' }}>{{ __('prefer_country.all-city') }}</option>
-                        @foreach($all_cities as $all_cities_key => $city)
-                            <option value="{{ $city->id }}" {{ $filter_city == $city->id ? 'selected' : '' }}>{{ $city->city_name }} {{$city->items_count}}</option>
+                        @foreach($cities_present as $all_cities_key => $city)
+                            <option value="{{ $city->id }}" {{ $filter_city == $city->id ? 'selected' : '' }}>{{ $city->city_name }}</option>
                         @endforeach
                     </select>
                     @error('filter_city')
