@@ -294,7 +294,7 @@ unset($__errorArgs, $__bag); ?>
                 </div>
             </div>
 
-            <div class="listing__list">
+            <div class="card-columns">
 
                 <!-- <?php if($ads_before_content->count() > 0): ?>
                     <?php $__currentLoopData = $ads_before_content; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_content_key => $ad_before_content): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -326,7 +326,7 @@ unset($__errorArgs, $__bag); ?>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <?php endif; ?> -->
 
-                
+                <!-- <div class="card-deck"> -->
                 <?php if($paid_items->count() > 0): ?>
                     <?php $__currentLoopData = $paid_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $paid_items_key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>

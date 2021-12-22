@@ -1,6 +1,6 @@
 <div class="card">
     <a href="{{ route('page.item', $item->item_slug) }}">
-      <img class="card-img-top" src="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}" alt="Listing Image">
+      <img class="card-img-top border-primary" src="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}" alt="Listing Image">
        <div class="listing__item__pic__tag">{{ __('frontend.item.featured') }}</div>
         </img>
     </a>
@@ -39,12 +39,12 @@
         @endif
     </div>
   </div>
-  <div class="card-footer">
+  <div class="card-footer bg-white">
     <!-- <small class="text-muted">Last updated 3 mins ago</small> -->
 
-    <div class="listing__item__text__info__left">
+        <!-- <div class="listing__item__text__info__left"> -->
                 @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
-                    <a href="{{ route('page.category', $category->category_slug) }}">
+                    <a class="listing__item__text__info__left" style="padding-top: 0px" href="{{ route('page.category', $category->category_slug) }}">
                         <span class="custom-color-schema-{{ $paid_items_key%10 }}">
                             @if(!empty($category->category_icon))
                                 <i class="{{ $category->category_icon }}"></i>
@@ -55,16 +55,18 @@
                         </span>
                     </a>
                 @endforeach
-            </div>
-            <div class="listing__item__text__info__right">
+            <!-- </div> -->
+            <!-- <div class="listing__item__text__info__right" style="padding-top: 0px;"> -->
                 @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
+                
                     @if($item->hasOpened())
-                        <span class="item-box-hour-span-opened">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                        <span class=" item-box-hour-span-opened float-right">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
                     @else
-                        <span class="item-box-hour-span-closed">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
+                        <span class="item-box-hour-span-closed float-right">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
                     @endif
+           
                 @endif
-            </div>
+            <!-- </div> -->
 
   </div>
 </div>

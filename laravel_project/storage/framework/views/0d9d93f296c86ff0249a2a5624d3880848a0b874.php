@@ -1,6 +1,6 @@
 <div class="card">
     <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
-      <img class="card-img-top" src="<?php echo e(!empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp')); ?>" alt="Listing Image">
+      <img class="card-img-top border-primary" src="<?php echo e(!empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp')); ?>" alt="Listing Image">
        <div class="listing__item__pic__tag"><?php echo e(__('frontend.item.featured')); ?></div>
         </img>
     </a>
@@ -10,7 +10,6 @@
             <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
                <h5 class="card-title "> <?php echo e(str_limit($item->item_title, 44, '...')); ?> </h5>
             </a>
-        
      
         <?php if($item->getCountRating() > 0): ?>
             <div class="listing__item__text__rating">
@@ -44,12 +43,12 @@
         <?php endif; ?>
     </div>
   </div>
-  <div class="card-footer">
+  <div class="card-footer bg-white">
     <!-- <small class="text-muted">Last updated 3 mins ago</small> -->
 
-    <div class="listing__item__text__info__left">
+        <!-- <div class="listing__item__text__info__left"> -->
                 <?php $__currentLoopData = $item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item_categories_key => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <a href="<?php echo e(route('page.category', $category->category_slug)); ?>">
+                    <a class="listing__item__text__info__left" style="padding-top: 0px" href="<?php echo e(route('page.category', $category->category_slug)); ?>">
                         <span class="custom-color-schema-<?php echo e($paid_items_key%10); ?>">
                             <?php if(!empty($category->category_icon)): ?>
                                 <i class="<?php echo e($category->category_icon); ?>"></i>
@@ -61,16 +60,18 @@
                         </span>
                     </a>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </div>
-            <div class="listing__item__text__info__right">
+            <!-- </div> -->
+            <!-- <div class="listing__item__text__info__right" style="padding-top: 0px;"> -->
                 <?php if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW): ?>
+                
                     <?php if($item->hasOpened()): ?>
-                        <span class="item-box-hour-span-opened"><?php echo e(__('item_hour.frontend-item-box-hour-opened')); ?></span>
+                        <span class=" item-box-hour-span-opened float-right"><?php echo e(__('item_hour.frontend-item-box-hour-opened')); ?></span>
                     <?php else: ?>
-                        <span class="item-box-hour-span-closed"><?php echo e(__('item_hour.frontend-item-box-hour-closed')); ?></span>
+                        <span class="item-box-hour-span-closed float-right"><?php echo e(__('item_hour.frontend-item-box-hour-closed')); ?></span>
                     <?php endif; ?>
+           
                 <?php endif; ?>
-            </div>
+            <!-- </div> -->
 
   </div>
 </div>

@@ -234,7 +234,7 @@
                 </div>
             </div>
 
-            <div class="listing__list">
+            <div class="card-columns">
 
                 <!-- @if($ads_before_content->count() > 0)
                     @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)
@@ -263,7 +263,7 @@
                     @endforeach
                 @endif -->
 
-                
+                <!-- <div class="card-deck"> -->
                 @if($paid_items->count() > 0)
                     @foreach($paid_items as $paid_items_key => $item)
                         @include('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block')
