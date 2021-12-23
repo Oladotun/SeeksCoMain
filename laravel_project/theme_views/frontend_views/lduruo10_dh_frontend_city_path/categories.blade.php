@@ -233,7 +233,7 @@
                     <i class="fas fa-sort-amount-down"></i>
                 </div>
             </div>
-
+        <div class="scrolling-pagination">
             <div class="card-columns">
 
                 <!-- @if($ads_before_content->count() > 0)
@@ -311,8 +311,8 @@
                     </div>
                 </div>
             @endif
-
-            @if($all_states->count() > 0)
+        
+            <!-- @if($all_states->count() > 0)
             <div class="listing__text__top">
                 <div class="listing__text__top__left">
                     <h5>{{ __('frontend.categories.sub-title-2') }}</h5>
@@ -327,9 +327,9 @@
                     </div>
                 @endif
                 @endforeach
-            </div>
+            </div> -->
             @endif
-
+         </div>
         </section>
         <!-- Listing Section End -->
 
@@ -349,6 +349,23 @@
         Make sure you put this AFTER Leaflet's CSS
         <script src="{{ asset('frontend/vendor/leaflet/leaflet.js') }}"></script>
     @endif -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscroll/2.4.1/jquery.jscroll.min.js"></script>
+
+    <script type="text/javascript">
+        $('ul.pagination').hide();
+        $(function() {
+            $('.scrolling-pagination').jscroll({
+                autoTrigger: true,
+                padding: 0,
+                nextSelector: '.pagination li.active + li a',
+                contentSelector: 'div.scrolling-pagination',
+                callback: function() {
+                    $('ul.pagination').remove();
+                }
+            });
+        });
+    </script>
 
     <script src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js') }}"></script>
     @include('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale')
