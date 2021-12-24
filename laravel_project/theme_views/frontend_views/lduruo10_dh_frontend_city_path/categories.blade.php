@@ -349,6 +349,8 @@
         Make sure you put this AFTER Leaflet's CSS
         <script src="{{ asset('frontend/vendor/leaflet/leaflet.js') }}"></script>
     @endif -->
+    <script src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js') }}"></script>
+    @include('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jscroll/2.4.1/jquery.jscroll.min.js"></script>
 
@@ -367,8 +369,7 @@
         });
     </script>
 
-    <script src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js') }}"></script>
-    @include('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale')
+    
 
     <script>
         $(document).ready(function(){
