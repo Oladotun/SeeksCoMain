@@ -195,7 +195,7 @@
             @if($categories->count() > 0)
                 <div class="row mb-4">
                     @foreach($categories as $categories_key => $category)
-                        <div class="col-12 col-md-6 col-lg-3 pr-0">
+                        <div class="col-6 col-md-4 col-lg-2 pr-0">
                             <div class="categories__item categories__item_sm">
                                 <a href="{{ route('page.category', $category->category_slug) }}">
 

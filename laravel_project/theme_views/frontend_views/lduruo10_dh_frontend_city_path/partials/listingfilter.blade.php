@@ -83,9 +83,9 @@
                     <a class="btn btn-outline-secondary filter__reset__btn" href="{{ route('page.categories') }}">{{ __('theme_directory_hub.filter-link-reset-all') }}</a>
                 </div>
             </form>
-            <hr>
+            <!-- <hr> -->
 
-            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width')
+            <!-- @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width') -->
         </div>
 
 
