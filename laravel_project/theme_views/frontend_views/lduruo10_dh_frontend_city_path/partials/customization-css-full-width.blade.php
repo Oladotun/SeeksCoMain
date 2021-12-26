@@ -57,8 +57,29 @@
     /*.listing {padding-top: 17%;}*/
     .h5{word-wrap: break-word;}
     @media only screen and (min-width: 768px) and (max-width: 1112px) {
-        .listing {padding-top: 30%;margin-left: 10%; column-width:100%;}
-        .filter {padding-top: 40%; align-items: left; }
+        /*.listing {padding-top: 30%;}*/
+        .container-fluid {padding-top: 10%;}
+
+        .card-columns {
+                column-count: 2;
+            }
+        /*.filter {padding-top: 40%; align-items: left; }*/
     }
+
+    @media  only screen and (min-width: 576px) and (min-width: 767px) {
+        .container-fluid {padding-top: 10%;}
+        .card-columns {
+            column-count: 2;
+        }
+    }
+
+    @media only screen and (min-width: 480px) {
+        .container-fluid {padding-top: 10%;}
+        .card-columns {
+            column-count: 2;
+        }
+    }
+
+
 </style>
 <!-- End page level nav style -->

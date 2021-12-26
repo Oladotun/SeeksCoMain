@@ -1,4 +1,4 @@
-<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="filter nice-scroll  col-xs-4 col-sm-4 col-md-12 col-lg-12">
             <form method="GET" action="{{ route('page.categories') }}">
                 <div class="filter__title">
                     <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
