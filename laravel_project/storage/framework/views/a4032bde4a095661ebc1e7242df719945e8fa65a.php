@@ -250,7 +250,7 @@ unset($__errorArgs, $__bag); ?>
             <?php if($categories->count() > 0): ?>
                 <div class="row mb-4">
                     <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categories_key => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="col-12 col-md-6 col-lg-3 pr-0">
+                        <div class="col-6 col-md-4 col-lg-2 pr-0">
                             <div class="categories__item categories__item_sm">
                                 <a href="<?php echo e(route('page.category', $category->category_slug)); ?>">
 
@@ -293,7 +293,7 @@ unset($__errorArgs, $__bag); ?>
                     <i class="fas fa-sort-amount-down"></i>
                 </div>
             </div>
-
+        <div class="scrolling-pagination">
             <div class="card-columns">
 
                 <!-- <?php if($ads_before_content->count() > 0): ?>
@@ -378,8 +378,8 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
             <?php endif; ?>
-
-            <?php if($all_states->count() > 0): ?>
+        
+            <!-- <?php if($all_states->count() > 0): ?>
             <div class="listing__text__top">
                 <div class="listing__text__top__left">
                     <h5><?php echo e(__('frontend.categories.sub-title-2')); ?></h5>
@@ -394,9 +394,9 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                 <?php endif; ?>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </div>
+            </div> -->
             <?php endif; ?>
-
+         </div>
         </section>
         <!-- Listing Section End -->
 
@@ -416,9 +416,27 @@ unset($__errorArgs, $__bag); ?>
         Make sure you put this AFTER Leaflet's CSS
         <script src="<?php echo e(asset('frontend/vendor/leaflet/leaflet.js')); ?>"></script>
     <?php endif; ?> -->
-
     <script src="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js')); ?>"></script>
     <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscroll/2.4.1/jquery.jscroll.min.js"></script>
+
+    <script type="text/javascript">
+        $('ul.pagination').hide();
+        $(function() {
+            $('.scrolling-pagination').jscroll({
+                autoTrigger: true,
+                padding: 0,
+                nextSelector: '.pagination li.active + li a',
+                contentSelector: 'div.scrolling-pagination',
+                callback: function() {
+                    $('ul.pagination').remove();
+                }
+            });
+        });
+    </script>
+
+    
 
     <script>
         $(document).ready(function(){

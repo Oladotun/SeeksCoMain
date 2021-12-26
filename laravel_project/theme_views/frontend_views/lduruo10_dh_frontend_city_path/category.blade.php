@@ -14,7 +14,8 @@
     <!-- Filter Begin Changed to previous examples -->
     <div class="container-fluid">
         <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
-            <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-4 col-lg-2">
+            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingcategoriesfilter')
+            <!-- <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-4 col-lg-2">
                 <form method="GET" action="{{ route('page.category', ['category_slug' => $category->category_slug]) }}">
                     <div class="filter__title">
                         <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
@@ -93,7 +94,7 @@
                 <hr>
 
                 @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width')
-            </div>
+            </div> -->
             <!-- Filter End -->
 
             <!-- Listing Section Begin -->
@@ -214,83 +215,83 @@
                         <i class="fas fa-sort-amount-down"></i>
                     </div>
                 </div>
+                <div class="scrolling-pagination">
+                    <div class="card-columns">
 
-                <div class="card-columns">
-
-                    @if($ads_before_content->count() > 0)
-                        @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)
-                            <div class="row mb-5">
-                                @if($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
-                                    <div class="col-12 text-left">
-                                        <div>
-                                            {!! $ad_before_content->advertisement_code !!}
+                        @if($ads_before_content->count() > 0)
+                            @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)
+                                <div class="row mb-5">
+                                    @if($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
+                                        <div class="col-12 text-left">
+                                            <div>
+                                                {!! $ad_before_content->advertisement_code !!}
+                                            </div>
                                         </div>
-                                    </div>
-                                @elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
-                                    <div class="col-12 text-center">
-                                        <div>
-                                            {!! $ad_before_content->advertisement_code !!}
+                                    @elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
+                                        <div class="col-12 text-center">
+                                            <div>
+                                                {!! $ad_before_content->advertisement_code !!}
+                                            </div>
                                         </div>
-                                    </div>
-                                @elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
-                                    <div class="col-12 text-right">
-                                        <div>
-                                            {!! $ad_before_content->advertisement_code !!}
+                                    @elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
+                                        <div class="col-12 text-right">
+                                            <div>
+                                                {!! $ad_before_content->advertisement_code !!}
+                                            </div>
                                         </div>
-                                    </div>
-                                @endif
+                                    @endif
 
-                            </div>
-                        @endforeach
-                    @endif
+                                </div>
+                            @endforeach
+                        @endif
 
-                    @if($paid_items->count() > 0)
-                        @foreach($paid_items as $paid_items_key => $item)
-                            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block')
-                        @endforeach
-                    @endif
+                        @if($paid_items->count() > 0)
+                            @foreach($paid_items as $paid_items_key => $item)
+                                @include('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block')
+                            @endforeach
+                        @endif
 
-                    @if($free_items->count() > 0)
-                        @foreach($free_items as $free_items_key => $item)
-                            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.free-item-block')
-                        @endforeach
-                    @endif
+                        @if($free_items->count() > 0)
+                            @foreach($free_items as $free_items_key => $item)
+                                @include('frontend_views.lduruo10_dh_frontend_city_path.partials.free-item-block')
+                            @endforeach
+                        @endif
 
-                    @if($ads_after_content->count() > 0)
-                        @foreach($ads_after_content as $ads_after_content_key => $ad_after_content)
-                            <div class="row mt-5">
-                                @if($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
-                                    <div class="col-12 text-left">
-                                        <div>
-                                            {!! $ad_after_content->advertisement_code !!}
+                        @if($ads_after_content->count() > 0)
+                            @foreach($ads_after_content as $ads_after_content_key => $ad_after_content)
+                                <div class="row mt-5">
+                                    @if($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT)
+                                        <div class="col-12 text-left">
+                                            <div>
+                                                {!! $ad_after_content->advertisement_code !!}
+                                            </div>
                                         </div>
-                                    </div>
-                                @elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
-                                    <div class="col-12 text-center">
-                                        <div>
-                                            {!! $ad_after_content->advertisement_code !!}
+                                    @elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER)
+                                        <div class="col-12 text-center">
+                                            <div>
+                                                {!! $ad_after_content->advertisement_code !!}
+                                            </div>
                                         </div>
-                                    </div>
-                                @elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
-                                    <div class="col-12 text-right">
-                                        <div>
-                                            {!! $ad_after_content->advertisement_code !!}
+                                    @elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT)
+                                        <div class="col-12 text-right">
+                                            <div>
+                                                {!! $ad_after_content->advertisement_code !!}
+                                            </div>
                                         </div>
-                                    </div>
-                                @endif
+                                    @endif
 
-                            </div>
-                        @endforeach
-                    @endif
-                </div>
-
-                @if($pagination->hasPages())
-                    <div class="row mb-5">
-                        <div class="col-12">
-                            {{ $pagination->links() }}
-                        </div>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
-                @endif
+
+                    @if($pagination->hasPages())
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                {{ $pagination->links() }}
+                            </div>
+                        </div>
+                    @endif
 
                 <!-- @if($all_states->count() > 0)
                     <div class="listing__text__top">
@@ -309,7 +310,7 @@
                         @endforeach
                     </div>
                 @endif -->
-
+                </div>
             </section>
             <!-- Listing Section End -->
 
@@ -332,6 +333,24 @@
 
     <script src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js') }}"></script>
     @include('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale')
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscroll/2.4.1/jquery.jscroll.min.js"></script>
+
+    <script type="text/javascript">
+        $('ul.pagination').hide();
+        $(function() {
+            $('.scrolling-pagination').jscroll({
+                autoTrigger: true,
+                padding: 0,
+                nextSelector: '.pagination li.active + li a',
+                contentSelector: 'div.scrolling-pagination',
+                callback: function() {
+                    $('ul.pagination').remove();
+                }
+            });
+        });
+    </script>
 
     <script>
         $(document).ready(function(){

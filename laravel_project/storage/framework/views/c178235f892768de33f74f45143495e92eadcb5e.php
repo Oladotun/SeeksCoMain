@@ -12,7 +12,8 @@
     <!-- Filter Begin Changed to previous examples -->
     <div class="container-fluid">
         <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
-            <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-4 col-lg-2">
+            <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.listingcategoriesfilter', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+            <!-- <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-4 col-lg-2">
                 <form method="GET" action="<?php echo e(route('page.category', ['category_slug' => $category->category_slug])); ?>">
                     <div class="filter__title">
                         <h5><i class="fas fa-filter"></i> <?php echo e(__('theme_directory_hub.filter-filter-by')); ?></h5>
@@ -141,7 +142,7 @@ unset($__errorArgs, $__bag); ?>
                 <hr>
 
                 <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-            </div>
+            </div> -->
             <!-- Filter End -->
 
             <!-- Listing Section Begin -->
@@ -274,90 +275,90 @@ unset($__errorArgs, $__bag); ?>
                         <i class="fas fa-sort-amount-down"></i>
                     </div>
                 </div>
+                <div class="scrolling-pagination">
+                    <div class="card-columns">
 
-                <div class="card-columns">
+                        <?php if($ads_before_content->count() > 0): ?>
+                            <?php $__currentLoopData = $ads_before_content; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_content_key => $ad_before_content): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <div class="row mb-5">
+                                    <?php if($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT): ?>
+                                        <div class="col-12 text-left">
+                                            <div>
+                                                <?php echo $ad_before_content->advertisement_code; ?>
 
-                    <?php if($ads_before_content->count() > 0): ?>
-                        <?php $__currentLoopData = $ads_before_content; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_content_key => $ad_before_content): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="row mb-5">
-                                <?php if($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT): ?>
-                                    <div class="col-12 text-left">
-                                        <div>
-                                            <?php echo $ad_before_content->advertisement_code; ?>
-
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER): ?>
-                                    <div class="col-12 text-center">
-                                        <div>
-                                            <?php echo $ad_before_content->advertisement_code; ?>
+                                    <?php elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER): ?>
+                                        <div class="col-12 text-center">
+                                            <div>
+                                                <?php echo $ad_before_content->advertisement_code; ?>
 
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT): ?>
-                                    <div class="col-12 text-right">
-                                        <div>
-                                            <?php echo $ad_before_content->advertisement_code; ?>
+                                    <?php elseif($ad_before_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT): ?>
+                                        <div class="col-12 text-right">
+                                            <div>
+                                                <?php echo $ad_before_content->advertisement_code; ?>
 
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php endif; ?>
+                                    <?php endif; ?>
 
-                            </div>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
 
-                    <?php if($paid_items->count() > 0): ?>
-                        <?php $__currentLoopData = $paid_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $paid_items_key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    <?php endif; ?>
+                        <?php if($paid_items->count() > 0): ?>
+                            <?php $__currentLoopData = $paid_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $paid_items_key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.paid-item-block', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
 
-                    <?php if($free_items->count() > 0): ?>
-                        <?php $__currentLoopData = $free_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $free_items_key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.free-item-block', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    <?php endif; ?>
+                        <?php if($free_items->count() > 0): ?>
+                            <?php $__currentLoopData = $free_items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $free_items_key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.free-item-block', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
 
-                    <?php if($ads_after_content->count() > 0): ?>
-                        <?php $__currentLoopData = $ads_after_content; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_after_content_key => $ad_after_content): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="row mt-5">
-                                <?php if($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT): ?>
-                                    <div class="col-12 text-left">
-                                        <div>
-                                            <?php echo $ad_after_content->advertisement_code; ?>
+                        <?php if($ads_after_content->count() > 0): ?>
+                            <?php $__currentLoopData = $ads_after_content; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_after_content_key => $ad_after_content): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <div class="row mt-5">
+                                    <?php if($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT): ?>
+                                        <div class="col-12 text-left">
+                                            <div>
+                                                <?php echo $ad_after_content->advertisement_code; ?>
 
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER): ?>
-                                    <div class="col-12 text-center">
-                                        <div>
-                                            <?php echo $ad_after_content->advertisement_code; ?>
+                                    <?php elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_CENTER): ?>
+                                        <div class="col-12 text-center">
+                                            <div>
+                                                <?php echo $ad_after_content->advertisement_code; ?>
 
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT): ?>
-                                    <div class="col-12 text-right">
-                                        <div>
-                                            <?php echo $ad_after_content->advertisement_code; ?>
+                                    <?php elseif($ad_after_content->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_RIGHT): ?>
+                                        <div class="col-12 text-right">
+                                            <div>
+                                                <?php echo $ad_after_content->advertisement_code; ?>
 
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php endif; ?>
+                                    <?php endif; ?>
 
-                            </div>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    <?php endif; ?>
-                </div>
-
-                <?php if($pagination->hasPages()): ?>
-                    <div class="row mb-5">
-                        <div class="col-12">
-                            <?php echo e($pagination->links()); ?>
-
-                        </div>
+                                </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
                     </div>
-                <?php endif; ?>
+
+                    <?php if($pagination->hasPages()): ?>
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <?php echo e($pagination->links()); ?>
+
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                 <!-- <?php if($all_states->count() > 0): ?>
                     <div class="listing__text__top">
@@ -376,7 +377,7 @@ unset($__errorArgs, $__bag); ?>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 <?php endif; ?> -->
-
+                </div>
             </section>
             <!-- Listing Section End -->
 
@@ -399,6 +400,24 @@ unset($__errorArgs, $__bag); ?>
 
     <script src="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js')); ?>"></script>
     <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscroll/2.4.1/jquery.jscroll.min.js"></script>
+
+    <script type="text/javascript">
+        $('ul.pagination').hide();
+        $(function() {
+            $('.scrolling-pagination').jscroll({
+                autoTrigger: true,
+                padding: 0,
+                nextSelector: '.pagination li.active + li a',
+                contentSelector: 'div.scrolling-pagination',
+                callback: function() {
+                    $('ul.pagination').remove();
+                }
+            });
+        });
+    </script>
 
     <script>
         $(document).ready(function(){

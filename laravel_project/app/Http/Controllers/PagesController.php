@@ -902,7 +902,7 @@ class PagesController extends Controller
         ### Get Cities
             // $cities_present = Cities::with('items')->all();
 
-        $cities_present = City::join('items', 'items.city_id', '=', 'cities.id')->orderByDesc('items')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
+        // $cities_present = City::join('items', 'items.city_id', '=', 'cities.id')->orderByDesc('items')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
 
 
         $categories = Category::withCount(['allItems' => function ($query) use ($active_user_ids, $site_prefer_country_id) {
@@ -1171,6 +1171,7 @@ class PagesController extends Controller
         /**
          * Start initial filter
          */
+        $cities_present = City::join('items', 'items.city_id', '=', 'cities.id')->orderByDesc('items')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
         $all_printable_categories = $category_obj->getPrintableCategoriesNoDash();
 
         $all_states = Country::find($site_prefer_country_id)
@@ -1184,8 +1185,15 @@ class PagesController extends Controller
         {
             $state = State::find($filter_state);
             $all_cities = $state->cities()->orderBy('city_name')->get();
+            // $all_cities = $cities_present;
         }
 
+        // else{
+            
+        //     $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);        
+        // }
+
+        $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);  
         $total_results = $total_paid_items + $total_free_items;
         /**
          * End initial filter
