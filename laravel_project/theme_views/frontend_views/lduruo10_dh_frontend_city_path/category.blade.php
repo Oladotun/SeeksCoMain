@@ -13,8 +13,11 @@
 
     <!-- Filter Begin Changed to previous examples -->
     <div class="container-fluid">
-        <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
+        
+        <div class="row" >
+            <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
             @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingcategoriesfilter')
+            </div>
             <!-- <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-4 col-lg-2">
                 <form method="GET" action="{{ route('page.category', ['category_slug' => $category->category_slug]) }}">
                     <div class="filter__title">
@@ -98,7 +101,7 @@
             <!-- Filter End -->
 
             <!-- Listing Section Begin -->
-            <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-left: 10%;">
+            <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-top: 15%;">
 
                 @if($ads_before_breadcrumb->count() > 0)
                     @foreach($ads_before_breadcrumb as $ads_before_breadcrumb_key => $ad_before_breadcrumb)
@@ -137,7 +140,6 @@
                                         {{ __('frontend.shared.home') }}
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="{{ route('page.categories') }}">{{ __('frontend.item.all-categories') }}</a></li>
                                 @foreach($parent_categories as $parent_categories_key => $parent_category)
                                     <li class="breadcrumb-item"><a href="{{ route('page.category', $parent_category->category_slug) }}">{{ $parent_category->category_name }}</a></li>
                                 @endforeach
