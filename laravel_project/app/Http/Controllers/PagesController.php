@@ -1780,10 +1780,43 @@ class PagesController extends Controller
                     'filter_city' => $filter_city,
                 ];
 
+                // if($total_free_items == 0 || $total_paid_items == 0)
+                // {
+                //     $paid_items = $paid_items_query->paginate(10);
+                //     $free_items = $free_items_query->paginate(10);
+
+                //     if($total_free_items == 0)
+                //     {
+                //         $pagination = $paid_items->appends($querystringArray);
+                //     }
+                //     if($total_paid_items == 0)
+                //     {
+                //         $pagination = $free_items->appends($querystringArray);
+                //     }
+                // }
+                // else
+                // {
+                //     $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
+                //     $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                //     $free_items_per_page = 10 - $paid_items_per_page;
+
+                //     $paid_items = $paid_items_query->paginate($paid_items_per_page);
+                //     $free_items = $free_items_query->paginate($free_items_per_page);
+
+                //     if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
+                //     {
+                //         $pagination = $paid_items->appends($querystringArray);
+                //     }
+                //     else
+                //     {
+                //         $pagination = $free_items->appends($querystringArray);
+                //     }
+                // }
+
                 if($total_free_items == 0 || $total_paid_items == 0)
                 {
-                    $paid_items = $paid_items_query->paginate(10);
-                    $free_items = $free_items_query->paginate(10);
+                    $paid_items = $paid_items_query->paginate(12);
+                    $free_items = $free_items_query->paginate(12);
 
                     if($total_free_items == 0)
                     {
@@ -1796,11 +1829,14 @@ class PagesController extends Controller
                 }
                 else
                 {
-                    $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
-                    $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
-                    $free_items_per_page = 10 - $paid_items_per_page;
+                    $num_of_pages = ceil(($total_paid_items + $total_free_items) / 12);
+
+                    $paid_items_per_page = ceil($total_paid_items / $num_of_pages) > 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                    // $free_items_per_page = 12 - $paid_items_per_page;
 
                     $paid_items = $paid_items_query->paginate($paid_items_per_page);
+
+                    $free_items_per_page = 12 - $paid_items->count();
                     $free_items = $free_items_query->paginate($free_items_per_page);
 
                     if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
@@ -2105,10 +2141,43 @@ class PagesController extends Controller
                         'filter_sort_by' => $filter_sort_by,
                     ];
 
+                    // if($total_free_items == 0 || $total_paid_items == 0)
+                    // {
+                    //     $paid_items = $paid_items_query->paginate(10);
+                    //     $free_items = $free_items_query->paginate(10);
+
+                    //     if($total_free_items == 0)
+                    //     {
+                    //         $pagination = $paid_items->appends($querystringArray);
+                    //     }
+                    //     if($total_paid_items == 0)
+                    //     {
+                    //         $pagination = $free_items->appends($querystringArray);
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
+                    //     $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                    //     $free_items_per_page = 10 - $paid_items_per_page;
+
+                    //     $paid_items = $paid_items_query->paginate($paid_items_per_page);
+                    //     $free_items = $free_items_query->paginate($free_items_per_page);
+
+                    //     if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
+                    //     {
+                    //         $pagination = $paid_items->appends($querystringArray);
+                    //     }
+                    //     else
+                    //     {
+                    //         $pagination = $free_items->appends($querystringArray);
+                    //     }
+                    // }
+
                     if($total_free_items == 0 || $total_paid_items == 0)
                     {
-                        $paid_items = $paid_items_query->paginate(10);
-                        $free_items = $free_items_query->paginate(10);
+                        $paid_items = $paid_items_query->paginate(12);
+                        $free_items = $free_items_query->paginate(12);
 
                         if($total_free_items == 0)
                         {
@@ -2121,11 +2190,14 @@ class PagesController extends Controller
                     }
                     else
                     {
-                        $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
-                        $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
-                        $free_items_per_page = 10 - $paid_items_per_page;
+                        $num_of_pages = ceil(($total_paid_items + $total_free_items) / 12);
+
+                        $paid_items_per_page = ceil($total_paid_items / $num_of_pages) > 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                        // $free_items_per_page = 12 - $paid_items_per_page;
 
                         $paid_items = $paid_items_query->paginate($paid_items_per_page);
+
+                        $free_items_per_page = 12 - $paid_items->count();
                         $free_items = $free_items_query->paginate($free_items_per_page);
 
                         if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
@@ -2414,10 +2486,42 @@ class PagesController extends Controller
                     'filter_city' => $filter_city,
                 ];
 
+                // if($total_free_items == 0 || $total_paid_items == 0)
+                // {
+                //     $paid_items = $paid_items_query->paginate(10);
+                //     $free_items = $free_items_query->paginate(10);
+
+                //     if($total_free_items == 0)
+                //     {
+                //         $pagination = $paid_items->appends($querystringArray);
+                //     }
+                //     if($total_paid_items == 0)
+                //     {
+                //         $pagination = $free_items->appends($querystringArray);
+                //     }
+                // }
+                // else
+                // {
+                //     $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
+                //     $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                //     $free_items_per_page = 10 - $paid_items_per_page;
+
+                //     $paid_items = $paid_items_query->paginate($paid_items_per_page);
+                //     $free_items = $free_items_query->paginate($free_items_per_page);
+
+                //     if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
+                //     {
+                //         $pagination = $paid_items->appends($querystringArray);
+                //     }
+                //     else
+                //     {
+                //         $pagination = $free_items->appends($querystringArray);
+                //     }
+                // }
                 if($total_free_items == 0 || $total_paid_items == 0)
                 {
-                    $paid_items = $paid_items_query->paginate(10);
-                    $free_items = $free_items_query->paginate(10);
+                    $paid_items = $paid_items_query->paginate(12);
+                    $free_items = $free_items_query->paginate(12);
 
                     if($total_free_items == 0)
                     {
@@ -2430,11 +2534,14 @@ class PagesController extends Controller
                 }
                 else
                 {
-                    $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
-                    $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
-                    $free_items_per_page = 10 - $paid_items_per_page;
+                    $num_of_pages = ceil(($total_paid_items + $total_free_items) / 12);
+
+                    $paid_items_per_page = ceil($total_paid_items / $num_of_pages) > 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                    // $free_items_per_page = 12 - $paid_items_per_page;
 
                     $paid_items = $paid_items_query->paginate($paid_items_per_page);
+
+                    $free_items_per_page = 12 - $paid_items->count();
                     $free_items = $free_items_query->paginate($free_items_per_page);
 
                     if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
@@ -2710,10 +2817,43 @@ class PagesController extends Controller
                         'filter_sort_by' => $filter_sort_by,
                     ];
 
+                    // if($total_free_items == 0 || $total_paid_items == 0)
+                    // {
+                    //     $paid_items = $paid_items_query->paginate(10);
+                    //     $free_items = $free_items_query->paginate(10);
+
+                    //     if($total_free_items == 0)
+                    //     {
+                    //         $pagination = $paid_items->appends($querystringArray);
+                    //     }
+                    //     if($total_paid_items == 0)
+                    //     {
+                    //         $pagination = $free_items->appends($querystringArray);
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
+                    //     $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                    //     $free_items_per_page = 10 - $paid_items_per_page;
+
+                    //     $paid_items = $paid_items_query->paginate($paid_items_per_page);
+                    //     $free_items = $free_items_query->paginate($free_items_per_page);
+
+                    //     if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
+                    //     {
+                    //         $pagination = $paid_items->appends($querystringArray);
+                    //     }
+                    //     else
+                    //     {
+                    //         $pagination = $free_items->appends($querystringArray);
+                    //     }
+                    // }
+
                     if($total_free_items == 0 || $total_paid_items == 0)
                     {
-                        $paid_items = $paid_items_query->paginate(10);
-                        $free_items = $free_items_query->paginate(10);
+                        $paid_items = $paid_items_query->paginate(12);
+                        $free_items = $free_items_query->paginate(12);
 
                         if($total_free_items == 0)
                         {
@@ -2726,11 +2866,14 @@ class PagesController extends Controller
                     }
                     else
                     {
-                        $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
-                        $paid_items_per_page = ceil($total_paid_items / $num_of_pages) < 4 ? 4 : ceil($total_paid_items / $num_of_pages);
-                        $free_items_per_page = 10 - $paid_items_per_page;
+                        $num_of_pages = ceil(($total_paid_items + $total_free_items) / 12);
+
+                        $paid_items_per_page = ceil($total_paid_items / $num_of_pages) > 4 ? 4 : ceil($total_paid_items / $num_of_pages);
+                        // $free_items_per_page = 12 - $paid_items_per_page;
 
                         $paid_items = $paid_items_query->paginate($paid_items_per_page);
+
+                        $free_items_per_page = 12 - $paid_items->count();
                         $free_items = $free_items_query->paginate($free_items_per_page);
 
                         if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))

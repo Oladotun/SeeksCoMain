@@ -11,8 +11,11 @@
 
     <!-- Filter Begin Changed to previous examples -->
     <div class="container-fluid">
-        <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;">
+        
+        <div class="row" >
+            <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
             <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.listingcategoriesfilter', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+            </div>
             <!-- <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-4 col-lg-2">
                 <form method="GET" action="<?php echo e(route('page.category', ['category_slug' => $category->category_slug])); ?>">
                     <div class="filter__title">
@@ -146,7 +149,7 @@ unset($__errorArgs, $__bag); ?>
             <!-- Filter End -->
 
             <!-- Listing Section Begin -->
-            <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-left: 10%;">
+            <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-top: 15%;">
 
                 <?php if($ads_before_breadcrumb->count() > 0): ?>
                     <?php $__currentLoopData = $ads_before_breadcrumb; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_breadcrumb_key => $ad_before_breadcrumb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -189,7 +192,6 @@ unset($__errorArgs, $__bag); ?>
 
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="<?php echo e(route('page.categories')); ?>"><?php echo e(__('frontend.item.all-categories')); ?></a></li>
                                 <?php $__currentLoopData = $parent_categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $parent_categories_key => $parent_category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <li class="breadcrumb-item"><a href="<?php echo e(route('page.category', $parent_category->category_slug)); ?>"><?php echo e($parent_category->category_name); ?></a></li>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
