@@ -14,10 +14,10 @@
     <div class="container-fluid">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
         <div class="row" >
-            <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-3" style="padding-top: 15%;">
             <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-            
+
             </div>
 
         <!-- <?php $__currentLoopData = $cities_present; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cities_key => $city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -167,7 +167,7 @@ unset($__errorArgs, $__bag); ?>
 
 
         <!-- Listing Section Begin -->
-        <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-top: 15%;">
+        <section class="listing nice-scroll col-xs-8 col-sm-8 col-md-8 col-lg-9" style="padding-top: 15%;">
 
 
 

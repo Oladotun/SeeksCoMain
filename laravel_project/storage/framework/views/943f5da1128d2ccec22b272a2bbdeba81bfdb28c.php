@@ -1,4 +1,4 @@
-<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="filter nice-scroll  col-xs-4 col-sm-4 col-md-12 col-lg-12">
             <form method="GET" action="<?php echo e(route('page.categories')); ?>">
                 <div class="filter__title">
                     <h5><i class="fas fa-filter"></i> <?php echo e(__('theme_directory_hub.filter-filter-by')); ?></h5>
@@ -15,6 +15,7 @@ unset($__errorArgs, $__bag); ?>" name="filter_state" id="filter_state" data-live
                         <option value="0" <?php echo e(empty($filter_state) ? 'selected' : ''); ?>><?php echo e(__('prefer_country.all-state')); ?></option>
                         <?php $__currentLoopData = $all_states; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_states_key => $state): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php if($state->items_count > 0): ?>
+
                             <option value="<?php echo e($state->id); ?>" <?php echo e($filter_state == $state->state_name ? 'selected' : ''); ?>><?php echo e($state->state_name); ?></option>
                             <?php endif; ?>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -150,10 +151,12 @@ unset($__errorArgs, $__bag); ?>
                         <h6><?php echo e(__('frontend.state.sub-title-2', ['state_name' => $state->state_name])); ?></h6>
                     </div>  -->
 
+                    <!-- <?php echo e($all_item_cities); ?> -->
+
                 <div class="row align-items-center">
                     <?php $__currentLoopData = $all_item_cities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_item_cities_key => $item_city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="col-8 col-lg-8">
-                            <a href="<?php echo e(route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $item_city->city->city_slug])); ?>"><?php echo e($item_city->city->city_name); ?>, (<?php echo e($item_city->city->items_count); ?>) </a>
+                            <a href="<?php echo e(route('page.city', ['state_slug' => $item_city->city->state->state_slug, 'city_slug' => $item_city->city->city_slug])); ?>"><?php echo e($item_city->city->city_name); ?>, (<?php echo e($item_city->city->items_count); ?>) </a>
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>

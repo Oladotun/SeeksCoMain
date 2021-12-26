@@ -1203,8 +1203,10 @@ class PagesController extends Controller
             ->groupBy('items.city_id')
             ->with(['city' => function($query) { 
                // $query->sum('quantity');
-               $query->withCount('items'); // without `order_id`
-           }]);
+               $query->withCount('items')
+               ->with('state'); // without `order_id`
+           }])
+            ;
 
         // ]);
        //      ->with('city' => function($query) { 

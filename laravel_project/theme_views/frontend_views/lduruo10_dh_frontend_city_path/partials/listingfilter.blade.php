@@ -8,6 +8,7 @@
                         <option value="0" {{ empty($filter_state) ? 'selected' : '' }}>{{ __('prefer_country.all-state') }}</option>
                         @foreach($all_states as $all_states_key => $state)
                             @if($state->items_count > 0)
+
                             <option value="{{ $state->id }}" {{ $filter_state == $state->state_name ? 'selected' : '' }}>{{ $state->state_name }}</option>
                             @endif
                         @endforeach
@@ -93,10 +94,12 @@
                         <h6>{{ __('frontend.state.sub-title-2', ['state_name' => $state->state_name]) }}</h6>
                     </div>  -->
 
+                    <!-- {{$all_item_cities}} -->
+
                 <div class="row align-items-center">
                     @foreach($all_item_cities as $all_item_cities_key => $item_city)
                         <div class="col-8 col-lg-8">
-                            <a href="{{ route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $item_city->city->city_slug]) }}">{{ $item_city->city->city_name }}, ({{$item_city->city->items_count}}) </a>
+                            <a href="{{ route('page.city', ['state_slug' => $item_city->city->state->state_slug, 'city_slug' => $item_city->city->city_slug]) }}">{{ $item_city->city->city_name }}, ({{$item_city->city->items_count}}) </a>
                         </div>
                     @endforeach
                 </div>

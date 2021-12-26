@@ -58,7 +58,7 @@
     .h5{word-wrap: break-word;}
     @media only screen and (min-width: 768px) and (max-width: 1112px) {
         /*.listing {padding-top: 30%;}*/
-        .container-fluid {padding-top: 10%;}
+        /*.container-fluid {padding-top: 10%;}*/
 
         .card-columns {
                 column-count: 2;
