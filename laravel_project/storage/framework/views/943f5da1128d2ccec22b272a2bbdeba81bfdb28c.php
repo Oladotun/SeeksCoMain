@@ -143,7 +143,23 @@ unset($__errorArgs, $__bag); ?>
             </form>
             <hr>
 
-            <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+            <?php if($all_item_cities->count() > 0): ?>
+                <!-- <div class="listing__text__top"> -->
+                    <!-- <div class="listing__text__top">
+                        <h6> <?php echo e($state->state_name); ?> Listings</h6>
+                        <h6><?php echo e(__('frontend.state.sub-title-2', ['state_name' => $state->state_name])); ?></h6>
+                    </div>  -->
+
+                <div class="row align-items-center">
+                    <?php $__currentLoopData = $all_item_cities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_item_cities_key => $item_city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="col-8 col-lg-8">
+                            <a href="<?php echo e(route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $item_city->city->city_slug])); ?>"><?php echo e($item_city->city->city_name); ?>, (<?php echo e($item_city->city->items_count); ?>) </a>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> -->
         </div>
 
 

@@ -1195,6 +1195,27 @@ class PagesController extends Controller
 
         $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);  
         $total_results = $total_paid_items + $total_free_items;
+
+        $item_select_city_query = Item::query();
+        $item_select_city_query->select('items.city_id')
+            ->where("items.item_status", Item::ITEM_PUBLISHED)
+            ->whereIn('items.user_id', $active_user_ids)
+            ->groupBy('items.city_id')
+            ->with(['city' => function($query) { 
+               // $query->sum('quantity');
+               $query->withCount('items'); // without `order_id`
+           }]);
+
+        // ]);
+       //      ->with('city' => function($query) { 
+       //     // $query->sum('quantity');
+       //     $query->withCount(['items']); // without `order_id`
+       // }]);
+            // ->withCount(['city.items']);
+            // ->withCount('city.items_id');
+
+        $all_item_cities = $item_select_city_query->get();
+
         /**
          * End initial filter
          */
@@ -1216,7 +1237,7 @@ class PagesController extends Controller
                 'site_innerpage_header_background_youtube_video', 'site_innerpage_header_title_font_color',
                 'site_innerpage_header_paragraph_font_color', 'filter_sort_by', 'all_printable_categories',
                 'filter_categories', 'site_prefer_country_id', 'filter_state', 'filter_city', 'all_cities',
-                'total_results', 'cities_present'));
+                'total_results', 'cities_present','all_item_cities'));
         // }
         // else {
             

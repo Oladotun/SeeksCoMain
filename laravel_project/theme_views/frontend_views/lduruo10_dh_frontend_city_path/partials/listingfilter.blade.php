@@ -86,7 +86,23 @@
             </form>
             <hr>
 
-            @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width')
+            @if($all_item_cities->count() > 0)
+                <!-- <div class="listing__text__top"> -->
+                    <!-- <div class="listing__text__top">
+                        <h6> {{$state->state_name}} Listings</h6>
+                        <h6>{{ __('frontend.state.sub-title-2', ['state_name' => $state->state_name]) }}</h6>
+                    </div>  -->
+
+                <div class="row align-items-center">
+                    @foreach($all_item_cities as $all_item_cities_key => $item_city)
+                        <div class="col-8 col-lg-8">
+                            <a href="{{ route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $item_city->city->city_slug]) }}">{{ $item_city->city->city_name }}, ({{$item_city->city->items_count}}) </a>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            <!-- @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width') -->
         </div>
 
 

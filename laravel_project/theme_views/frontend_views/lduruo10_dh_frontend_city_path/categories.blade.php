@@ -18,6 +18,8 @@
         <div class="row" >
             <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
             @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter')
+
+            
             </div>
 
         <!-- @foreach($cities_present as $cities_key => $city)
