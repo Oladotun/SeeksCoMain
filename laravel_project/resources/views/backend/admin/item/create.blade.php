@@ -456,7 +456,7 @@
                                 </div>
                                 <div class="form-row mb-3 align-items-end">
                                     <div class="col-12 col-md-2">
-                                        <label for="item_hour_day_of_week" class="text-black">{{ __('item_hour.day-of-week') }}</label>
+                                        <label for="item_hour_day_of_week" class="text-black"> Open {{ __('item_hour.day-of-week') }}</label>
                                         <select id="item_hour_day_of_week" class="selectpicker form-control" name="item_hour_day_of_week" data-live-search="true">
                                             <option value="{{ \App\ItemHour::DAY_OF_WEEK_MONDAY }}">{{ __('item_hour.monday') }}</option>
                                             <option value="{{ \App\ItemHour::DAY_OF_WEEK_TUESDAY }}">{{ __('item_hour.tuesday') }}</option>
@@ -481,6 +481,18 @@
                                             @for($full_minute=0; $full_minute<=59; $full_minute++)
                                                 <option value="{{ $full_minute }}">{{ $full_minute }}</option>
                                             @endfor
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <label for="item_close_day_of_week" class="text-black"> Close {{ __('item_hour.day-of-week') }}</label>
+                                        <select id="item_close_day_of_week" class="selectpicker form-control" name="item_hour_day_of_week" data-live-search="true">
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_MONDAY }}">{{ __('item_hour.monday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_TUESDAY }}">{{ __('item_hour.tuesday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_WEDNESDAY }}">{{ __('item_hour.wednesday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_THURSDAY }}">{{ __('item_hour.thursday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_FRIDAY }}">{{ __('item_hour.friday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_SATURDAY }}">{{ __('item_hour.saturday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_SUNDAY }}">{{ __('item_hour.sunday') }}</option>
                                         </select>
                                     </div>
                                     <div class="col-12 col-md-2">

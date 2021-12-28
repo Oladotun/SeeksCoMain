@@ -801,6 +801,18 @@ unset($__errorArgs, $__bag); ?>
                                         </select>
                                     </div>
                                     <div class="col-12 col-md-2">
+                                        <label for="item_close_day_of_week" class="text-black"> Close <?php echo e(__('item_hour.day-of-week')); ?></label>
+                                        <select id="item_close_day_of_week" class="selectpicker form-control" name="item_hour_day_of_week" data-live-search="true">
+                                            <option value="<?php echo e(\App\ItemHour::DAY_OF_WEEK_MONDAY); ?>"><?php echo e(__('item_hour.monday')); ?></option>
+                                            <option value="<?php echo e(\App\ItemHour::DAY_OF_WEEK_TUESDAY); ?>"><?php echo e(__('item_hour.tuesday')); ?></option>
+                                            <option value="<?php echo e(\App\ItemHour::DAY_OF_WEEK_WEDNESDAY); ?>"><?php echo e(__('item_hour.wednesday')); ?></option>
+                                            <option value="<?php echo e(\App\ItemHour::DAY_OF_WEEK_THURSDAY); ?>"><?php echo e(__('item_hour.thursday')); ?></option>
+                                            <option value="<?php echo e(\App\ItemHour::DAY_OF_WEEK_FRIDAY); ?>"><?php echo e(__('item_hour.friday')); ?></option>
+                                            <option value="<?php echo e(\App\ItemHour::DAY_OF_WEEK_SATURDAY); ?>"><?php echo e(__('item_hour.saturday')); ?></option>
+                                            <option value="<?php echo e(\App\ItemHour::DAY_OF_WEEK_SUNDAY); ?>"><?php echo e(__('item_hour.sunday')); ?></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-2">
                                         <label for="item_hour_open_time_close_hour" class="text-black"><?php echo e(__('item_hour.item-hour-close-hour')); ?></label>
                                         <select id="item_hour_open_time_close_hour" class="selectpicker form-control" name="item_hour_open_time_close_hour" data-live-search="true">
                                             <?php for($full_hour=0; $full_hour<=24; $full_hour++): ?>
