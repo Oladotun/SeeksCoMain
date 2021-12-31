@@ -740,19 +740,20 @@ class ItemController extends Controller
         {
             $item_hour_record = explode(' ', $item_hour);
 
-            if(count($item_hour_record) == 3)
+            if(count($item_hour_record) == 4)
             {
                 $item_hour_day_of_week = intval($item_hour_record[0]);
+                $item_hour_close_day_of_week = intval($item_hour_record[2]);
 
                 if($item_hour_day_of_week >= ItemHour::DAY_OF_WEEK_MONDAY && $item_hour_day_of_week <= ItemHour::DAY_OF_WEEK_SUNDAY)
                 {
                     $item_hour_open_hour = intval(substr($item_hour_record[1], 0, 2));
-                    $item_hour_close_hour = intval(substr($item_hour_record[2], 0, 2));
+                    $item_hour_close_hour = intval(substr($item_hour_record[3], 0, 2));
 
                     if($item_hour_open_hour <= $item_hour_close_hour)
                     {
                         $item_hour_open_time = $item_hour_record[1] . ':00';
-                        $item_hour_close_time = $item_hour_record[2] . ':00';
+                        $item_hour_close_time = $item_hour_record[3] . ':00';
 
                         if($item_hour_open_hour == 24)
                         {
@@ -774,7 +775,44 @@ class ItemController extends Controller
                             ));
                             $create_item_hour->save();
                         }
+                    } else {
+                        $open_dw = $item_hour_day_of_week % 7;
+                        $close_dw = $item_hour_close_day_of_week % 7;
+
+                        if ($open_dw < $close_dw) {
+
+                            $item_hour_open_hour = intval(substr($item_hour_record[1], 0, 2));
+                            $item_hour_close_hour = intval(substr($item_hour_record[3], 0, 2));
+
+                            $item_hour_open_time = $item_hour_record[1] . ':00';
+                            $item_hour_close_time = $item_hour_record[3] . ':00';
+
+                            if($item_hour_open_hour == 24)
+                            {
+                                $item_hour_open_time = '24:00:00';
+                            }
+
+                            if($item_hour_close_hour == 24)
+                            {
+                                $item_hour_close_time = '24:00:00';
+                            }
+
+
+                            $create_item_hour = new ItemHour(array(
+                                'item_id' => $new_item->id,
+                                'item_hour_day_of_week' => $item_hour_day_of_week,
+                                'item_hour_open_time' => $item_hour_open_time,
+                                'item_hour_close_time' => $item_hour_close_time,
+                                'item_hour_close_day_of_week' => $item_hour_close_day_of_week,
+                            ));
+                            $create_item_hour->save();
+
+
+
+
+                        }
                     }
+
                 }
             }
         }
@@ -2944,39 +2982,116 @@ class ItemController extends Controller
                 'item_hour_open_time_minute' => 'required|numeric|between:0,59',
                 'item_hour_close_time_hour' => 'required|numeric|between:0,24',
                 'item_hour_close_time_minute' => 'required|numeric|between:0,59',
+                'item_hour_close_day_of_week' => 'required|numeric|between:1,7',
+
             ]);
 
-            $item_hour_day_of_week = $request->item_hour_day_of_week;
+            $item_hour_day_of_week = intval($request->item_hour_day_of_week);
+            $item_hour_close_day_of_week = intval($request->item_close_day_of_week);
 
             $item_hour_open_time_hour = intval($request->item_hour_open_time_hour);
             $item_hour_close_time_hour = intval($request->item_hour_close_time_hour);
 
-            if($item_hour_open_time_hour <= $item_hour_close_time_hour)
+            if( $item_hour_close_day_of_week == 0) {
+
+                if($item_hour->item_hour_close_day_of_week != 0) {
+                    $item_hour_close_day_of_week  = $item_hour->item_hour_close_day_of_week; 
+                } else {
+                     $item_hour_close_day_of_week  = $item_hour->item_hour_day_of_week;
+                }
+
+                
+
+                \Session::flash('flash_message', 'close day is zero');
+
+            }
+
+            if( $item_hour_day_of_week == 0) {
+
+                if($item_hour->item_hour_day_of_week != 0) {
+                    $item_hour_day_of_week  = $item_hour->item_hour_day_of_week; 
+                } 
+
+                
+                //error
+                \Session::flash('flash_message', 'error');
+
+            }
+
+
+
+            $open_dw = $item_hour_day_of_week % 7;
+            $close_dw = $item_hour_close_day_of_week % 7;
+
+            if ($open_dw == $close_dw){
+
+                if($item_hour_open_time_hour <= $item_hour_close_time_hour)
+                {
+                    $item_hour_open_time = $request->item_hour_open_time_hour . ':' . $request->item_hour_open_time_minute . ':00';
+                    $item_hour_close_time = $request->item_hour_close_time_hour . ':' . $request->item_hour_close_time_minute . ':00';
+
+                    if($item_hour_open_time_hour == 24)
+                    {
+                        $item_hour_open_time = '24:00:00';
+                    }
+
+                    if($item_hour_close_time_hour == 24)
+                    {
+                        $item_hour_close_time = '24:00:00';
+                    }
+
+                    if($item_hour_open_time != $item_hour_close_time)
+                    {
+                        $item_hour->item_hour_day_of_week = $item_hour_day_of_week;
+                        $item_hour->item_hour_open_time = $item_hour_open_time;
+                        $item_hour->item_hour_close_time = $item_hour_close_time;
+                        $item_hour->save();
+                    }
+                } 
+
+                \Session::flash('flash_message', 'close day & open day is the same');
+                \Session::flash('flash_type', 'success');
+
+            }
+            else 
             {
-                $item_hour_open_time = $request->item_hour_open_time_hour . ':' . $request->item_hour_open_time_minute . ':00';
-                $item_hour_close_time = $request->item_hour_close_time_hour . ':' . $request->item_hour_close_time_minute . ':00';
+               
 
-                if($item_hour_open_time_hour == 24)
-                {
-                    $item_hour_open_time = '24:00:00';
-                }
+                if ($open_dw < $close_dw) {
 
-                if($item_hour_close_time_hour == 24)
-                {
-                    $item_hour_close_time = '24:00:00';
-                }
+                    $item_hour_open_time = $request->item_hour_open_time_hour . ':' . $request->item_hour_open_time_minute . ':00';
+                    $item_hour_close_time = $request->item_hour_close_time_hour . ':' . $request->item_hour_close_time_minute . ':00';
 
-                if($item_hour_open_time != $item_hour_close_time)
-                {
+                    if($item_hour_open_time_hour == 24)
+                    {
+                        $item_hour_open_time = '24:00:00';
+                    }
+
+                    if($item_hour_close_time_hour == 24)
+                    {
+                        $item_hour_close_time = '24:00:00';
+                    }
+
+
+
+
                     $item_hour->item_hour_day_of_week = $item_hour_day_of_week;
                     $item_hour->item_hour_open_time = $item_hour_open_time;
                     $item_hour->item_hour_close_time = $item_hour_close_time;
+                    $item_hour->item_hour_close_day_of_week = $item_hour->item_hour_close_day_of_week ;
                     $item_hour->save();
+
+                    \Session::flash('flash_message', 'saved');
+                    \Session::flash('flash_type', 'success');
+
                 }
+
+                 
+
             }
 
-            \Session::flash('flash_message', __('item_hour.alert.item-hour-updated'));
-            \Session::flash('flash_type', 'success');
+            // \Session::flash('flash_message', __('item_hour.alert.item-hour-updated'));
+            // \Session::flash('flash_type', 'success');
 
             return redirect()->route('admin.items.edit', ['item' => $item]);
         }

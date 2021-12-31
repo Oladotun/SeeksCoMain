@@ -484,8 +484,8 @@
                                         </select>
                                     </div>
                                     <div class="col-12 col-md-2">
-                                        <label for="item_close_day_of_week" class="text-black"> Close {{ __('item_hour.day-of-week') }}</label>
-                                        <select id="item_close_day_of_week" class="selectpicker form-control" name="item_hour_day_of_week" data-live-search="true">
+                                        <label for="item_hour_close_day_of_week" class="text-black"> Close {{ __('item_hour.day-of-week') }}</label>
+                                        <select id="item_hour_close_day_of_week" class="selectpicker form-control" name="item_hour_close_day_of_week" data-live-search="true">
                                             <option value="{{ \App\ItemHour::DAY_OF_WEEK_MONDAY }}">{{ __('item_hour.monday') }}</option>
                                             <option value="{{ \App\ItemHour::DAY_OF_WEEK_TUESDAY }}">{{ __('item_hour.tuesday') }}</option>
                                             <option value="{{ \App\ItemHour::DAY_OF_WEEK_WEDNESDAY }}">{{ __('item_hour.wednesday') }}</option>
@@ -1189,13 +1189,15 @@
 
                 var item_hour_day_of_week_text = $("#item_hour_day_of_week option:selected").text();
                 var item_hour_day_of_week_value = $("#item_hour_day_of_week").val();
+                var item_hour_close_day_of_week_text = $("#item_hour_close_day_of_week option:selected").text();
+                var item_hour_close_day_of_week_value = $("#item_hour_close_day_of_week").val();
                 var item_hour_open_time_open_hour = $("#item_hour_open_time_open_hour").val();
                 var item_hour_open_time_open_minute = $("#item_hour_open_time_open_minute").val();
                 var item_hour_open_time_close_hour = $("#item_hour_open_time_close_hour").val();
                 var item_hour_open_time_close_minute = $("#item_hour_open_time_close_minute").val();
 
-                var item_hours_value = item_hour_day_of_week_value + ' ' + item_hour_open_time_open_hour + ':' + item_hour_open_time_open_minute + ' ' + item_hour_open_time_close_hour + ':' + item_hour_open_time_close_minute;
-                var item_hour_span_text = item_hour_day_of_week_text + ' ' + item_hour_open_time_open_hour + ':' + item_hour_open_time_open_minute + '-' + item_hour_open_time_close_hour + ':' + item_hour_open_time_close_minute;
+                var item_hours_value = item_hour_day_of_week_value + ' ' + item_hour_open_time_open_hour + ':' + item_hour_open_time_open_minute + ' ' +item_hour_close_day_of_week_value +' ' + item_hour_open_time_close_hour + ':' + item_hour_open_time_close_minute;
+                var item_hour_span_text = item_hour_day_of_week_text + ' ' + item_hour_open_time_open_hour + ':' + item_hour_open_time_open_minute + '-' +item_hour_close_day_of_week_text +' '+ item_hour_open_time_close_hour + ':' + item_hour_open_time_close_minute;
 
                 $( "#open_hour_added_hours" ).append("<div class='col-12 col-md-3'><input type='hidden' name='item_hours[]' value='" + item_hours_value + "'>"+item_hour_span_text+"<a class='btn btn-sm text-danger bg-white' onclick='$(this).parent().remove();'><i class='far fa-trash-alt'></i></a></div>");
             });

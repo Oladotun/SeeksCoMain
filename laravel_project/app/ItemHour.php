@@ -31,6 +31,7 @@ class ItemHour extends Model
         'item_hour_day_of_week',
         'item_hour_open_time',
         'item_hour_close_time',
+        'item_hour_close_day_of_week',
     ];
 
     public function item()

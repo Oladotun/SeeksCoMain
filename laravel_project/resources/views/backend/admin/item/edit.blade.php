@@ -582,6 +582,18 @@
                                         </select>
                                     </div>
                                     <div class="col-12 col-md-2">
+                                        <label for="item_hour_close_day_of_week" class="text-black"> Close {{ __('item_hour.day-of-week') }}</label>
+                                        <select id="item_hour_close_day_of_week" class="selectpicker form-control" name="item_hour_close_day_of_week" data-live-search="true">
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_MONDAY }}">{{ __('item_hour.monday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_TUESDAY }}">{{ __('item_hour.tuesday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_WEDNESDAY }}">{{ __('item_hour.wednesday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_THURSDAY }}">{{ __('item_hour.thursday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_FRIDAY }}">{{ __('item_hour.friday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_SATURDAY }}">{{ __('item_hour.saturday') }}</option>
+                                            <option value="{{ \App\ItemHour::DAY_OF_WEEK_SUNDAY }}">{{ __('item_hour.sunday') }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-2">
                                         <label for="item_hour_open_time_close_hour" class="text-black">{{ __('item_hour.item-hour-close-hour') }}</label>
                                         <select id="item_hour_open_time_close_hour" class="selectpicker form-control" name="item_hour_open_time_close_hour" data-live-search="true">
                                             @for($full_hour=0; $full_hour<=24; $full_hour++)
@@ -622,7 +634,28 @@
                                             @elseif($item_hour->item_hour_day_of_week == \App\ItemHour::DAY_OF_WEEK_SUNDAY)
                                                 {{ __('item_hour.sunday') }}
                                             @endif
-                                            {{ substr($item_hour->item_hour_open_time, 0, -3) . '-' . substr($item_hour->item_hour_close_time, 0, -3) }}
+                                            {{ substr($item_hour->item_hour_open_time, 0, -3) . '-' }}
+
+
+                                            @if($item_hour->item_hour_close_day_of_week== \App\ItemHour::DAY_OF_WEEK_MONDAY)
+                                                {{ __('item_hour.monday') }}
+                                            @elseif($item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_TUESDAY)
+                                                {{ __('item_hour.tuesday') }}
+                                            @elseif($item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_WEDNESDAY)
+                                                {{ __('item_hour.wednesday') }}
+                                            @elseif($item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_THURSDAY)
+                                                {{ __('item_hour.thursday') }}
+                                            @elseif($item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_FRIDAY)
+                                                {{ __('item_hour.friday') }}
+                                            @elseif($item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_SATURDAY)
+                                                {{ __('item_hour.saturday') }}
+                                            @elseif($item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_SUNDAY)
+                                                {{ __('item_hour.sunday') }}
+                                            @endif
+
+                                            {{substr($item_hour->item_hour_close_time, 0, -3) }}
+
+                                            
                                             <a class="text-primary" href="#" data-toggle="modal" data-target="#editItemHourModal_{{ $item_hour->id }}">
                                                 <i class="far fa-edit"></i>
                                             </a>
@@ -1083,8 +1116,8 @@
                         @endphp
 
                         <div class="form-row mb-3 align-items-end">
-                            <div class="col-12 col-md-4">
-                                <label for="item_hour_day_of_week" class="text-black">{{ __('item_hour.day-of-week') }}</label>
+                            <div class="col-12 col-md-6">
+                                <label for="item_hour_day_of_week" class="text-black">Open {{ __('item_hour.day-of-week') }}</label>
                                 <select id="item_hour_day_of_week" class="selectpicker form-control" name="item_hour_day_of_week" data-live-search="true">
                                     <option value="{{ \App\ItemHour::DAY_OF_WEEK_MONDAY }}" {{ $item_hour->item_hour_day_of_week == \App\ItemHour::DAY_OF_WEEK_MONDAY ? 'selected' :'' }}>{{ __('item_hour.monday') }}</option>
                                     <option value="{{ \App\ItemHour::DAY_OF_WEEK_TUESDAY }}" {{ $item_hour->item_hour_day_of_week == \App\ItemHour::DAY_OF_WEEK_TUESDAY ? 'selected' :'' }}>{{ __('item_hour.tuesday') }}</option>
@@ -1109,6 +1142,19 @@
                                     @for($full_minute=0; $full_minute<=59; $full_minute++)
                                         <option value="{{ $full_minute }}" {{ $full_minute == $item_hour_open_time_minute ? 'selected' :'' }}>{{ $full_minute }}</option>
                                     @endfor
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="item_hour_close_day_of_week" class="text-black">Closed {{ __('item_hour.day-of-week') }}</label>
+                                <select id="item_hour_close_day_of_week" class="selectpicker form-control" name="item_hour_close_day_of_week" data-live-search="true">
+                                    <option value="{{ \App\ItemHour::DAY_OF_WEEK_MONDAY }}" {{ $item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_MONDAY ? 'selected' :'' }}>{{ __('item_hour.monday') }}</option>
+                                    <option value="{{ \App\ItemHour::DAY_OF_WEEK_TUESDAY }}" {{ $item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_TUESDAY ? 'selected' :'' }}>{{ __('item_hour.tuesday') }}</option>
+                                    <option value="{{ \App\ItemHour::DAY_OF_WEEK_WEDNESDAY }}" {{ $item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_WEDNESDAY ? 'selected' :'' }}>{{ __('item_hour.wednesday') }}</option>
+                                    <option value="{{ \App\ItemHour::DAY_OF_WEEK_THURSDAY }}" {{ $item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_THURSDAY ? 'selected' :'' }}>{{ __('item_hour.thursday') }}</option>
+                                    <option value="{{ \App\ItemHour::DAY_OF_WEEK_FRIDAY }}" {{ $item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_FRIDAY ? 'selected' :'' }}>{{ __('item_hour.friday') }}</option>
+                                    <option value="{{ \App\ItemHour::DAY_OF_WEEK_SATURDAY }}" {{ $item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_SATURDAY ? 'selected' :'' }}>{{ __('item_hour.saturday') }}</option>
+                                    <option value="{{ \App\ItemHour::DAY_OF_WEEK_SUNDAY }}" {{ $item_hour->item_hour_close_day_of_week == \App\ItemHour::DAY_OF_WEEK_SUNDAY ? 'selected' :'' }}>{{ __('item_hour.sunday') }}</option>
                                 </select>
                             </div>
                             <div class="col-12 col-md-2">
@@ -1767,13 +1813,15 @@
 
                 var item_hour_day_of_week_text = $("#item_hour_day_of_week option:selected").text();
                 var item_hour_day_of_week_value = $("#item_hour_day_of_week").val();
+                var item_hour_close_day_of_week_text = $("#item_hour_close_day_of_week option:selected").text();
+                var item_hour_close_day_of_week_value = $("#item_hour_close_day_of_week").val();
                 var item_hour_open_time_open_hour = $("#item_hour_open_time_open_hour").val();
                 var item_hour_open_time_open_minute = $("#item_hour_open_time_open_minute").val();
                 var item_hour_open_time_close_hour = $("#item_hour_open_time_close_hour").val();
                 var item_hour_open_time_close_minute = $("#item_hour_open_time_close_minute").val();
 
-                var item_hours_value = item_hour_day_of_week_value + ' ' + item_hour_open_time_open_hour + ':' + item_hour_open_time_open_minute + ' ' + item_hour_open_time_close_hour + ':' + item_hour_open_time_close_minute;
-                var item_hour_span_text = item_hour_day_of_week_text + ' ' + item_hour_open_time_open_hour + ':' + item_hour_open_time_open_minute + '-' + item_hour_open_time_close_hour + ':' + item_hour_open_time_close_minute;
+                var item_hours_value = item_hour_day_of_week_value + ' ' + item_hour_open_time_open_hour + ':' + item_hour_open_time_open_minute + ' ' + item_hour_close_day_of_week_value+ ' '+item_hour_open_time_close_hour + ':' + item_hour_open_time_close_minute;
+                var item_hour_span_text = item_hour_day_of_week_text + ' ' + item_hour_open_time_open_hour + ':' + item_hour_open_time_open_minute + '-' + item_hour_close_day_of_week_text + ' '+item_hour_open_time_close_hour + ':' + item_hour_open_time_close_minute;
 
                 $( "#open_hour_added_hours" ).append("<div class='col-12 col-md-3'><input type='hidden' name='item_hours[]' value='" + item_hours_value + "'>"+item_hour_span_text+"<a class='btn btn-sm text-danger bg-white' onclick='$(this).parent().remove();'><i class='far fa-trash-alt'></i></a></div>");
             });
