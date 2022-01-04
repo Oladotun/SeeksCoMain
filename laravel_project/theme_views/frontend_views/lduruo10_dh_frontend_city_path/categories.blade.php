@@ -359,6 +359,13 @@
     <script type="text/javascript">
         $('ul.pagination').hide();
         $(function() {
+
+            $('.jscroll').jscroll({
+                loadingHtml: '<img src="loading.gif" alt="Loading" /> Loading...',
+                padding: 20,
+                nextSelector: 'a.jscroll-next:last',
+                contentSelector: 'li'
+            });
             $('.scrolling-pagination').jscroll({
                 autoTrigger: true,
                 padding: 0,
