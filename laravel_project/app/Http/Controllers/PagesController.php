@@ -1250,8 +1250,8 @@ class PagesController extends Controller
 
     public function category(Request $request, string $category_slug)
     {
-        if(Auth::check())
-            {
+        // if(Auth::check())
+        //     {
                 $category = Category::where('category_slug', $category_slug)->first();
 
                 if($category)
@@ -1619,11 +1619,11 @@ class PagesController extends Controller
                 {
                     abort(404);
                 }
-        }
-        else {
+        // }
+        // else {
             
-            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
-        }
+        //     return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+        // }
     }
 
     public function categoryByState(Request $request, string $category_slug, string $state_slug)

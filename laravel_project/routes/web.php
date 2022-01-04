@@ -72,7 +72,8 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
 
     // Route::get('/categories', 'PagesController@categories')->name('page.categories')->middleware('verified');
     Route::get('/categories', 'PagesController@categories')->name('page.categories');
-    Route::get('/category/{category_slug}', 'PagesController@category')->name('page.category')->middleware('verified');
+    // Route::get('/category/{category_slug}', 'PagesController@category')->name('page.category')->middleware('verified');
+    Route::get('/category/{category_slug}', 'PagesController@category')->name('page.category');
     Route::get('/category/{category_slug}/state/{state_slug}', 'PagesController@categoryByState')->name('page.category.state');
     Route::get('/category/{category_slug}/state/{state_slug}/city/{city_slug}', 'PagesController@categoryByStateCity')->name('page.category.state.city');
 

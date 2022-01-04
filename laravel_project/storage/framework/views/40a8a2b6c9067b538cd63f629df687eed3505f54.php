@@ -773,7 +773,7 @@ unset($__errorArgs, $__bag); ?>
                                 </div>
                                 <div class="form-row mb-3 align-items-end">
                                     <div class="col-12 col-md-2">
-                                        <label for="item_hour_day_of_week" class="text-black"><?php echo e(__('item_hour.day-of-week')); ?></label>
+                                        <label for="item_hour_day_of_week" class="text-black"> Open <?php echo e(__('item_hour.day-of-week')); ?></label>
                                         <select id="item_hour_day_of_week" class="selectpicker form-control" name="item_hour_day_of_week" data-live-search="true">
                                             <option value="<?php echo e(\App\ItemHour::DAY_OF_WEEK_MONDAY); ?>"><?php echo e(__('item_hour.monday')); ?></option>
                                             <option value="<?php echo e(\App\ItemHour::DAY_OF_WEEK_TUESDAY); ?>"><?php echo e(__('item_hour.tuesday')); ?></option>
