@@ -41,6 +41,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Artesaos\SEOTools\Facades\SEOMeta;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Notifications\SavedBusinessListing;
 
 use Spatie\OpeningHours\OpeningHours;
 
@@ -4018,6 +4019,9 @@ class PagesController extends Controller
                     \Session::flash('flash_message', $url);
                     // \Session::flash('flash_message', __('frontend.item.save-item-success'));
                     \Session::flash('flash_type', 'success');
+
+                    //user.items.saved 
+                    $login_user->notify(new SavedBusinessListing($item, $login_user->isAdmin()));
 
                     return redirect()->route('page.item', $item->item_slug);
                 }
