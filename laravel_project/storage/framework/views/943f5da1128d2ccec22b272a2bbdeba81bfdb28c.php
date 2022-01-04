@@ -155,9 +155,11 @@ unset($__errorArgs, $__bag); ?>
 
                 <div class="row align-items-center">
                     <?php $__currentLoopData = $all_item_cities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_item_cities_key => $item_city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="col-8 col-lg-8">
-                            <a href="<?php echo e(route('page.city', ['state_slug' => $item_city->city->state->state_slug, 'city_slug' => $item_city->city->city_slug])); ?>"><?php echo e($item_city->city->city_name); ?>, (<?php echo e($item_city->city->items_count); ?>) </a>
-                        </div>
+                        <?php if($item_city->city->items_count > 50): ?>
+                            <div class="col-8 col-lg-8">
+                                <a href="<?php echo e(route('page.city', ['state_slug' => $item_city->city->state->state_slug, 'city_slug' => $item_city->city->city_slug])); ?>"><?php echo e($item_city->city->city_name); ?>, (<?php echo e($item_city->city->items_count); ?>) </a>
+                            </div>
+                        <?php endif; ?>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             <?php endif; ?>
