@@ -263,6 +263,7 @@ unset($__errorArgs, $__bag); ?>
                                     <?php endif; ?>
 
                                     <h5><?php echo e($category->category_name); ?></h5>
+                                    <span class="number"><?php echo e(number_format(count($category->getItemIdsByCategoryIds([$category->id])))); ?></span>
                                 </a>
                             </div>
                         </div>

@@ -208,6 +208,7 @@
                                     @endif
 
                                     <h5>{{ $category->category_name }}</h5>
+                                    <span class="number">{{ number_format(count($category->getItemIdsByCategoryIds([$category->id]))) }}</span>
                                 </a>
                             </div>
                         </div>
