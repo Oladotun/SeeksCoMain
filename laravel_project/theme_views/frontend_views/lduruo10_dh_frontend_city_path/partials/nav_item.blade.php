@@ -18,7 +18,7 @@
                     @endforeach
                 </a>
             @else
-                <a  class="navbar-brand custom-site-logo" href="{{ route('page.home') }}">
+                <a  class="d-none d-sm-block navbar-brand custom-site-logo" href="{{ route('page.home') }}">
                     <img  src="{{ Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo) }}" alt="{{ empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name }}" style="opacity: 0;">
                 </a>
 
@@ -32,8 +32,12 @@
 
                 </a>
                 <!-- <p>{{ __('frontend.homepage.description') }}</p> -->
-                <a  class="d-block d-sm-none " href="{{ route('page.home') }}">
-                    <strong class="lead">SeeksCo</strong>
+                <div class="d-block d-sm-none col-2"><strong style="opacity: 0;">hhhhhh</strong>
+                    </div>
+
+                <a  class="d-block d-sm-none custom-site-logo" href="{{ route('page.home') }}">
+                    <img  src="{{ Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo) }}" alt="{{ empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name }}"></div>
+
                 </a>
             @endif
             <!-- class="header__logo custom-site-logo"  -->
