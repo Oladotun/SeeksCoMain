@@ -1,4 +1,4 @@
-<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12" style="background-color:#b6d5f6;">
             <form method="GET" action="<?php echo e(route('page.categories')); ?>">
 
 

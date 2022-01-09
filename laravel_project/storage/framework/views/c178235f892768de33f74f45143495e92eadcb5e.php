@@ -10,7 +10,7 @@
 <?php $__env->startSection('content'); ?>
 
     <!-- Filter Begin Changed to previous examples -->
-    <div class="container-fluid">
+    <div class="container-fluid" style="background-color: #e3f2fd;">
         
         <div class="row" >
             <div class="col-sm-12 col-md-4 col-lg-3">

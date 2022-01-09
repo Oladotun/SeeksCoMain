@@ -42,9 +42,10 @@
     
      body {
         padding-top: 60px;
+        /*background-color: #C7F6FF;*/
       }
 
-
+     
     /*body {
       padding-top: 20px;
     }
@@ -54,11 +55,12 @@
       }
     }*/
 
-    .custom-site-logo img { max-height: 130px; }
-    .nav {position: sticky}
+    .custom-site-logo img { max-height: 120px; }
+    .nav {position: sticky;}
+
     /*.filter {margin-top: 4%; height: auto;}*/
     /*.listing {margin-top: 0%;}*/
-    .filter {padding-top: 160px; height: auto;}
+    .filter {padding-top: 160px; height: auto;margin-top:3%;}
     .h5{word-wrap: break-word;}
     @media only screen and (min-width: 992px) and (max-width: 1112px) {
         /*.listing {padding-top: 30%;}*/
@@ -74,7 +76,7 @@
         /*.container-fluid {position: absolute;}*/
         .listing { padding-top: 110px; padding-left: 60px;}
 
-        .filter {padding-top: 160px; height: auto;}
+        .filter {padding-top: 160px; height: auto; }
         .card-columns {
            
             column-count: 2;

@@ -1,4 +1,4 @@
-<div class="filter nice-scroll col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="filter nice-scroll col-xs-12 col-sm-12 col-md-12 col-lg-12" style="background-color:#b6d5f6;">
     <form method="GET" action="<?php echo e(route('page.category', ['category_slug' => $category->category_slug])); ?>">
         <div class="filter__title">
             <h5><i class="fas fa-filter"></i> <?php echo e(__('theme_directory_hub.filter-filter-by')); ?></h5>

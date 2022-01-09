@@ -14,7 +14,7 @@
 <?php $__env->startSection('content'); ?>
 
     <!-- Filter Begin -->
-    <div class="container-fluid">
+    <div class="container-fluid"  style="background-color: #e3f2fd;">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
         <div class="row" >
             <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">

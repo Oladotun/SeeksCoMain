@@ -1,7 +1,7 @@
 <!-- Header Section Begin -->
 <header class="header">
     <!-- Image and text -->
-    <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-white font-weight-bold justify-content-between justify-content-lg-between justify-content-xl-between">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light font-weight-bold justify-content-between justify-content-lg-between justify-content-xl-between" style="background-color: #e3f2fd;">
       <!-- <a class="navbar-brand" href="#"> -->
 
         <!-- <div class="header__logo custom-site-logo"> -->
@@ -19,13 +19,15 @@
                 </a>
             @else
                 <a  class="navbar-brand custom-site-logo" href="{{ route('page.home') }}">
-                    <img  src="{{ Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo) }}" alt="{{ empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name }}">
+                    <img  src="{{ Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo) }}" alt="{{ empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name }}" style="opacity: 0;">
                 </a>
 
                 <!-- <a  class="d-none d-sm-block d-lg-none " href="{{ route('page.home') }}">  --> <!--show only on medium screen SeeksCo -->
-                <a  class="d-none d-sm-block"   href="{{ route('page.home') }}"> 
-                    <div class="col-12" style="text-align: center;"><strong class="display-4" >SeeksCo</strong></div>
-                    <div class="col-12"><strong class="display-7" style="text-align: center;">{{ __('frontend.homepage.title') }}</strong>
+                <a  class="d-none d-sm-block align-self-center "   href="{{ route('page.home') }}"> 
+                    <div class="col-12 navbar-brand custom-site-logo" style="text-align: center;">
+                        <img  src="{{ Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo) }}" alt="{{ empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name }}"></div>
+
+                    <div class="col-12"><strong class="display-7" style="text-align: center; color: black;">{{ __('frontend.homepage.title') }}</strong>
                         </div>
 
                 </a>
