@@ -11,10 +11,10 @@
 <?php $__env->startSection('content'); ?>
 
     <!-- Filter Begin -->
-    <div class="container-fluid">
+    <div class="container-fluid" style="background-color: #e3f2fd;">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
         <div class="row">
-            <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
+            <div class="col-sm-12 col-md-4 col-lg-3">
                 <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
             </div>
     <!-- <div class="filter nice-scroll">
