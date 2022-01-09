@@ -279,7 +279,7 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
                 <div class="scrolling-pagination">
-                    <div class="card-columns">
+                    <div class="grid row mb-4">
 
                         <?php if($ads_before_content->count() > 0): ?>
                             <?php $__currentLoopData = $ads_before_content; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_content_key => $ad_before_content): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>

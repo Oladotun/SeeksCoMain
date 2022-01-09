@@ -8,6 +8,9 @@
 
     <link href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.css') }}" rel="stylesheet" />
 
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.js"></script>
+
 @endsection
 
 @section('content')
@@ -195,10 +198,10 @@
             @endif -->
 
             @if($categories->count() > 0)
-                <div class="row mb-4">
+                <div class="grid row mb-4">
                     @foreach($categories as $categories_key => $category)
-                        <div class="col-6 col-md-4 col-lg-2 pr-0">
-                            <div class="categories__item categories__item_sm">
+                        <div class="grid-item .grid-item--width2 col-2 pr-0" style="">
+                            <div class=" rounded-circle categories__item categories__item_sm">
                                 <a href="{{ route('page.category', $category->category_slug) }}">
 
                                     @if($category->category_icon)
@@ -207,8 +210,8 @@
                                         <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="fas fa-heart"></i></span>
                                     @endif
 
-                                    <h5>{{ $category->category_name }}</h5>
-                                    <span class="number">{{ number_format(count($category->getItemIdsByCategoryIds([$category->id]))) }}</span>
+                                    <dt class="text-wrap"> <small class="font-weight-bold">{{ $category->category_name }}</small></dt>
+                                    <small class="number">{{ number_format(count($category->getItemIdsByCategoryIds([$category->id]))) }}</small>
                                 </a>
                             </div>
                         </div>
@@ -237,7 +240,7 @@
                 </div>
             </div>
         <div class="scrolling-pagination">
-            <div class="card-columns">
+            <div class="grid row mb-4">
 
                 <!-- @if($ads_before_content->count() > 0)
                     @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)

@@ -6,6 +6,9 @@
 
     <link href="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.css')); ?>" rel="stylesheet" />
 
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.js"></script>
+
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -250,10 +253,10 @@ unset($__errorArgs, $__bag); ?>
             <?php endif; ?> -->
 
             <?php if($categories->count() > 0): ?>
-                <div class="row mb-4">
+                <div class="grid row mb-4">
                     <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categories_key => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="col-6 col-md-4 col-lg-2 pr-0">
-                            <div class="categories__item categories__item_sm">
+                        <div class="grid-item .grid-item--width2 col-2 pr-0" style="">
+                            <div class=" rounded-circle categories__item categories__item_sm">
                                 <a href="<?php echo e(route('page.category', $category->category_slug)); ?>">
 
                                     <?php if($category->category_icon): ?>
@@ -262,8 +265,8 @@ unset($__errorArgs, $__bag); ?>
                                         <span class="custom-icon custom-color-schema-<?php echo e($categories_key%10); ?>"><i class="fas fa-heart"></i></span>
                                     <?php endif; ?>
 
-                                    <h5><?php echo e($category->category_name); ?></h5>
-                                    <span class="number"><?php echo e(number_format(count($category->getItemIdsByCategoryIds([$category->id])))); ?></span>
+                                    <dt class="text-wrap"> <small class="font-weight-bold"><?php echo e($category->category_name); ?></small></dt>
+                                    <small class="number"><?php echo e(number_format(count($category->getItemIdsByCategoryIds([$category->id])))); ?></small>
                                 </a>
                             </div>
                         </div>
@@ -297,7 +300,7 @@ unset($__errorArgs, $__bag); ?>
                 </div>
             </div>
         <div class="scrolling-pagination">
-            <div class="card-columns">
+            <div class="grid row mb-4">
 
                 <!-- <?php if($ads_before_content->count() > 0): ?>
                     <?php $__currentLoopData = $ads_before_content; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_content_key => $ad_before_content): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>

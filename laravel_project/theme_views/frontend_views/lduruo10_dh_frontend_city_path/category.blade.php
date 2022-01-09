@@ -219,7 +219,7 @@
                     </div>
                 </div>
                 <div class="scrolling-pagination">
-                    <div class="card-columns">
+                    <div class="grid row mb-4">
 
                         @if($ads_before_content->count() > 0)
                             @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)
