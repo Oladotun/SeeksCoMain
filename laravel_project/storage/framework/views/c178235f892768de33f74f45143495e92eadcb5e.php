@@ -13,7 +13,7 @@
     <div class="container-fluid">
         
         <div class="row" >
-            <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
+            <div class="col-sm-12 col-md-4 col-lg-3">
             <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.listingcategoriesfilter', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
             </div>
             <!-- <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-4 col-lg-2">
@@ -149,7 +149,7 @@ unset($__errorArgs, $__bag); ?>
             <!-- Filter End -->
 
             <!-- Listing Section Begin -->
-            <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-top: 15%;">
+            <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9">
 
                 <?php if($ads_before_breadcrumb->count() > 0): ?>
                     <?php $__currentLoopData = $ads_before_breadcrumb; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_breadcrumb_key => $ad_before_breadcrumb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -203,7 +203,7 @@ unset($__errorArgs, $__bag); ?>
 
                 <?php if($ads_after_breadcrumb->count() > 0): ?>
                     <?php $__currentLoopData = $ads_after_breadcrumb; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_after_breadcrumb_key => $ad_after_breadcrumb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="row mb-5">
+                        <div class="grid row mb-5">
                             <?php if($ad_after_breadcrumb->advertisement_alignment == \App\Advertisement::AD_ALIGNMENT_LEFT): ?>
                                 <div class="col-12 text-left">
                                     <div>
@@ -232,10 +232,10 @@ unset($__errorArgs, $__bag); ?>
                 <?php endif; ?>
 
                 <?php if($children_categories->count() > 0): ?>
-                    <div class="row mb-4">
+                    <div class="grid row  mb-4">
                         <?php $__currentLoopData = $children_categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $children_categories_key => $children_category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="col-12 col-md-6 col-lg-3 pr-0">
-                                <div class="categories__item categories__item_sm">
+                            <div class="grid-item .grid-item--width2 col-2 pr-0">
+                                <div class="rounded-circle categories__item categories__item_sm">
                                     <a href="<?php echo e(route('page.category', $children_category->category_slug)); ?>">
 
                                         <?php if($children_category->category_icon): ?>
