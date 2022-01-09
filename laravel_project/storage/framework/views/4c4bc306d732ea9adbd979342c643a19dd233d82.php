@@ -2287,11 +2287,11 @@ unset($__errorArgs, $__bag); ?>
                                     <div class="listing__item">
                                         <a href="<?php echo e(route('page.item', $similar_item->item_slug)); ?>">
                                             <div class="listing__item__pic set-bg" data-setbg="<?php echo e(!empty($similar_item->item_image_medium) ? Storage::disk('public')->url('item/' . $similar_item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp')); ?>">
-                                                <?php if(empty($similar_item->user->user_image)): ?>
+                                                <!-- <?php if(empty($similar_item->user->user_image)): ?>
                                                     <img src="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($similar_item->user->id % 10) . '.webp')); ?>" alt="">
                                                 <?php else: ?>
                                                     <img src="<?php echo e(Storage::disk('public')->url('user/' . $similar_item->user->user_image)); ?>" alt="<?php echo e($similar_item->user->name); ?>">
-                                                <?php endif; ?>
+                                                <?php endif; ?> -->
                                             </div>
                                         </a>
                                         <div class="listing__item__text">
@@ -2385,10 +2385,10 @@ unset($__errorArgs, $__bag); ?>
                                         <a href="<?php echo e(route('page.item', $nearby_item->item_slug)); ?>">
                                             <div class="listing__item__pic set-bg" data-setbg="<?php echo e(!empty($nearby_item->item_image_medium) ? Storage::disk('public')->url('item/' . $nearby_item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp')); ?>">
                                                 <?php if(empty($nearby_item->user->user_image)): ?>
-                                                    <img src="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($nearby_item->user->id % 10) . '.webp')); ?>" alt="">
+                                                <!--     <img src="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($nearby_item->user->id % 10) . '.webp')); ?>" alt="">
                                                 <?php else: ?>
                                                     <img src="<?php echo e(Storage::disk('public')->url('user/' . $nearby_item->user->user_image)); ?>" alt="<?php echo e($nearby_item->user->name); ?>">
-                                                <?php endif; ?>
+                                                <?php endif; ?> -->
                                             </div>
                                         </a>
                                         <div class="listing__item__text">

@@ -64,7 +64,7 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
     // Route::get('/', 'PagesController@index')->name('page.home');
     Route::get('/', 'PagesController@categories')->name('page.home');
 
-    Route::get('/search', 'PagesController@search')->name('page.search')->middleware('verified');
+    Route::get('/search', 'PagesController@search')->name('page.search');
 
     Route::get('/about', 'PagesController@about')->name('page.about');
     Route::get('/contact', 'PagesController@contact')->name('page.contact');
@@ -80,7 +80,7 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
     Route::get('/state/{state_slug}', 'PagesController@state')->name('page.state');
     Route::get('/state/{state_slug}/city/{city_slug}', 'PagesController@city')->name('page.city');
 
-    Route::get('/listing/{item_slug}', 'PagesController@item')->name('page.item')->middleware('verified');
+    Route::get('/listing/{item_slug}', 'PagesController@item')->name('page.item');
     Route::get('/listing/{item_slug}/product/{product_slug}', 'PagesController@product')->name('page.product');
 
     Route::middleware(['auth'])->group(function () {

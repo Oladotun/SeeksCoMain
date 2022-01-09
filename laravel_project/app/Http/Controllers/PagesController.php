@@ -238,10 +238,11 @@ class PagesController extends Controller
 
     public function search(Request $request)
     {
-        if (Auth::check())
-        {
+    
             $settings = app('site_global_settings');
             $site_prefer_country_id = app('site_prefer_country_id');
+
+            $request = request();
 
             /**
              * Start SEO
@@ -257,6 +258,7 @@ class PagesController extends Controller
             /**
              * Start filter
              */
+
             $search_query = empty($request->search_query) ? null : $request->search_query;
             $search_values = !empty($search_query) ? preg_split('/\s+/', $search_query, -1, PREG_SPLIT_NO_EMPTY) : array();
 
@@ -569,6 +571,8 @@ class PagesController extends Controller
                 $all_cities = $state->cities()->orderBy('city_name')->get();
             }
 
+
+
             $total_results = $total_paid_items + $total_free_items;
             /**
              * End initial filter
@@ -598,6 +602,44 @@ class PagesController extends Controller
              * End homepage header customization
              */
 
+            $subscription_obj = new Subscription();
+
+            $active_user_ids = $subscription_obj->getActiveUserIds();
+
+
+             $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);  
+             $total_results = $total_paid_items + $total_free_items;
+
+             $item_select_city_query = Item::query();
+             $item_select_city_query->select('items.city_id')
+                 ->where("items.item_status", Item::ITEM_PUBLISHED)
+                 ->whereIn('items.user_id', $active_user_ids)
+                 ->groupBy('items.city_id')
+                 ->with(['city' => function($query) { 
+                    // $query->sum('quantity');
+                    $query->withCount('items')
+                    ->with('state'); // without `order_id`
+                }])
+                 ;
+
+            $all_states = Country::find($site_prefer_country_id)
+                ->states()
+                ->withCount(['items' => function($query) {
+                    $query->where("items.item_status", Item::ITEM_PUBLISHED);
+                }
+
+            ])->orderBy('state_name')
+                ->get();
+
+             // ]);
+            //      ->with('city' => function($query) { 
+            //     // $query->sum('quantity');
+            //     $query->withCount(['items']); // without `order_id`
+            // }]);
+                 // ->withCount(['city.items']);
+                 // ->withCount('city.items_id');
+
+            $all_item_cities = $item_select_city_query->get();
             /**
              * Start initial blade view file path
              */
@@ -606,6 +648,16 @@ class PagesController extends Controller
             /**
              * End initial blade view file path
              */
+            $request_check = false;
+            if ($request){
+
+                $request_check = $request["GET_/categories?search_query"];
+
+                // $request_check = $request[1];
+                // $search_query = 'espresso';
+                
+            }
+
 
             return response()->view($theme_view_path . 'search',
                 compact('ads_before_breadcrumb', 'ads_after_breadcrumb', 'ads_before_content', 'ads_after_content',
@@ -613,11 +665,8 @@ class PagesController extends Controller
                         'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
                         'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color',
                         'search_query', 'filter_categories', 'filter_state', 'filter_city', 'filter_sort_by', 'paid_items',
-                        'free_items', 'pagination', 'all_printable_categories', 'all_states', 'all_cities', 'total_results'));
-        }else {
-            
-            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
-        }
+                        'free_items', 'pagination', 'all_printable_categories', 'all_states', 'all_cities', 'total_results','all_item_cities', 'request', 'request_check'));
+        
     }
 
 
@@ -925,6 +974,14 @@ class PagesController extends Controller
          * 4. run query and render
          */
 
+        // filter search query
+        $search_query = empty($request->search_query) ? null : $request->search_query;
+        $search_values = !empty($search_query) ? preg_split('/\s+/', $search_query, -1, PREG_SPLIT_NO_EMPTY) : array();
+
+        if ($search_query) {
+            return $this->search($request);
+        }
+
         // paid listing
         $paid_items_query = Item::query();
 
@@ -962,8 +1019,7 @@ class PagesController extends Controller
 
                 $query->whereIn('items.user_id', $paid_user_ids)
                     ->orWhere('items.item_featured_by_admin', Item::ITEM_FEATURED_BY_ADMIN);
-            });
-
+            });        
         // filter paid listings state
         if(!empty($filter_state))
         {
@@ -3320,7 +3376,7 @@ class PagesController extends Controller
     public function item(Request $request, string $item_slug)
     {
         
-        if (Auth::check()) {
+        // if (Auth::check()) {
         
             $settings = app('site_global_settings');
 
@@ -3746,11 +3802,11 @@ class PagesController extends Controller
             {
                 abort(404);
             }
-        }
-        else {
+        // }
+        // else {
             
-            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
-        }
+        //     return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+        // }
     }
 
     public function storeItemLead(Request $request, string $item_slug)

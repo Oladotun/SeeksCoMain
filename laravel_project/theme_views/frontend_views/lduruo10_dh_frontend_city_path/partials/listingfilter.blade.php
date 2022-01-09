@@ -1,7 +1,32 @@
 <div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <form method="GET" action="{{ route('page.categories') }}">
+
+
                 <div class="filter__title">
                     <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <label for="search_query" class="text-black">{{ __('frontend.search.search') }}</label>
+                        <input id="search_query" type="text" class="form-control @error('search_query') is-invalid @enderror" name="search_query" value="{{isset($search_query) ? $search_query : ''}}">
+                        @error('search_query')
+                        <span class="invalid-tooltip">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+
+                    
+
+                    @if(!empty($request_check))
+
+                            @php
+                               var_dump($request_check);
+                           @endphp
+                       
+                        
+                    @endif
                 </div>
                 <div class="filter__select">
                     <select class="selectpicker @error('filter_state') is-invalid @enderror" name="filter_state" id="filter_state" data-live-search="true">
@@ -109,14 +134,3 @@
 
             <!-- @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width') -->
         </div>
-
-
-
-        <script>
-            $(document).ready(function(){
-
-                "use strict";
-
-                
-            }
-        </script>

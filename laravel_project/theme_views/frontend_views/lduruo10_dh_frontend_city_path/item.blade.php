@@ -2110,11 +2110,11 @@
                                     <div class="listing__item">
                                         <a href="{{ route('page.item', $similar_item->item_slug) }}">
                                             <div class="listing__item__pic set-bg" data-setbg="{{ !empty($similar_item->item_image_medium) ? Storage::disk('public')->url('item/' . $similar_item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
-                                                @if(empty($similar_item->user->user_image))
+                                                <!-- @if(empty($similar_item->user->user_image))
                                                     <img src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($similar_item->user->id % 10) . '.webp') }}" alt="">
                                                 @else
                                                     <img src="{{ Storage::disk('public')->url('user/' . $similar_item->user->user_image) }}" alt="{{ $similar_item->user->name }}">
-                                                @endif
+                                                @endif -->
                                             </div>
                                         </a>
                                         <div class="listing__item__text">
@@ -2203,10 +2203,10 @@
                                         <a href="{{ route('page.item', $nearby_item->item_slug) }}">
                                             <div class="listing__item__pic set-bg" data-setbg="{{ !empty($nearby_item->item_image_medium) ? Storage::disk('public')->url('item/' . $nearby_item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">
                                                 @if(empty($nearby_item->user->user_image))
-                                                    <img src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($nearby_item->user->id % 10) . '.webp') }}" alt="">
+                                                <!--     <img src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/profile-'. intval($nearby_item->user->id % 10) . '.webp') }}" alt="">
                                                 @else
                                                     <img src="{{ Storage::disk('public')->url('user/' . $nearby_item->user->user_image) }}" alt="{{ $nearby_item->user->name }}">
-                                                @endif
+                                                @endif -->
                                             </div>
                                         </a>
                                         <div class="listing__item__text">

@@ -1,7 +1,46 @@
 <div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <form method="GET" action="<?php echo e(route('page.categories')); ?>">
+
+
                 <div class="filter__title">
                     <h5><i class="fas fa-filter"></i> <?php echo e(__('theme_directory_hub.filter-filter-by')); ?></h5>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <label for="search_query" class="text-black"><?php echo e(__('frontend.search.search')); ?></label>
+                        <input id="search_query" type="text" class="form-control <?php $__errorArgs = ['search_query'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" name="search_query" value="<?php echo e(isset($search_query) ? $search_query : ''); ?>">
+                        <?php $__errorArgs = ['search_query'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <span class="invalid-tooltip">
+                            <strong><?php echo e($message); ?></strong>
+                        </span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    </div>
+
+                    
+
+                    <?php if(!empty($request_check)): ?>
+
+                            <?php
+                               var_dump($request_check);
+                           ?>
+                       
+                        
+                    <?php endif; ?>
                 </div>
                 <div class="filter__select">
                     <select class="selectpicker <?php $__errorArgs = ['filter_state'];
@@ -165,15 +204,4 @@ unset($__errorArgs, $__bag); ?>
             <?php endif; ?>
 
             <!-- <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> -->
-        </div>
-
-
-
-        <script>
-            $(document).ready(function(){
-
-                "use strict";
-
-                
-            }
-        </script><?php /**PATH /var/www/seekscodirectory/laravel_project/theme_views/frontend_views/lduruo10_dh_frontend_city_path/partials/listingfilter.blade.php ENDPATH**/ ?>
+        </div><?php /**PATH /var/www/seekscodirectory/laravel_project/theme_views/frontend_views/lduruo10_dh_frontend_city_path/partials/listingfilter.blade.php ENDPATH**/ ?>
