@@ -1330,6 +1330,16 @@ class PagesController extends Controller
                     /**
                      * Get parent and children categories
                      */
+
+                    // filter search query
+                    $search_query = empty($request->search_query) ? null : $request->search_query;
+                    $search_values = !empty($search_query) ? preg_split('/\s+/', $search_query, -1, PREG_SPLIT_NO_EMPTY) : array();
+
+                    if ($search_query) {
+                        return $this->search($request);
+                    }
+
+                    
                     $parent_categories = $category->allParents();
 
                     // get one level down sub-categories
@@ -1377,6 +1387,8 @@ class PagesController extends Controller
                     // state & city
                     $filter_state = empty($request->filter_state) ? null : $request->filter_state;
                     $filter_city = empty($request->filter_city) ? null : $request->filter_city;
+
+
                     /**
                      * End filter for paid listing
                      */

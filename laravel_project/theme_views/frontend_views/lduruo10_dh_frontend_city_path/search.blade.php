@@ -144,7 +144,7 @@
                                 {{ __('frontend.shared.home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item"><a href="{{ route('page.categories') }}">{{ __('frontend.item.all-categories') }}</a></li>
+                        <!-- <li class="breadcrumb-item"><a href="{{ route('page.categories') }}">{{ __('frontend.item.all-categories') }}</a></li> -->
                         <li class="breadcrumb-item active" aria-current="page">{{ __('frontend.search.title-search') }}</li>
                     </ol>
                 </nav>

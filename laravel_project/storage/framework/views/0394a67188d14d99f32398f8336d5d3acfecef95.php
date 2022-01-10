@@ -196,7 +196,7 @@ unset($__errorArgs, $__bag); ?>
 
                             </a>
                         </li>
-                        <li class="breadcrumb-item"><a href="<?php echo e(route('page.categories')); ?>"><?php echo e(__('frontend.item.all-categories')); ?></a></li>
+                        <!-- <li class="breadcrumb-item"><a href="<?php echo e(route('page.categories')); ?>"><?php echo e(__('frontend.item.all-categories')); ?></a></li> -->
                         <li class="breadcrumb-item active" aria-current="page"><?php echo e(__('frontend.search.title-search')); ?></li>
                     </ol>
                 </nav>
