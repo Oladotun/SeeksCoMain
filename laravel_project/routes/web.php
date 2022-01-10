@@ -66,9 +66,9 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
 
     Route::get('/search', 'PagesController@search')->name('page.search');
 
-    Route::get('/about', 'PagesController@about')->name('page.about');
-    Route::get('/contact', 'PagesController@contact')->name('page.contact');
-    Route::post('/contact', 'PagesController@doContact')->name('page.contact.do');
+    Route::get('/about', 'PagesController@about')->name('page.about')->middleware('verified');
+    Route::get('/contact', 'PagesController@contact')->name('page.contact')->middleware('verified');;
+    Route::post('/contact', 'PagesController@doContact')->name('page.contact.do')->middleware('verified');;
 
     // Route::get('/categories', 'PagesController@categories')->name('page.categories')->middleware('verified');
     Route::get('/categories', 'PagesController@categories')->name('page.categories');
@@ -92,7 +92,7 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
 
     Route::post('/items/{item_slug}/lead/store', 'PagesController@storeItemLead')->name('page.item.lead.store');
 
-    Route::get('/pricing', 'PagesController@pricing')->name('page.pricing');
+    Route::get('/pricing', 'PagesController@pricing')->name('page.pricing')->middleware('verified');;
     Route::get('/terms-of-service', 'PagesController@termsOfService')->name('page.terms-of-service');
     Route::get('/privacy-policy', 'PagesController@privacyPolicy')->name('page.privacy-policy');
 
