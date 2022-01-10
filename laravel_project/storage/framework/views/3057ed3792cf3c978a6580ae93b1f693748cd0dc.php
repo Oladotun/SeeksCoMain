@@ -60,7 +60,16 @@
 
     /*.filter {margin-top: 4%; height: auto;}*/
     /*.listing {margin-top: 0%;}*/
-    .filter {padding-top: 160px; height: auto;margin-top:3%;}
+    .filter {
+        padding-top: 160px; 
+        height: auto;
+        margin-top:3%;
+        transition: all .3s;
+    }
+
+    .filter.active {
+        left: 0;
+    }
     .h5{word-wrap: break-word;}
     @media  only screen and (min-width: 992px) and (max-width: 1112px) {
         /*.listing {padding-top: 30%;}*/

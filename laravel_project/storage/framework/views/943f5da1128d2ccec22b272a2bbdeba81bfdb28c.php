@@ -1,4 +1,7 @@
-<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12" style="background-color:#b6d5f6;">
+<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12"  style="background-color:#b6d5f6;">
+           <!--  <button type="button"  class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+             </button> -->
             <form method="GET" action="<?php echo e(route('page.categories')); ?>">
 
 
@@ -31,16 +34,7 @@ endif;
 unset($__errorArgs, $__bag); ?>
                     </div>
 
-                    
-
-                    <?php if(!empty($request_check)): ?>
-
-                            <?php
-                               var_dump($request_check);
-                           ?>
-                       
-                        
-                    <?php endif; ?>
+        
                 </div>
                 <div class="filter__select">
                     <select class="selectpicker <?php $__errorArgs = ['filter_state'];

@@ -165,6 +165,23 @@
 
         <?php endif; ?>
 
+
+        $('.open-menu').on('click', function(e) {
+                e.preventDefault();
+                $('.filter').addClass('active');
+                // $('.overlay').addClass('active');
+                // close opened sub-menus
+                // $('.collapse.show').toggleClass('show');
+                // $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+            });
+
+        $('.close').on('click', function() {
+                $('.filter').removeClass('active');
+            });
+
+    
+
+
     });
 </script>
 

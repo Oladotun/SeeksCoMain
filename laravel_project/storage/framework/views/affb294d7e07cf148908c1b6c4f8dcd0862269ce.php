@@ -3,6 +3,34 @@
         <div class="filter__title">
             <h5><i class="fas fa-filter"></i> <?php echo e(__('theme_directory_hub.filter-filter-by')); ?></h5>
         </div>
+
+        <div class="row form-group">
+            <div class="col-md-12">
+                <label for="search_query" class="text-black"><?php echo e(__('frontend.search.search')); ?></label>
+                <input id="search_query" type="text" class="form-control <?php $__errorArgs = ['search_query'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" name="search_query" value="<?php echo e(isset($search_query) ? $search_query : ''); ?>">
+                <?php $__errorArgs = ['search_query'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <span class="invalid-tooltip">
+                    <strong><?php echo e($message); ?></strong>
+                </span>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+            </div>
+
+        
+        </div>
         <div class="filter__select">
             <select class="selectpicker <?php $__errorArgs = ['filter_state'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');

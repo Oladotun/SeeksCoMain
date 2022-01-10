@@ -1,4 +1,4 @@
-<div class="grid-item col-md-3">
+<div class="grid-item col-md-6 col-lg-3">
     <div class="card">
         <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
           <img class="card-img-top border-primary" src="<?php echo e(!empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp')); ?>" alt="Listing Image">

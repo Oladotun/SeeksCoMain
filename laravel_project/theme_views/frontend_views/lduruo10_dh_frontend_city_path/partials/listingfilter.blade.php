@@ -1,4 +1,7 @@
-<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12" style="background-color:#b6d5f6;">
+<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12"  style="background-color:#b6d5f6;">
+           <!--  <button type="button"  class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+             </button> -->
             <form method="GET" action="{{ route('page.categories') }}">
 
 
@@ -17,16 +20,7 @@
                         @enderror
                     </div>
 
-                    
-
-                    @if(!empty($request_check))
-
-                            @php
-                               var_dump($request_check);
-                           @endphp
-                       
-                        
-                    @endif
+        
                 </div>
                 <div class="filter__select">
                     <select class="selectpicker @error('filter_state') is-invalid @enderror" name="filter_state" id="filter_state" data-live-search="true">

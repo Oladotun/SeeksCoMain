@@ -19,7 +19,8 @@
     <div class="container-fluid"  style="background-color: #e3f2fd;">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
         <div class="row" >
-            <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+            <div class="collapse" id="collapseOne"  data-parent="#accordion">
+
             @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter')
 
 
@@ -122,7 +123,7 @@
 
 
         <!-- Listing Section Begin -->
-        <section class="listing nice-scroll col-xs-8 col-sm-8 col-md-9 col-lg-9" >
+        <section class="listing nice-scroll col-12" >
 
 
 
@@ -200,7 +201,7 @@
             @if($categories->count() > 0)
                 <div class="grid row mb-4">
                     @foreach($categories as $categories_key => $category)
-                        <div class="grid-item .grid-item--width2 col-2 pr-0" style="">
+                        <div class="grid-item .grid-item--width2 col-4 col-md-3 col-lg-2 col-xl-2 pr-0" style="">
                             <div class=" rounded-circle categories__item categories__item_sm">
                                 <a href="{{ route('page.category', $category->category_slug) }}">
 

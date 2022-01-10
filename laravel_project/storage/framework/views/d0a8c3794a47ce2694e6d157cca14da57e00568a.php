@@ -19,9 +19,12 @@
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </a>
             <?php else: ?>
-                <a  class="d-none d-sm-block navbar-brand custom-site-logo" href="<?php echo e(route('page.home')); ?>">
-                    <img  src="<?php echo e(Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo)); ?>" alt="<?php echo e(empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name); ?>" style="opacity: 0;">
-                </a>
+                <!-- <a  class="d-none d-sm-block navbar-brand "> -->
+                    <a class="btn" data-toggle="collapse" data-target="#collapseOne" id="accordion"><i class="fas fa-sliders-h" style="font-size: 1.5em;"></i></a>
+                   <!--  <img  src="<?php echo e(Storage::disk('public')->url('setting/' . $site_global_settings->setting_site_logo)); ?>" alt="<?php echo e(empty($site_global_settings->setting_site_name) ? config('app.name', 'Laravel') : $site_global_settings->setting_site_name); ?>" style="opacity: 0;"> -->
+
+
+                <!-- </a> -->
 
                 <!-- <a  class="d-none d-sm-block d-lg-none " href="<?php echo e(route('page.home')); ?>">  --> <!--show only on medium screen SeeksCo -->
                 <a  class="d-none d-sm-block align-self-center "   href="<?php echo e(route('page.home')); ?>"> 

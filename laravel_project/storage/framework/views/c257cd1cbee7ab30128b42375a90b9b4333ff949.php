@@ -77,10 +77,6 @@
         background-color: <?php echo e($customization_site_header_background_color); ?>;
 
     }
-
-    .navbar-custom {
-        background-color: lightgreen;
-    }
     .customization-header-font-color {
         color: <?php echo e($customization_site_header_font_color); ?>;
     }

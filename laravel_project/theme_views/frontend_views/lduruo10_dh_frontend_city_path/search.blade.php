@@ -16,7 +16,7 @@
     <div class="container-fluid" style="background-color: #e3f2fd;">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
         <div class="row">
-            <div class="col-sm-12 col-md-4 col-lg-3">
+            <div class="collapse" id="collapseOne"  data-parent="#accordion">
                 @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter')
             </div>
     <!-- <div class="filter nice-scroll">
@@ -105,7 +105,7 @@
     <!-- Filter End -->
 
     <!-- Listing Section Begin -->
-    <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9">
+    <section class="listing nice-scroll col-12">
 
         @if($ads_before_breadcrumb->count() > 0)
             @foreach($ads_before_breadcrumb as $ads_before_breadcrumb_key => $ad_before_breadcrumb)

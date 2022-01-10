@@ -14,7 +14,7 @@
     <div class="container-fluid" style="background-color: #e3f2fd;">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
         <div class="row">
-            <div class="col-sm-12 col-md-4 col-lg-3">
+            <div class="collapse" id="collapseOne"  data-parent="#accordion">
                 <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfilter', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
             </div>
     <!-- <div class="filter nice-scroll">
@@ -153,7 +153,7 @@ unset($__errorArgs, $__bag); ?>
     <!-- Filter End -->
 
     <!-- Listing Section Begin -->
-    <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9">
+    <section class="listing nice-scroll col-12">
 
         <?php if($ads_before_breadcrumb->count() > 0): ?>
             <?php $__currentLoopData = $ads_before_breadcrumb; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_breadcrumb_key => $ad_before_breadcrumb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
