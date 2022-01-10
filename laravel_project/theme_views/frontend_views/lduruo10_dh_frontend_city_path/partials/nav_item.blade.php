@@ -89,7 +89,7 @@
                         @guest
                             <div>
                                 <li class="nav-item">
-                                        <a href="{{ route('page.pricing') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                        <a href="{{ route('register') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
                                         <i class="fas fa-plus mr-1"></i>
                                         {{ __('frontend.header.list-business') }}
                                     </a>
@@ -120,7 +120,7 @@
                                         {{ __('frontend.header.list-business') }}
                                     </a>
                                 @else
-                                    <a  href="{{ route('page.pricing') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                    <a  href="{{ route('register') }}" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
                                         <i class="fas fa-plus mr-1"></i>
                                         {{ __('frontend.header.list-business') }}
                                     </a>

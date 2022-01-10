@@ -90,7 +90,7 @@
                         <?php if(auth()->guard()->guest()): ?>
                             <div>
                                 <li class="nav-item">
-                                        <a href="<?php echo e(route('page.pricing')); ?>" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                        <a href="<?php echo e(route('register')); ?>" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
                                         <i class="fas fa-plus mr-1"></i>
                                         <?php echo e(__('frontend.header.list-business')); ?>
 
@@ -124,7 +124,7 @@
 
                                     </a>
                                 <?php else: ?>
-                                    <a  href="<?php echo e(route('page.pricing')); ?>" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
+                                    <a  href="<?php echo e(route('register')); ?>" class="nav-item primary-btn nav-primary-btn pl-3 pr-3 pt-2 pb-2">
                                         <i class="fas fa-plus mr-1"></i>
                                         <?php echo e(__('frontend.header.list-business')); ?>
 
