@@ -180,6 +180,8 @@
             column-count: 2;
         }
 
+        .custom-site-logo img { max-height: 95px; }
+
         .circle-img {
           width: 4.5rem;
           height: 4.5rem;
