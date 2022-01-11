@@ -1,4 +1,4 @@
-<div class="grid-item col-md-6 col-lg-3">
+<div class="grid-item .grid-item--width2 col-6 col-md-6 col-lg-3 col-xl-3">
     <div class="card">
         <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
           <img class="card-img-top border-primary" src="<?php echo e(!empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp')); ?>" alt="Listing Image">
@@ -49,7 +49,7 @@
         <div class="listing__item__text__info__left">
                     <?php $__currentLoopData = $item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item_categories_key => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <a class="listing__item__text__info__left" style="padding-top: 0px" href="<?php echo e(route('page.category', $category->category_slug)); ?>">
-                           
+                           <span class="custom-color-schema-<?php echo e($paid_items_key%10); ?>">
                                 <?php if(!empty($category->category_icon)): ?>
                                     <i class="<?php echo e($category->category_icon); ?>"></i>
                                 <?php else: ?>
@@ -57,7 +57,7 @@
                                 <?php endif; ?>
                                 <?php echo e($category->category_name); ?>
 
-                            <!-- </span> -->
+                            </span>
                         </a>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>

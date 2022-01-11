@@ -1,4 +1,4 @@
-<div class="grid-item col-md-6 col-lg-3 col-xl-3">
+<div class="grid-item .grid-item--width2 col-6 col-md-6 col-lg-3 col-xl-3">
     <div class="card">
         <a href="{{ route('page.item', $item->item_slug) }}">
           <img class="card-img-top border-primary" src="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}" alt="Listing Image">
@@ -61,7 +61,7 @@
                     @if($item->item_hour_show_hours == \App\Item::ITEM_HOUR_SHOW)
                     
                         @if($item->hasOpened())
-                            <span class=" item-box-hour-span-opened float-right">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
+                            <span class="item-box-hour-span-opened float-right">{{ __('item_hour.frontend-item-box-hour-opened') }}</span>
                         @else
                             <span class="item-box-hour-span-closed float-right">{{ __('item_hour.frontend-item-box-hour-closed') }}</span>
                         @endif

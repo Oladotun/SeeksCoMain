@@ -254,10 +254,10 @@ unset($__errorArgs, $__bag); ?>
             <?php endif; ?> -->
 
             <?php if($categories->count() > 0): ?>
-                <div class="grid row mb-4">
+                <div class="grid row mb-2">
                     <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categories_key => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="grid-item .grid-item--width2 col-4 col-md-3 col-lg-2 col-xl-2 pr-0" style="">
-                            <div class=" rounded-circle categories__item categories__item_sm">
+                        <div class="grid-item .grid-item--width2 col-3 col-md-3 col-lg-2 col-xl-1 pr-0 " style="">
+                            <div class="circle-img rounded-circle categories__item categories__item_sm z-depth-2">
                                 <a href="<?php echo e(route('page.category', $category->category_slug)); ?>">
 
                                     <?php if($category->category_icon): ?>
@@ -266,7 +266,9 @@ unset($__errorArgs, $__bag); ?>
                                         <span class="custom-icon custom-color-schema-<?php echo e($categories_key%10); ?>"><i class="fas fa-heart"></i></span>
                                     <?php endif; ?>
 
-                                    <dt class="text-wrap"> <small class="font-weight-bold"><?php echo e($category->category_name); ?></small></dt>
+                                    <dt > <small class="break-word font-weight-bold"  style="display:inline-block;"><?php echo e($category->category_name); ?></small>
+
+                                    </dt>
                                     <small class="number"><?php echo e(number_format(count($category->getItemIdsByCategoryIds([$category->id])))); ?></small>
                                 </a>
                             </div>

@@ -4,6 +4,14 @@
         .header {
             padding: 0px 0px;
         }
+        .circle-img {
+          width: 6.5rem;
+          height: 6.5rem;
+          overflow: hidden;
+        }
+        small{
+            font-size: .65em;
+        }
     }
     .header {
 
@@ -12,6 +20,8 @@
         /*position: sticky;*/
         /*top: 0;*/
     }
+
+    
     .customization-header-font-color {
         color: #323232;
     }
@@ -37,6 +47,10 @@
         padding-right: 0;
         padding-left: 0;
         padding-bottom: 0;
+    }
+
+    .categories__item_sm .custom-icon {
+        font-size: 20px;
     }
 
     
@@ -71,13 +85,35 @@
         left: 0;
     }
     .h5{word-wrap: break-word;}
-    @media only screen and (min-width: 992px) and (max-width: 1112px) {
+    @media only screen and (min-width: 1200px) and (max-width: 1399px) {
+        /*.listing {padding-top: 30%;}*/
+        /*.container-fluid {padding-top: 10%;}*/
+
+        .circle-img {
+          width: 6.4rem;
+          height: 6.4rem;
+          overflow: hidden;
+        }
+
+        small{
+            font-size: .55em;
+        }
+
+
+
+        /*.filter {padding-top: 40%; align-items: left; }*/
+    }
+    @media only screen and (min-width: 992px) and (max-width: 1199px) {
         /*.listing {padding-top: 30%;}*/
         /*.container-fluid {padding-top: 10%;}*/
 
         .card-columns {
                 column-count: 3;
             }
+
+
+
+
         /*.filter {padding-top: 40%; align-items: left; }*/
     }
 
@@ -141,7 +177,69 @@
         .listing { padding-top: 80px; padding-left: 40px;}
         .filter {padding-top: 80px; height: auto;}
         .card-columns {
-            column-count: 1;
+            column-count: 2;
+        }
+
+        .circle-img {
+          width: 4.5rem;
+          height: 4.5rem;
+          overflow: hidden;
+        }
+
+        small {
+            font-size: .5rem;
+        }
+
+        .categories__item_sm .custom-icon {
+            font-size: .7rem;
+        }
+
+        .rounded-circle .categories__item_sm div {
+            max-height: 0.5rem;
+        }
+
+        .card {
+            width: 10rem;
+            height: 20rem;
+        }
+        .listing__item__text__inside h5 {
+            font-size: 0.7rem;
+        }
+
+        .listing__item__text__inside ul li{
+            font-size: 0.5rem;
+        }
+        .listing__item__text__info__left span {
+            font-size: 0.5rem;
+        }
+
+         .listing__item__text__rating h6{
+            font-size: 0.4rem;
+        }
+
+        .listing__item__rating__star {
+            width: .5rem;
+            
+        }
+
+        .item-box-hour-span-opened {
+            font-size: 0.4rem;
+            font-weight: 200;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 0 1em 0 1em;
+            border-radius: 3px;
+            line-height: 1;
+        }
+
+        .item-box-hour-span-closed {
+            font-size: 0.4rem;
+            font-weight: 200;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 0 1em 0 1em;
+            border-radius: 3px;
+            line-height: 1;
         }
     }
 

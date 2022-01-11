@@ -199,10 +199,10 @@
             @endif -->
 
             @if($categories->count() > 0)
-                <div class="grid row mb-4">
+                <div class="grid row mb-2">
                     @foreach($categories as $categories_key => $category)
-                        <div class="grid-item .grid-item--width2 col-4 col-md-3 col-lg-2 col-xl-2 pr-0" style="">
-                            <div class=" rounded-circle categories__item categories__item_sm">
+                        <div class="grid-item .grid-item--width2 col-3 col-md-3 col-lg-2 col-xl-1 pr-0 " style="">
+                            <div class="circle-img rounded-circle categories__item categories__item_sm z-depth-2">
                                 <a href="{{ route('page.category', $category->category_slug) }}">
 
                                     @if($category->category_icon)
@@ -211,7 +211,9 @@
                                         <span class="custom-icon custom-color-schema-{{ $categories_key%10 }}"><i class="fas fa-heart"></i></span>
                                     @endif
 
-                                    <dt class="text-wrap"> <small class="font-weight-bold">{{ $category->category_name }}</small></dt>
+                                    <dt > <small class="break-word font-weight-bold"  style="display:inline-block;">{{ $category->category_name }}</small>
+
+                                    </dt>
                                     <small class="number">{{ number_format(count($category->getItemIdsByCategoryIds([$category->id]))) }}</small>
                                 </a>
                             </div>

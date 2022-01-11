@@ -1,4 +1,4 @@
-<div class="grid-item col-md-6 col-lg-3">
+<div class="grid-item .grid-item--width2 col-6 col-md-6 col-lg-3 col-xl-3">
     <div class="card">
         <a href="{{ route('page.item', $item->item_slug) }}">
           <img class="card-img-top border-primary" src="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}" alt="Listing Image">
@@ -45,14 +45,14 @@
         <div class="listing__item__text__info__left">
                     @foreach($item->getAllCategories(\App\Item::ITEM_TOTAL_SHOW_CATEGORY_HOMEPAGE - 1) as $item_categories_key => $category)
                         <a class="listing__item__text__info__left" style="padding-top: 0px" href="{{ route('page.category', $category->category_slug) }}">
-                           
+                           <span class="custom-color-schema-{{ $paid_items_key%10 }}">
                                 @if(!empty($category->category_icon))
                                     <i class="{{ $category->category_icon }}"></i>
                                 @else
                                     <i class="fas fa-heart"></i>
                                 @endif
                                 {{ $category->category_name }}
-                            <!-- </span> -->
+                            </span>
                         </a>
                     @endforeach
                 </div>
