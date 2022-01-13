@@ -15,84 +15,19 @@
     <div class="container-fluid">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
         <div class="row" >
-            <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
-                <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <form method="GET" action="{{ route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $city->city_slug]) }}">
-                        <div class="filter__title">
-                            <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
-                        </div>
-                        <div class="filter__select">
-                            <select class="selectpicker @error('filter_sort_by') is-invalid @enderror" name="filter_sort_by" id="filter_sort_by">
-                                <option value="{{ \App\Item::ITEMS_SORT_BY_NEWEST_CREATED }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_NEWEST_CREATED ? 'selected' : '' }}>{{ __('listings_filter.sort-by-newest') }}</option>
-                                <option value="{{ \App\Item::ITEMS_SORT_BY_OLDEST_CREATED }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_OLDEST_CREATED ? 'selected' : '' }}>{{ __('listings_filter.sort-by-oldest') }}</option>
-                                <option value="{{ \App\Item::ITEMS_SORT_BY_HIGHEST_RATING }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_HIGHEST_RATING ? 'selected' : '' }}>{{ __('listings_filter.sort-by-highest') }}</option>
-                                <option value="{{ \App\Item::ITEMS_SORT_BY_LOWEST_RATING }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_LOWEST_RATING ? 'selected' : '' }}>{{ __('listings_filter.sort-by-lowest') }}</option>
-                                <option value="{{ \App\Item::ITEMS_SORT_BY_NEARBY_FIRST }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_NEARBY_FIRST ? 'selected' : '' }}>{{ __('theme_directory_hub.filter-sort-by-nearby-first') }}</option>
-                            </select>
-                            @error('filter_sort_by')
-                            <span class="invalid-tooltip">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                            @enderror
-                        </div>
-                        <div class="filter__tags">
-                            <h6>{{ __('backend.category.category') }}</h6>
-                            <select class="selectpicker @error('filter_categories') is-invalid @enderror" multiple data-live-search="true" name="filter_categories[]" id="filter_categories">
+            <div class="row" >
+                <div class="collapse" id="collapseOne"  data-parent="#accordion">
 
-                                @foreach($all_printable_categories as $all_printable_categories_key => $all_printable_category)
-                                    <!-- <label class="filter_category_div" for="filter_categories_{{ $all_printable_category['category_id'] }}">
-                                        {{ $all_printable_category['category_name'] }}
-                                        <input {{ in_array($all_printable_category['category_id'], $filter_categories) ? 'checked' : '' }} name="filter_categories[]" type="checkbox" value="{{ $all_printable_category['category_id'] }}" id="filter_categories_{{ $all_printable_category['category_id'] }}">
-                                        <span class="checkmark"></span>
-                                    </label> -->
-                                    <option value="{{ $all_printable_category['category_id'] }}" {{ $filter_categories == $all_printable_category['category_id']? 'selected' : '' }}>{{ $all_printable_category['category_name'] }}</option>
-                                @endforeach
-                            </select>
+                @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfiltercity')
 
-                            @error('filter_categories')
-                            <span class="invalid-tooltip">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                            @enderror
 
-                            <!-- <div class="row">
-                                <div class="col-12 text-center">
-                                    <a href="javascript:;" class="show_more">{{ __('listings_filter.show-more') }}</a>
-                                </div>
-                            </div> -->
-                        </div>
-
-                        <div class="filter__btns">
-                            <button type="submit">{{ __('theme_directory_hub.filter-button-filter-results') }}</button>
-                            <a class="btn btn-outline-secondary filter__reset__btn" href="{{ route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $city->city_slug]) }}">{{ __('theme_directory_hub.filter-link-reset-all') }}</a>
-                        </div>
-                    </form>
-                    <hr>
-
-                    <!-- @include('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width') -->
-                    @if($all_item_cities->count() > 0)
-                        <!-- <div class="listing__text__top"> -->
-                            <div class="listing__text__top">
-                                <h6> {{$state->state_name}} Listings</h6>
-                                <!-- <h6>{{ __('frontend.state.sub-title-2', ['state_name' => $state->state_name]) }}</h6> -->
-                            </div>
-                        <!-- </div> -->
-
-                        <div class="row align-items-center">
-                            @foreach($all_item_cities as $all_item_cities_key => $item_city)
-                                <div class="col-6 col-lg-6 mb-3">
-                                    <a href="{{ route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $item_city->city->city_slug]) }}">{{ $item_city->city->city_name }}</a>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
                 </div>
                 <!-- Filter End -->
             </div>
             
 
             <!-- Listing Section Begin -->
-            <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-top: 15%;">
+           <section class="listing nice-scroll col-12" >
 
                 @if($ads_before_breadcrumb->count() > 0)
                     @foreach($ads_before_breadcrumb as $ads_before_breadcrumb_key => $ad_before_breadcrumb)
@@ -187,7 +122,7 @@
                     </div>
                 </div>
                 <div class="scrolling-pagination">
-                    <div class="card-columns">
+                    <div class="grid row mb-4">
 
                         <!-- @if($ads_before_content->count() > 0)
                             @foreach($ads_before_content as $ads_before_content_key => $ad_before_content)

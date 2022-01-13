@@ -4,7 +4,7 @@
              </button> -->
             <form method="GET" action="<?php echo e(route('page.categories')); ?>">
 
-
+                <!-- <?php echo e($all_item_cities); ?> -->
                 <div class="filter__title">
                     <h5><i class="fas fa-filter"></i> <?php echo e(__('theme_directory_hub.filter-filter-by')); ?></h5>
                 </div>

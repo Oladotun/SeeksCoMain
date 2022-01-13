@@ -334,6 +334,9 @@ class PagesController extends Controller
                 ->with('user');
                 // Add distance
             $paid_items_query->selectRaw('*, ( 3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+
+            $paid_items_query->where('items.item_type', Item::ITEM_TYPE_REGULAR)
+                ->orderBy('distance_miles', 'ASC');
             
 
 
@@ -380,6 +383,8 @@ class PagesController extends Controller
                 ->whereIn('items.user_id', $free_user_ids);
 
             $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+            $free_items_query->where('items.item_type', Item::ITEM_TYPE_REGULAR)
+                ->orderBy('distance_miles', 'ASC');
 
             // filter free listings state
             if(!empty($filter_state))
@@ -396,6 +401,9 @@ class PagesController extends Controller
             /**
              * Start filter sort by for free listing
              */
+
+            
+
             $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
             if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
             {
@@ -613,7 +621,7 @@ class PagesController extends Controller
             $active_user_ids = $subscription_obj->getActiveUserIds();
 
 
-             $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);  
+             $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->where("items.item_status", Item::ITEM_PUBLISHED)->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
              $total_results = $total_paid_items + $total_free_items;
 
              $item_select_city_query = Item::query();
@@ -632,10 +640,12 @@ class PagesController extends Controller
                 ->states()
                 ->withCount(['items' => function($query) {
                     $query->where("items.item_status", Item::ITEM_PUBLISHED);
-                }
-
-            ])->orderBy('state_name')
+                }])->orderBy('state_name')
                 ->get();
+
+
+                
+            
 
              // ]);
             //      ->with('city' => function($query) { 
@@ -663,6 +673,7 @@ class PagesController extends Controller
                 // $search_query = 'espresso';
                 
             }
+            
 
 
             return response()->view($theme_view_path . 'search',
@@ -671,7 +682,7 @@ class PagesController extends Controller
                         'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
                         'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color',
                         'search_query', 'filter_categories', 'filter_state', 'filter_city', 'filter_sort_by', 'paid_items',
-                        'free_items', 'pagination', 'all_printable_categories', 'all_states', 'all_cities', 'total_results','all_item_cities', 'request', 'request_check'));
+                        'free_items', 'pagination', 'all_printable_categories', 'all_states', 'all_cities', 'total_results','all_item_cities', 'request', 'request_check','all_states','all_cities'));
         
     }
 
@@ -1048,6 +1059,8 @@ class PagesController extends Controller
         if(!empty($filter_city))
         {
             $paid_items_query->where('items.city_id', $filter_city);
+
+            // return $this->categoryByStateCity($request);
         }
 
         $paid_items_query->orderBy('items.created_at', 'DESC')
@@ -1084,19 +1097,32 @@ class PagesController extends Controller
             ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
             ->whereIn('items.user_id', $free_user_ids);
 
-        // filter free listings state
-        if(!empty($filter_state))
-        {
-            $free_items_query->where('items.state_id', $filter_state);
-        }
-
+        
         // filter free listings city
         if(!empty($filter_city))
         {
             $free_items_query->where('items.city_id', $filter_city);
+
+
         }
 
+        // filter free listings state
+        if(!empty($filter_state))
+        {
+            $free_items_query->where('items.state_id', $filter_state);
+
+            $state = State::where('id', $filter_state)->first();
+
+            return $this->state($request, $state->state_slug);
+
+
+
+        }
+
+        
         $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+
+        
     
         /**
          * Start filter sort by for free listing
@@ -1256,7 +1282,9 @@ class PagesController extends Controller
 
         $all_states = Country::find($site_prefer_country_id)
             ->states()
-            ->withCount(['items'])
+            ->withCount(['items' => function($query){
+                $query->where("items.item_status", Item::ITEM_PUBLISHED);
+            }])
             ->orderBy('state_name')
             ->get();
 
@@ -1273,7 +1301,7 @@ class PagesController extends Controller
         //     $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);        
         // }
 
-        $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);  
+        $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->where("items.item_status", Item::ITEM_PUBLISHED)->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);  
         $total_results = $total_paid_items + $total_free_items;
 
         $item_select_city_query = Item::query();
@@ -1302,8 +1330,15 @@ class PagesController extends Controller
          * End initial filter
          */
 
-        $paid_items = $paid_items->shuffle();
-        $free_items = $free_items->shuffle();
+
+        if(empty($request->filter_sort_by)) {
+
+            $paid_items = $paid_items->shuffle();
+            $free_items = $free_items->shuffle();
+
+        }
+
+        
         /**
          * Start initial blade view file path
          */
@@ -1321,7 +1356,7 @@ class PagesController extends Controller
                 'site_innerpage_header_background_youtube_video', 'site_innerpage_header_title_font_color',
                 'site_innerpage_header_paragraph_font_color', 'filter_sort_by', 'all_printable_categories',
                 'filter_categories', 'site_prefer_country_id', 'filter_state', 'filter_city', 'all_cities',
-                'total_results', 'cities_present','all_item_cities'));
+                'total_results', 'cities_present','all_item_cities','all_states','all_cities'));
         // }
         // else {
             
@@ -1490,6 +1525,7 @@ class PagesController extends Controller
 
 
                     $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+
 
                     // filter free listings state
                     if(!empty($filter_state))
@@ -1666,11 +1702,19 @@ class PagesController extends Controller
                     /**
                      * Start initial filter
                      */
+                   
+                    
                     $all_states = Country::find($site_prefer_country_id)
-                        ->states()
-                        ->orderBy('state_name')->get();
+                                    ->states()
+                                    ->withCount(['items' => function($query) {
+                                        $query->where("items.item_status", Item::ITEM_PUBLISHED);
+                                    }])->orderBy('state_name')
+                                    ->get();
 
                     $all_cities = collect([]);
+
+                    $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->where("items.item_status", Item::ITEM_PUBLISHED)->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
+
                     if(!empty($filter_state))
                     {
                         $state = State::find($filter_state);
@@ -1711,8 +1755,15 @@ class PagesController extends Controller
                      * Start initial blade view file path
                      */
 
-                    $paid_items = $paid_items->shuffle();
-                    $free_items = $free_items->shuffle();
+
+                    if(empty($request->filter_sort_by)) {
+
+                        $paid_items = $paid_items->shuffle();
+                        $free_items = $free_items->shuffle();
+
+                    }
+
+                    
 
                     $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
                     $theme_view_path = $theme_view_path->getViewPath();
@@ -1727,7 +1778,7 @@ class PagesController extends Controller
                             'parent_category_id', 'site_innerpage_header_background_type', 'site_innerpage_header_background_color',
                             'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
                             'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color', 'filter_sort_by',
-                            'filter_categories', 'filter_state', 'filter_city', 'all_cities', 'total_results'));
+                            'filter_categories', 'filter_state', 'filter_city', 'all_cities', 'total_results','all_states','all_cities'));
                 }
                 else
                 {
@@ -1742,7 +1793,7 @@ class PagesController extends Controller
 
     public function categoryByState(Request $request, string $category_slug, string $state_slug)
     {   
-        if(Auth::check()){    
+        // if(Auth::check()){    
             $category = Category::where('category_slug', $category_slug)->first();
             $state = State::where('state_slug', $state_slug)->first();
 
@@ -1894,6 +1945,9 @@ class PagesController extends Controller
                 {
                     $free_items_query->where('items.city_id', $filter_city);
                 }
+
+                $paid_items = $paid_items->shuffle();
+                $free_items = $free_items->shuffle();
 
                 /**
                  * Start filter sort by for free listing
@@ -2064,6 +2118,14 @@ class PagesController extends Controller
                     ->groupBy('items.city_id')
                     ->with('city');
 
+                $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->where("items.item_status", Item::ITEM_PUBLISHED)->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
+                $all_states = Country::find($site_prefer_country_id)
+                                ->states()
+                                ->withCount(['items' => function($query) {
+                                    $query->where("items.item_status", Item::ITEM_PUBLISHED);
+                                }])->orderBy('state_name')
+                                ->get();
+
                 $all_item_cities = $item_select_city_query->get();
 
                 /**
@@ -2103,10 +2165,6 @@ class PagesController extends Controller
                  * Start initial blade view file path
                  */
 
-                $paid_items = $paid_items->shuffle();
-                $free_items = $free_items->shuffle();
-
-
                 $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
                 $theme_view_path = $theme_view_path->getViewPath();
                 /**
@@ -2120,18 +2178,18 @@ class PagesController extends Controller
                         'parent_category_id', 'site_innerpage_header_background_type', 'site_innerpage_header_background_color',
                         'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
                         'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color',
-                        'filter_sort_by', 'filter_categories', 'filter_city', 'filter_all_cities', 'total_results'));
+                        'filter_sort_by', 'filter_categories', 'filter_city', 'filter_all_cities', 'total_results','all_states','all_cities'));
             }
             else
             {
                 abort(404);
             }
         }
-        else {
+    //     else {
             
-            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
-        }
-    }
+    //         return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+    //     }
+    // }
 
     public function categoryByStateCity(Request $request, string $category_slug, string $state_slug, string $city_slug)
     {
@@ -2277,6 +2335,9 @@ class PagesController extends Controller
                         ->whereIn('items.user_id', $free_user_ids);
 
                     $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+
+                    $paid_items = $paid_items->shuffle();
+                    $free_items = $free_items->shuffle();
 
                     /**
                      * Start filter sort by for free listing
@@ -2452,6 +2513,14 @@ class PagesController extends Controller
                      * Start initial filter
                      */
                     $total_results = $total_paid_items + $total_free_items;
+
+                    $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->where("items.item_status", Item::ITEM_PUBLISHED)->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
+                    $all_states = Country::find($site_prefer_country_id)
+                                    ->states()
+                                    ->withCount(['items' => function($query) {
+                                        $query->where("items.item_status", Item::ITEM_PUBLISHED);
+                                    }])->orderBy('state_name')
+                                    ->get();
                     /**
                      * End initial filter
                      */
@@ -2484,8 +2553,7 @@ class PagesController extends Controller
                      * Start initial blade view file path
                      */
 
-                    $paid_items = $paid_items->shuffle();
-                    $free_items = $free_items->shuffle();
+                    
 
                     $theme_view_path = Theme::find($settings->setting_site_active_theme_id);
                     $theme_view_path = $theme_view_path->getViewPath();
@@ -2500,7 +2568,7 @@ class PagesController extends Controller
                             'parent_category_id', 'site_innerpage_header_background_type', 'site_innerpage_header_background_color',
                             'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
                             'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color',
-                            'filter_sort_by', 'filter_categories', 'total_results'));
+                            'filter_sort_by', 'filter_categories', 'total_results','all_states','all_cities'));
                 }
                 else
                 {
@@ -2520,8 +2588,8 @@ class PagesController extends Controller
 
     public function state(Request $request, string $state_slug)
     {
-        if(Auth::check())
-        {
+        // if(Auth::check())
+        // {
             $state = State::where('state_slug', $state_slug)->first();
 
             if($state)
@@ -2574,6 +2642,9 @@ class PagesController extends Controller
 
                 // city
                 $filter_city = empty($request->filter_city) ? null : $request->filter_city;
+                // state & city
+                // $filter_state = empty($request->filter_state) ? null : $request->filter_state;
+                // $filter_city = empty($request->filter_city) ? null : $request->filter_city;
                 /**
                  * End filter for paid listing
                  */
@@ -2646,6 +2717,9 @@ class PagesController extends Controller
                 /**
                  * Start filter sort by for free listing
                  */
+
+                
+
                 $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
                 if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
                 {
@@ -2844,12 +2918,17 @@ class PagesController extends Controller
                 $filter_all_cities = $state->cities()->orderBy('city_name')->get();
 
                 $total_results = $total_paid_items + $total_free_items;
+
+                $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->where("items.item_status", Item::ITEM_PUBLISHED)->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
+                $all_states = Country::find($site_prefer_country_id)
+                                ->states()
+                                ->withCount(['items' => function($query) {
+                                    $query->where("items.item_status", Item::ITEM_PUBLISHED);
+                                }])->orderBy('state_name')
+                                ->get();
                 /**
                  * End initial filter
                  */
-
-                $paid_items = $paid_items->shuffle();
-                $free_items = $free_items->shuffle();
 
                 /**
                  * Start initial blade view file path
@@ -2867,16 +2946,17 @@ class PagesController extends Controller
                         'site_innerpage_header_background_color', 'site_innerpage_header_background_image',
                         'site_innerpage_header_background_youtube_video', 'site_innerpage_header_title_font_color',
                         'site_innerpage_header_paragraph_font_color', 'filter_categories', 'filter_all_cities', 'filter_city',
-                        'filter_sort_by', 'total_results', 'all_printable_categories'));
+                        'filter_sort_by', 'total_results', 'all_printable_categories','all_states','all_cities'));
             }
             else
             {
                 abort(404);
             }
-        }else {
+        // }
+        // else {
             
-            return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
-        }
+        //     return \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+        // }
     }
 
     public function city(Request $request, string $state_slug, string $city_slug)
@@ -2992,6 +3072,10 @@ class PagesController extends Controller
                         ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
                         ->whereIn('items.user_id', $free_user_ids);
                     $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+
+
+                    $paid_items = $paid_items->shuffle();
+                    $free_items = $free_items->shuffle();
 
                     /**
                      * Start filter sort by for free listing
@@ -3192,12 +3276,18 @@ class PagesController extends Controller
                     $all_printable_categories = $category_obj->getPrintableCategoriesNoDash();
 
                     $total_results = $total_paid_items + $total_free_items;
+
+                    $all_cities = City::join('items', 'items.city_id', '=', 'cities.id')->where("items.item_status", Item::ITEM_PUBLISHED)->orderBy('cities.city_name', 'asc')->groupBy('cities.city_name')->get(['cities.id', 'cities.city_name', DB::raw('count(items.id) as items')]);
+                    $all_states = Country::find($site_prefer_country_id)
+                                    ->states()
+                                    ->withCount(['items' => function($query) {
+                                        $query->where("items.item_status", Item::ITEM_PUBLISHED);
+                                    }])->orderBy('state_name')
+                                    ->get();
                     /**
                      * End initial filter
                      */
 
-                    $paid_items = $paid_items->shuffle();
-                    $free_items = $free_items->shuffle();
                     /**
                      * Start initial blade view file path
                      */
@@ -3214,7 +3304,7 @@ class PagesController extends Controller
                             'site_innerpage_header_background_color', 'site_innerpage_header_background_image',
                             'site_innerpage_header_background_youtube_video', 'site_innerpage_header_title_font_color',
                             'site_innerpage_header_paragraph_font_color', 'filter_categories', 'filter_sort_by', 'total_results',
-                            'all_printable_categories'));
+                            'all_printable_categories','all_states','all_cities'));
                 }
                 else
                 {

@@ -542,44 +542,44 @@
             /**
              * Start state selector in filter
              */
-            $('#filter_state').on('change', function() {
+            // $('#filter_state').on('change', function() {
 
-                if(this.value > 0)
-                {
-                    $('#filter_city').html("<option selected>{{ __('prefer_country.loading-wait') }}</option>");
-                    $('#filter_city').selectpicker('refresh');
+            //     if(this.value > 0)
+            //     {
+            //         $('#filter_city').html("<option selected>{{ __('prefer_country.loading-wait') }}</option>");
+            //         $('#filter_city').selectpicker('refresh');
 
-                    var ajax_url = '/ajax/cities/' + this.value;
+            //         var ajax_url = '/ajax/cities/' + this.value;
 
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-                    jQuery.ajax({
-                        url: ajax_url,
-                        method: 'get',
-                        data: {
-                        },
-                        success: function(result){
-                            console.log(result);
-                            $('#filter_city').html("<option value='0'>{{ __('prefer_country.all-city') }}</option>");
-                            $('#filter_city').selectpicker('refresh');
-                            $.each(JSON.parse(result), function(key, value) {
-                                var city_id = value.id;
-                                var city_name = value.city_name;
-                                $('#filter_city').append('<option value="'+ city_id +'">' + city_name + '</option>');
-                            });
-                            $('#filter_city').selectpicker('refresh');
-                        }});
-                }
-                else
-                {
-                    $('#filter_city').html("<option value='0'>{{ __('prefer_country.all-city') }}</option>");
-                    $('#filter_city').selectpicker('refresh');
-                }
+            //         $.ajaxSetup({
+            //             headers: {
+            //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //             }
+            //         });
+            //         jQuery.ajax({
+            //             url: ajax_url,
+            //             method: 'get',
+            //             data: {
+            //             },
+            //             success: function(result){
+            //                 console.log(result);
+            //                 $('#filter_city').html("<option value='0'>{{ __('prefer_country.all-city') }}</option>");
+            //                 $('#filter_city').selectpicker('refresh');
+            //                 $.each(JSON.parse(result), function(key, value) {
+            //                     var city_id = value.id;
+            //                     var city_name = value.city_name;
+            //                     $('#filter_city').append('<option value="'+ city_id +'">' + city_name + '</option>');
+            //                 });
+            //                 $('#filter_city').selectpicker('refresh');
+            //             }});
+            //     }
+            //     else
+            //     {
+            //         $('#filter_city').html("<option value='0'>{{ __('prefer_country.all-city') }}</option>");
+            //         $('#filter_city').selectpicker('refresh');
+            //     }
 
-            });
+            // });
             /**
              * End state selector in filter
              */

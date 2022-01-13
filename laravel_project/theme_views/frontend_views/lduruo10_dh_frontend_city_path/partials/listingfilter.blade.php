@@ -4,7 +4,7 @@
              </button> -->
             <form method="GET" action="{{ route('page.categories') }}">
 
-
+                <!-- {{$all_item_cities}} -->
                 <div class="filter__title">
                     <h5><i class="fas fa-filter"></i> {{ __('theme_directory_hub.filter-filter-by') }}</h5>
                 </div>

@@ -21,7 +21,9 @@
             <select class="selectpicker @error('filter_state') is-invalid @enderror" name="filter_state" id="filter_state" data-live-search="true">
                 <option value="0" {{ empty($filter_state) ? 'selected' : '' }}>{{ __('prefer_country.all-state') }}</option>
                 @foreach($all_states as $all_states_key => $state)
+                @if($state->items_count > 0)
                     <option value="{{ $state->id }}" {{ $filter_state == $state->id ? 'selected' : '' }}>{{ $state->state_name }}</option>
+                @endif
                 @endforeach
             </select>
             @error('filter_state')
