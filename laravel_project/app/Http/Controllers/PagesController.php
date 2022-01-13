@@ -1097,13 +1097,16 @@ class PagesController extends Controller
             ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
             ->whereIn('items.user_id', $free_user_ids);
 
-        
+        // $city_check =City::where('id', '4936812')->with('state')->first();
         // filter free listings city
         if(!empty($filter_city))
         {
             $free_items_query->where('items.city_id', $filter_city);
 
+            $city = City::where('id', $filter_city)->with('state')->first();
+            // $city_check =City::where('id', '4936812')->with('state')->first();
 
+            return $this->city($request, $city->state->state_slug ,$city->city_slug);
         }
 
         // filter free listings state
@@ -2336,8 +2339,7 @@ class PagesController extends Controller
 
                     $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
 
-                    $paid_items = $paid_items->shuffle();
-                    $free_items = $free_items->shuffle();
+                   
 
                     /**
                      * Start filter sort by for free listing
@@ -2962,8 +2964,8 @@ class PagesController extends Controller
     public function city(Request $request, string $state_slug, string $city_slug)
     {
         
-        if(Auth::check())
-        {
+        // if(Auth::check())
+        // {
             $state = State::where('state_slug', $state_slug)->first();
 
             if($state)
@@ -3074,8 +3076,7 @@ class PagesController extends Controller
                     $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
 
 
-                    $paid_items = $paid_items->shuffle();
-                    $free_items = $free_items->shuffle();
+                    
 
                     /**
                      * Start filter sort by for free listing
@@ -3112,9 +3113,15 @@ class PagesController extends Controller
 
                     $total_free_items = $free_items_query->count();
 
+                    // state & city
+                    $filter_state = empty($request->filter_state) ? null : $request->filter_state;
+                    $filter_city = empty($request->filter_city) ? null : $request->filter_city;
+
                     $querystringArray = [
                         'filter_categories' => $filter_categories,
                         'filter_sort_by' => $filter_sort_by,
+                        'filter_state' => $filter_state,
+                        'filter_city' => $filter_city,
                     ];
 
                     // if($total_free_items == 0 || $total_paid_items == 0)
@@ -3184,6 +3191,11 @@ class PagesController extends Controller
                         {
                             $pagination = $free_items->appends($querystringArray);
                         }
+                    }
+
+                    if(empty($request->filter_sort_by)) {
+                        $paid_items = $paid_items->shuffle();
+                        $free_items = $free_items->shuffle();
                     }
                     /**
                      * End do listing query
@@ -3304,7 +3316,7 @@ class PagesController extends Controller
                             'site_innerpage_header_background_color', 'site_innerpage_header_background_image',
                             'site_innerpage_header_background_youtube_video', 'site_innerpage_header_title_font_color',
                             'site_innerpage_header_paragraph_font_color', 'filter_categories', 'filter_sort_by', 'total_results',
-                            'all_printable_categories','all_states','all_cities'));
+                            'all_printable_categories','all_states','all_cities', 'filter_state','filter_city'));
                 }
                 else
                 {
@@ -3315,11 +3327,11 @@ class PagesController extends Controller
             {
                 abort(404);
             }
-        }else {
+        // }else {
             
-            return redirect()->route('page.home');
-            // \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
-        }
+        //     return redirect()->route('page.home');
+        //     // \App::call('App\Http\Controllers\Auth\RegisterController@showRegistrationForm');
+        // }
     }
 
     public function product(Request $request, string $item_slug, string $product_slug)

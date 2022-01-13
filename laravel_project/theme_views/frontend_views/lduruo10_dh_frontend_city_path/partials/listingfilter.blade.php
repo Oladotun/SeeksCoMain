@@ -22,6 +22,21 @@
 
         
                 </div>
+                
+                <div class="filter__select">
+                    <select class="selectpicker @error('filter_city') is-invalid @enderror" name="filter_city" id="filter_city" data-live-search="true">
+                        <option value="0" {{ empty($filter_city) ? 'selected' : '' }}>{{ __('prefer_country.all-city') }}</option>
+                        @foreach($all_cities as $all_cities_key => $city)                      
+                            <option value="{{ $city->id}}" {{ $filter_city == $city->city_name ? 'selected' : '' }}>{{ $city->city_name }}</option>
+                        @endforeach
+                    </select>
+                    @error('filter_city')
+                    <span class="invalid-tooltip">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+
+                </div>
                 <div class="filter__select">
                     <select class="selectpicker @error('filter_state') is-invalid @enderror" name="filter_state" id="filter_state" data-live-search="true">
                         <option value="0" {{ empty($filter_state) ? 'selected' : '' }}>{{ __('prefer_country.all-state') }}</option>
@@ -33,20 +48,6 @@
                         @endforeach
                     </select>
                     @error('filter_state')
-                    <span class="invalid-tooltip">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-
-                </div>
-                <div class="filter__select">
-                    <select class="selectpicker @error('filter_city') is-invalid @enderror" name="filter_city" id="filter_city" data-live-search="true">
-                        <option value="0" {{ empty($filter_city) ? 'selected' : '' }}>{{ __('prefer_country.all-city') }}</option>
-                        @foreach($all_cities as $all_cities_key => $city)                      
-                            <option value="{{ $city->id}}" {{ $filter_city == $city->city_name ? 'selected' : '' }}>{{ $city->city_name }}</option>
-                        @endforeach
-                    </select>
-                    @error('filter_city')
                     <span class="invalid-tooltip">
                         <strong>{{ $message }}</strong>
                     </span>

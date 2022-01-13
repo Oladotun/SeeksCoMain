@@ -10,116 +10,22 @@
 <?php $__env->startSection('content'); ?>
 
     <!-- Filter Begin -->
-    <div class="container-fluid">
+    <div class="container-fluid" style="background-color: #e3f2fd;">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
-        <div class="row" >
-            <div class="col-sm-12 col-md-4 col-lg-3" style="padding-top: 15%;">
-                <div class="filter nice-scroll col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <form method="GET" action="<?php echo e(route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $city->city_slug])); ?>">
-                        <div class="filter__title">
-                            <h5><i class="fas fa-filter"></i> <?php echo e(__('theme_directory_hub.filter-filter-by')); ?></h5>
-                        </div>
-                        <div class="filter__select">
-                            <select class="selectpicker <?php $__errorArgs = ['filter_sort_by'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>" name="filter_sort_by" id="filter_sort_by">
-                                <option value="<?php echo e(\App\Item::ITEMS_SORT_BY_NEWEST_CREATED); ?>" <?php echo e($filter_sort_by == \App\Item::ITEMS_SORT_BY_NEWEST_CREATED ? 'selected' : ''); ?>><?php echo e(__('listings_filter.sort-by-newest')); ?></option>
-                                <option value="<?php echo e(\App\Item::ITEMS_SORT_BY_OLDEST_CREATED); ?>" <?php echo e($filter_sort_by == \App\Item::ITEMS_SORT_BY_OLDEST_CREATED ? 'selected' : ''); ?>><?php echo e(__('listings_filter.sort-by-oldest')); ?></option>
-                                <option value="<?php echo e(\App\Item::ITEMS_SORT_BY_HIGHEST_RATING); ?>" <?php echo e($filter_sort_by == \App\Item::ITEMS_SORT_BY_HIGHEST_RATING ? 'selected' : ''); ?>><?php echo e(__('listings_filter.sort-by-highest')); ?></option>
-                                <option value="<?php echo e(\App\Item::ITEMS_SORT_BY_LOWEST_RATING); ?>" <?php echo e($filter_sort_by == \App\Item::ITEMS_SORT_BY_LOWEST_RATING ? 'selected' : ''); ?>><?php echo e(__('listings_filter.sort-by-lowest')); ?></option>
-                                <option value="<?php echo e(\App\Item::ITEMS_SORT_BY_NEARBY_FIRST); ?>" <?php echo e($filter_sort_by == \App\Item::ITEMS_SORT_BY_NEARBY_FIRST ? 'selected' : ''); ?>><?php echo e(__('theme_directory_hub.filter-sort-by-nearby-first')); ?></option>
-                            </select>
-                            <?php $__errorArgs = ['filter_sort_by'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                            <span class="invalid-tooltip">
-                                <strong><?php echo e($message); ?></strong>
-                            </span>
-                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                        </div>
-                        <div class="filter__tags">
-                            <h6><?php echo e(__('backend.category.category')); ?></h6>
-                            <select class="selectpicker <?php $__errorArgs = ['filter_categories'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>" multiple data-live-search="true" name="filter_categories[]" id="filter_categories">
+        
+            <div class="row" >
+                <div class="collapse" id="collapseOne"  data-parent="#accordion">
 
-                                <?php $__currentLoopData = $all_printable_categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_printable_categories_key => $all_printable_category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <!-- <label class="filter_category_div" for="filter_categories_<?php echo e($all_printable_category['category_id']); ?>">
-                                        <?php echo e($all_printable_category['category_name']); ?>
+                <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.listinfiltercity', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-                                        <input <?php echo e(in_array($all_printable_category['category_id'], $filter_categories) ? 'checked' : ''); ?> name="filter_categories[]" type="checkbox" value="<?php echo e($all_printable_category['category_id']); ?>" id="filter_categories_<?php echo e($all_printable_category['category_id']); ?>">
-                                        <span class="checkmark"></span>
-                                    </label> -->
-                                    <option value="<?php echo e($all_printable_category['category_id']); ?>" <?php echo e($filter_categories == $all_printable_category['category_id']? 'selected' : ''); ?>><?php echo e($all_printable_category['category_name']); ?></option>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </select>
 
-                            <?php $__errorArgs = ['filter_categories'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                            <span class="invalid-tooltip">
-                                <strong><?php echo e($message); ?></strong>
-                            </span>
-                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-
-                            <!-- <div class="row">
-                                <div class="col-12 text-center">
-                                    <a href="javascript:;" class="show_more"><?php echo e(__('listings_filter.show-more')); ?></a>
-                                </div>
-                            </div> -->
-                        </div>
-
-                        <div class="filter__btns">
-                            <button type="submit"><?php echo e(__('theme_directory_hub.filter-button-filter-results')); ?></button>
-                            <a class="btn btn-outline-secondary filter__reset__btn" href="<?php echo e(route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $city->city_slug])); ?>"><?php echo e(__('theme_directory_hub.filter-link-reset-all')); ?></a>
-                        </div>
-                    </form>
-                    <hr>
-
-                    <!-- <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.footer-full-width', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> -->
-                    <?php if($all_item_cities->count() > 0): ?>
-                        <!-- <div class="listing__text__top"> -->
-                            <div class="listing__text__top">
-                                <h6> <?php echo e($state->state_name); ?> Listings</h6>
-                                <!-- <h6><?php echo e(__('frontend.state.sub-title-2', ['state_name' => $state->state_name])); ?></h6> -->
-                            </div>
-                        <!-- </div> -->
-
-                        <div class="row align-items-center">
-                            <?php $__currentLoopData = $all_item_cities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_item_cities_key => $item_city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <div class="col-6 col-lg-6 mb-3">
-                                    <a href="<?php echo e(route('page.city', ['state_slug' => $state->state_slug, 'city_slug' => $item_city->city->city_slug])); ?>"><?php echo e($item_city->city->city_name); ?></a>
-                                </div>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </div>
-                    <?php endif; ?>
                 </div>
                 <!-- Filter End -->
-            </div>
+            
             
 
             <!-- Listing Section Begin -->
-            <section class="listing nice-scroll col-sm-12 col-md-8 col-lg-9" style="padding-top: 15%;">
+           <section class="listing nice-scroll col-12" >
 
                 <?php if($ads_before_breadcrumb->count() > 0): ?>
                     <?php $__currentLoopData = $ads_before_breadcrumb; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_breadcrumb_key => $ad_before_breadcrumb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -226,7 +132,7 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
                 <div class="scrolling-pagination">
-                    <div class="card-columns">
+                    <div class="grid row mb-4">
 
                         <!-- <?php if($ads_before_content->count() > 0): ?>
                             <?php $__currentLoopData = $ads_before_content; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ads_before_content_key => $ad_before_content): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>

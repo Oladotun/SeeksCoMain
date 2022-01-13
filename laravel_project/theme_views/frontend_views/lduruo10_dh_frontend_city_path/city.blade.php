@@ -12,18 +12,18 @@
 @section('content')
 
     <!-- Filter Begin -->
-    <div class="container-fluid">
+    <div class="container-fluid" style="background-color: #e3f2fd;">
         <!-- <div class="row" style="margin-left: 12%;margin-right:0px;padding-top: 8%;"> -->
-        <div class="row" >
+        
             <div class="row" >
                 <div class="collapse" id="collapseOne"  data-parent="#accordion">
 
-                @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listingfiltercity')
+                @include('frontend_views.lduruo10_dh_frontend_city_path.partials.listinfiltercity')
 
 
                 </div>
                 <!-- Filter End -->
-            </div>
+            
             
 
             <!-- Listing Section Begin -->
