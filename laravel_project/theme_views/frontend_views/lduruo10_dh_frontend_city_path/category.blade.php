@@ -179,8 +179,8 @@
                 @if($children_categories->count() > 0)
                     <div class="grid row  mb-4">
                         @foreach($children_categories as $children_categories_key => $children_category)
-                            <div class="grid-item .grid-item--width2 col-2 pr-0">
-                                <div class="rounded-circle categories__item categories__item_sm">
+                            <div class="grid-item .grid-item--width2 col-3 col-md-3 col-lg-2 col-xl-1 pr-0">
+                                <div class="circle-img rounded-circle categories__item categories__item_sm">
                                     <a href="{{ route('page.category', $children_category->category_slug) }}">
 
                                         @if($children_category->category_icon)
@@ -189,8 +189,8 @@
                                             <span class="custom-icon custom-color-schema-{{ $children_categories_key%10 }}"><i class="fas fa-heart"></i></span>
                                         @endif
 
-                                        <h5>{{ $children_category->category_name }}</h5>
-                                         <span class="number">{{ number_format(count($children_category->getItemIdsByCategoryIds([$children_category->id]))) }}</span>
+                                        <dt> <small class="break-word font-weight-bold"  style="display:inline-block;">{{ $children_category->category_name }}</small></dt>
+                                         <small class="number">{{ number_format(count($children_category->getItemIdsByCategoryIds([$children_category->id]))) }}</small>
                                     </a>
                                 </div>
                             </div>

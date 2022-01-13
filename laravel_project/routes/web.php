@@ -67,8 +67,8 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
     Route::get('/search', 'PagesController@search')->name('page.search');
 
     Route::get('/about', 'PagesController@about')->name('page.about')->middleware('verified');
-    Route::get('/contact', 'PagesController@contact')->name('page.contact')->middleware('verified');;
-    Route::post('/contact', 'PagesController@doContact')->name('page.contact.do')->middleware('verified');;
+    Route::get('/contact', 'PagesController@contact')->name('page.contact')->middleware('verified');
+    Route::post('/contact', 'PagesController@doContact')->name('page.contact.do')->middleware('verified');
 
     // Route::get('/categories', 'PagesController@categories')->name('page.categories')->middleware('verified');
     Route::get('/categories', 'PagesController@categories')->name('page.categories');
@@ -80,8 +80,8 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
     Route::get('/state/{state_slug}', 'PagesController@state')->name('page.state');
     Route::get('/state/{state_slug}/city/{city_slug}', 'PagesController@city')->name('page.city');
 
-    Route::get('/listing/{item_slug}', 'PagesController@item')->name('page.item');
-    Route::get('/listing/{item_slug}/product/{product_slug}', 'PagesController@product')->name('page.product');
+    Route::get('/listing/{item_slug}', 'PagesController@item')->name('page.item')->middleware('verified');
+    Route::get('/listing/{item_slug}/product/{product_slug}', 'PagesController@product')->name('page.product')->middleware('verified');
 
     Route::middleware(['auth'])->group(function () {
 
@@ -102,7 +102,7 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
     Route::group(['prefix'=>'blog'], function(){
 
         // Get all published posts
-        Route::get('/', 'PagesController@blog')->name('page.blog');
+        Route::get('/', 'PagesController@blog')->name('page.blog')->middleware('verified');
 
         // Get posts for a given tag
         Route::get('/tag/{tag_slug}', 'PagesController@blogByTag')->name('page.blog.tag');

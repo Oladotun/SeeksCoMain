@@ -33,12 +33,16 @@
                 <ul>
                     <li>
                         <span class="icon_pin_alt"></span>
-                        <?php echo e($item->item_address_hide == \App\Item::ITEM_ADDR_NOT_HIDE ? $item->item_address . ',' : ''); ?>
+
+                        <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
+                            <?php echo e(number_format($item->distance_miles, 2, '.', '')); ?> miles
+                        </a>
+
+                        <!-- <?php echo e($item->item_address_hide == \App\Item::ITEM_ADDR_NOT_HIDE ? $item->item_address . ',' : ''); ?>
 
                         <a href="<?php echo e(route('page.city', ['state_slug'=>$item->state->state_slug, 'city_slug'=>$item->city->city_slug])); ?>"><?php echo e($item->city->city_name); ?></a>,
                         <a href="<?php echo e(route('page.state', ['state_slug'=>$item->state->state_slug])); ?>"><?php echo e($item->state->state_name); ?></a>
-                        <?php echo e($item->item_postal_code); ?>
-
+                        <?php echo e($item->item_postal_code); ?> -->
                     </li>
                 </ul>
             <?php endif; ?>

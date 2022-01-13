@@ -385,6 +385,51 @@
 
             "use strict";
 
+
+            /**
+             * Start get user lat & lng location
+             */
+            function success(position) {
+                const latitude  = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                console.log("Latitude: " + latitude + ", Longitude: " + longitude);
+
+                var ajax_url = '/ajax/location/save/' + latitude + '/' + longitude;
+
+                console.log(ajax_url);
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+                jQuery.ajax({
+                    url: ajax_url,
+                    method: 'post',
+                    data: {
+                    },
+                    success: function(result){
+                        console.log(result);
+                    }});
+            }
+
+            function error() {
+                console.log("Unable to retrieve your location");
+            }
+
+            if(!navigator.geolocation) {
+
+                console.log("Geolocation is not supported by your browser");
+            } else {
+
+                console.log("Locating ...");
+                navigator.geolocation.getCurrentPosition(success, error);
+            }
+            /**
+             * End get user lat & lng location
+             */
+
             /**
              * Start initial map box with OpenStreetMap
              */

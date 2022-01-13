@@ -31,10 +31,15 @@
                 <ul>
                     <li>
                         <span class="icon_pin_alt"></span>
-                        {{ $item->item_address_hide == \App\Item::ITEM_ADDR_NOT_HIDE ? $item->item_address . ',' : '' }}
+
+                        <a href="{{ route('page.item', $item->item_slug) }}">
+                            {{number_format($item->distance_miles, 2, '.', '')}} miles
+                        </a>
+
+                        <!-- {{ $item->item_address_hide == \App\Item::ITEM_ADDR_NOT_HIDE ? $item->item_address . ',' : '' }}
                         <a href="{{ route('page.city', ['state_slug'=>$item->state->state_slug, 'city_slug'=>$item->city->city_slug]) }}">{{ $item->city->city_name }}</a>,
                         <a href="{{ route('page.state', ['state_slug'=>$item->state->state_slug]) }}">{{ $item->state->state_name }}</a>
-                        {{ $item->item_postal_code }}
+                        {{ $item->item_postal_code }} -->
                     </li>
                 </ul>
             @endif

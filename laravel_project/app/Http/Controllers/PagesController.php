@@ -332,6 +332,10 @@ class PagesController extends Controller
                 ->with('state')
                 ->with('city')
                 ->with('user');
+                // Add distance
+            $paid_items_query->selectRaw('*, ( 3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+            
+
 
             $total_paid_items = $paid_items_query->count();
             /**
@@ -375,6 +379,8 @@ class PagesController extends Controller
                 ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
                 ->whereIn('items.user_id', $free_user_ids);
 
+            $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+
             // filter free listings state
             if(!empty($filter_state))
             {
@@ -409,9 +415,8 @@ class PagesController extends Controller
             }
             elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
             {
-                $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
-                    ->where('items.item_type', Item::ITEM_TYPE_REGULAR)
-                    ->orderBy('distance', 'ASC');
+                $free_items_query->where('items.item_type', Item::ITEM_TYPE_REGULAR)
+                    ->orderBy('distance_miles', 'ASC');
             }
             /**
              * End filter sort by for free listing
@@ -437,8 +442,8 @@ class PagesController extends Controller
 
             if($total_free_items == 0 || $total_paid_items == 0)
             {
-                $paid_items = $paid_items_query->paginate(10);
-                $free_items = $free_items_query->paginate(10);
+                $paid_items = $paid_items_query->paginate(12);
+                $free_items = $free_items_query->paginate(12);
 
                 if($total_free_items == 0)
                 {
@@ -451,13 +456,14 @@ class PagesController extends Controller
             }
             else
             {
-                $num_of_pages = ceil(($total_paid_items + $total_free_items) / 10);
+                $num_of_pages = ceil(($total_paid_items + $total_free_items) / 12);
 
                 $paid_items_per_page = ceil($total_paid_items / $num_of_pages) > 4 ? 4 : ceil($total_paid_items / $num_of_pages);
-
-                $free_items_per_page = 10 - $paid_items_per_page;
+                // $free_items_per_page = 12 - $paid_items_per_page;
 
                 $paid_items = $paid_items_query->paginate($paid_items_per_page);
+
+                $free_items_per_page = 12 - $paid_items->count();
                 $free_items = $free_items_query->paginate($free_items_per_page);
 
                 if(ceil($total_paid_items / $paid_items_per_page) > ceil($total_free_items / $free_items_per_page))
@@ -949,6 +955,18 @@ class PagesController extends Controller
         $active_user_ids = $subscription_obj->getActiveUserIds();
 
 
+        if(!empty(session('user_device_location_lat', '')) && !empty(session('user_device_location_lng', '')))
+        {
+            $latitude = session('user_device_location_lat', '');
+            $longitude = session('user_device_location_lng', '');
+        }
+        else
+        {
+            $latitude = $settings->setting_site_location_lat;
+            $longitude = $settings->setting_site_location_lng;
+        }
+
+
         ### Get Cities
             // $cities_present = Cities::with('items')->all();
 
@@ -1038,6 +1056,10 @@ class PagesController extends Controller
             ->with('city')
             ->with('user');
 
+
+        // Add distance
+        $paid_items_query->selectRaw('*, ( 3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+
         $total_paid_items = $paid_items_query->count();
 
         // free listing
@@ -1074,6 +1096,8 @@ class PagesController extends Controller
             $free_items_query->where('items.city_id', $filter_city);
         }
 
+        $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+    
         /**
          * Start filter sort by for free listing
          */
@@ -1096,9 +1120,8 @@ class PagesController extends Controller
         }
         elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
         {
-            $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
-                ->where('items.item_type', Item::ITEM_TYPE_REGULAR)
-                ->orderBy('distance', 'ASC');
+            $free_items_query->where('items.item_type', Item::ITEM_TYPE_REGULAR)
+                ->orderBy('distance_miles', 'ASC');
         }
         /**
          * End filter sort by for free listing
@@ -1331,6 +1354,17 @@ class PagesController extends Controller
                      * Get parent and children categories
                      */
 
+                    if(!empty(session('user_device_location_lat', '')) && !empty(session('user_device_location_lng', '')))
+                    {
+                        $latitude = session('user_device_location_lat', '');
+                        $longitude = session('user_device_location_lng', '');
+                    }
+                    else
+                    {
+                        $latitude = $settings->setting_site_location_lat;
+                        $longitude = $settings->setting_site_location_lng;
+                    }
+
                     // filter search query
                     $search_query = empty($request->search_query) ? null : $request->search_query;
                     $search_values = !empty($search_query) ? preg_split('/\s+/', $search_query, -1, PREG_SPLIT_NO_EMPTY) : array();
@@ -1399,6 +1433,9 @@ class PagesController extends Controller
 
                     $paid_items_query->whereIn('id', $item_ids);
 
+                    // Add distance
+                    $paid_items_query->selectRaw('*, ( 3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+
                     $paid_items_query->where("items.item_status", Item::ITEM_PUBLISHED)
                         ->where(function ($query) use ($site_prefer_country_id) {
                             $query->where('items.country_id', $site_prefer_country_id)
@@ -1449,6 +1486,9 @@ class PagesController extends Controller
                         ->where('items.item_featured_by_admin', Item::ITEM_NOT_FEATURED_BY_ADMIN)
                         ->whereIn('items.user_id', $free_user_ids);
 
+
+                    $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
+
                     // filter free listings state
                     if(!empty($filter_state))
                     {
@@ -1483,9 +1523,8 @@ class PagesController extends Controller
                     }
                     elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEARBY_FIRST)
                     {
-                        $free_items_query->selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()])
-                            ->where('items.item_type', Item::ITEM_TYPE_REGULAR)
-                            ->orderBy('distance', 'ASC');
+                        $free_items_query->where('items.item_type', Item::ITEM_TYPE_REGULAR)
+                            ->orderBy('distance_miles', 'ASC');
                     }
                     /**
                      * End filter sort by for free listing
