@@ -664,15 +664,15 @@ class PagesController extends Controller
             /**
              * End initial blade view file path
              */
-            $request_check = false;
-            if ($request){
+            // $request_check = false;
+            // if ($request){
 
-                $request_check = $request["GET_/categories?search_query"];
+            //     $request_check = $request["GET_/categories?search_query"];
 
-                // $request_check = $request[1];
-                // $search_query = 'espresso';
+            //     // $request_check = $request[1];
+            //     // $search_query = 'espresso';
                 
-            }
+            // }
             
 
 
@@ -1126,12 +1126,14 @@ class PagesController extends Controller
         $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
 
         
-    
+        // $free_items_query->inRandomOrder()->orderBy('distance_miles', 'ASC');
         /**
          * Start filter sort by for free listing
          */
-        $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-        if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+        $filter_sort_by = empty($request->filter_sort_by) ? 'empty': $request->filter_sort_by;
+        if($filter_sort_by == 'empty'){
+            $free_items_query->inRandomOrder()->orderBy('distance_miles', 'ASC');
+        }elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
         {
             $free_items_query->orderBy('items.created_at', 'DESC');
         }
@@ -1334,12 +1336,12 @@ class PagesController extends Controller
          */
 
 
-        if(empty($request->filter_sort_by)) {
+        // if(empty($request->filter_sort_by)) {
 
-            $paid_items = $paid_items->shuffle();
-            $free_items = $free_items->shuffle();
+        //     $paid_items = $paid_items->shuffle();
+        //     $free_items = $free_items->shuffle();
 
-        }
+        // }
 
         
         /**
@@ -1529,6 +1531,8 @@ class PagesController extends Controller
 
                     $free_items_query->selectRaw('*, (  3959 * acos( cos( radians( ? ) ) * cos( radians( item_lat ) ) * cos( radians( item_lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( item_lat ) ) ) ) AS distance_miles', [$this->getLatitude(), $this->getLongitude(), $this->getLatitude()]);
 
+                    
+
 
                     // filter free listings state
                     if(!empty($filter_state))
@@ -1545,8 +1549,12 @@ class PagesController extends Controller
                     /**
                      * Start filter sort by for free listing
                      */
-                    $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-                    if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+                    $filter_sort_by = empty($request->filter_sort_by) ? 'empty' : $request->filter_sort_by;
+
+                    if($filter_sort_by == 'empty'){
+                        $free_items_query->inRandomOrder()->orderBy('distance_miles', 'ASC');
+                    }
+                    elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
                     {
                         $free_items_query->orderBy('items.created_at', 'DESC');
                     }
@@ -1759,12 +1767,12 @@ class PagesController extends Controller
                      */
 
 
-                    if(empty($request->filter_sort_by)) {
+                    // if(empty($request->filter_sort_by)) {
 
-                        $paid_items = $paid_items->shuffle();
-                        $free_items = $free_items->shuffle();
+                    //     $paid_items = $paid_items->shuffle();
+                    //     $free_items = $free_items->shuffle();
 
-                    }
+                    // }
 
                     
 
@@ -1949,14 +1957,16 @@ class PagesController extends Controller
                     $free_items_query->where('items.city_id', $filter_city);
                 }
 
-                $paid_items = $paid_items->shuffle();
-                $free_items = $free_items->shuffle();
+                // $paid_items = $paid_items->shuffle();
+                // $free_items = $free_items->shuffle();
 
                 /**
                  * Start filter sort by for free listing
                  */
-                $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-                if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+                $filter_sort_by = empty($request->filter_sort_by) ? 'empty': $request->filter_sort_by;
+                if($filter_sort_by == 'empty'){
+                    $free_items_query->inRandomOrder()->orderBy('distance_miles', 'ASC');
+                }elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
                 {
                     $free_items_query->orderBy('items.created_at', 'DESC');
                 }
@@ -2344,8 +2354,10 @@ class PagesController extends Controller
                     /**
                      * Start filter sort by for free listing
                      */
-                    $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-                    if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+                    $filter_sort_by = empty($request->filter_sort_by) ? 'empty': $request->filter_sort_by;
+                    if($filter_sort_by == 'empty'){
+                        $free_items_query->inRandomOrder()->orderBy('distance_miles', 'ASC');
+                    }elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
                     {
                         $free_items_query->orderBy('items.created_at', 'DESC');
                     }
@@ -2722,8 +2734,10 @@ class PagesController extends Controller
 
                 
 
-                $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-                if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+                $filter_sort_by = empty($request->filter_sort_by) ? 'empty': $request->filter_sort_by;
+                if($filter_sort_by == 'empty'){
+                    $free_items_query->inRandomOrder()->orderBy('distance_miles', 'ASC');
+                }elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
                 {
                     $free_items_query->orderBy('items.created_at', 'DESC');
                 }
@@ -3081,8 +3095,10 @@ class PagesController extends Controller
                     /**
                      * Start filter sort by for free listing
                      */
-                    $filter_sort_by = empty($request->filter_sort_by) ? Item::ITEMS_SORT_BY_NEWEST_CREATED : $request->filter_sort_by;
-                    if($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
+                    $filter_sort_by = empty($request->filter_sort_by) ? 'empty': $request->filter_sort_by;
+                    if($filter_sort_by == 'empty'){
+                        $free_items_query->inRandomOrder()->orderBy('distance_miles', 'ASC');
+                    }elseif($filter_sort_by == Item::ITEMS_SORT_BY_NEWEST_CREATED)
                     {
                         $free_items_query->orderBy('items.created_at', 'DESC');
                     }
