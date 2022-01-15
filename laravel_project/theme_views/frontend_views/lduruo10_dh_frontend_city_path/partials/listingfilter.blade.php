@@ -1,7 +1,4 @@
-<div class="filter nice-scroll  col-xs-12 col-sm-12 col-md-12 col-lg-12"  style="background-color:#b6d5f6;">
-           <!--  <button type="button"  class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-             </button> -->
+<div class="filter nice-scroll  col-12"  style="background-color:#b6d5f6; overflow-y: scroll;">
             <form method="GET" action="{{ route('page.categories') }}">
 
                 <!-- {{$all_item_cities}} -->

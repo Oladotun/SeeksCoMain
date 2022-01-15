@@ -74,11 +74,27 @@
 
     /*.filter {margin-top: 4%; height: auto;}*/
     /*.listing {margin-top: 0%;}*/
-    .filter {
+   /* .filter {
         padding-top: 160px; 
         height: auto;
         margin-top:3%;
         transition: all .3s;
+    }*/
+
+    .filter {
+        padding-top: 160px; 
+        height: 100%;
+        margin-top:2%;
+        overflow-y: scroll;
+        top:  0;
+        bottom: 0;
+    }
+
+    .nice-scroll {
+        overflow-y: scroll !important; 
+        height: 100% !important;
+        cursor: default !important;
+        touch-action: auto !important;
     }
 
     .filter.active {

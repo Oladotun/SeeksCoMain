@@ -172,6 +172,7 @@
             });
 
         $('.close').on('click', function() {
+                e.preventDefault();
                 $('.filter').removeClass('active');
             });
 

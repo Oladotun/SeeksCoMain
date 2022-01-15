@@ -682,7 +682,7 @@ class PagesController extends Controller
                         'site_innerpage_header_background_image', 'site_innerpage_header_background_youtube_video',
                         'site_innerpage_header_title_font_color', 'site_innerpage_header_paragraph_font_color',
                         'search_query', 'filter_categories', 'filter_state', 'filter_city', 'filter_sort_by', 'paid_items',
-                        'free_items', 'pagination', 'all_printable_categories', 'all_states', 'all_cities', 'total_results','all_item_cities', 'request', 'request_check','all_states','all_cities'));
+                        'free_items', 'pagination', 'all_printable_categories', 'all_states', 'all_cities', 'total_results','all_item_cities', 'request','all_states','all_cities'));
         
     }
 
