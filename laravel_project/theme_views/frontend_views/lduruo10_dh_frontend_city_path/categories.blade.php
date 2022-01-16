@@ -381,13 +381,14 @@
     <script>
 
         $(function () {
-          $('[data-toggle="tooltip"]').tooltip()
+          jQuery('[data-toggle="tooltip"]').tooltip();
         });
 
     </script>
 
     <script type="text/javascript">
 
+        // $('[data-toggle="tooltip"]').tooltip();
 
         
         $('#item-save-button-xl').on('click', function(){

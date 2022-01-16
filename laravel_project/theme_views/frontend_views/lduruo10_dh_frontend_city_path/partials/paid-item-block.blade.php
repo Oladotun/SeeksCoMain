@@ -18,14 +18,14 @@
         </a>
 
         @guest
-            <a class="btn primary-btn" id="item-save-button-xl" data-toggle="tooltip" title="{{ __('frontend.item.save') }}"><i class="far fa-bookmark"></i></a>
+            <a class="btn primary-btn clickHandleButton" id="item-save-button-xl" data-toggle="tooltip" title="{{ __('frontend.item.save') }}"><i class="far fa-bookmark"></i></a>
             <form id="item-save-form-xl" action="{{ route('listing.item.save', ['item_slug' => $item->item_slug]) }}" method="POST" hidden="true">
                 @csrf
             </form>
             <!-- <div>{{$item->item_slug}}</div> -->
         @else
             @if(Auth::user()->hasSavedItem($item->id))
-                <a class="btn primary-btn primary-btn-warning" id="item-saved-button-xl" data-toggle="tooltip" title="{{ __('frontend.item.saved') }}"><i class="fas fa-check"></i></a>
+                <a class="btn primary-btn primary-btn-warning clickSavedHandleButton" id="item-saved-button-xl" data-toggle="tooltip" title="{{ __('frontend.item.saved') }}"><i class="fas fa-check"></i></a>
                 <form id="item-unsave-form-xl" action="{{ route('page.item.unsave', ['item_slug' => $item->item_slug]) }}" method="POST" hidden="true">
                     @csrf
                 </form>
@@ -115,20 +115,49 @@
       </div>
     </div>
 </div>
+
+<script src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js') }}"></script>
+@include('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script>
+
+    // $(function () {
+    //   $('[data-toggle="tooltip"]').tooltip()
+    // });
+
+    $(document).on('click', '.clickHandleButton', (e) => { //replaces function book()
+        $(e.currentTarget).addClass("disabled");
+
+       $(e.currentTarget).next('form').submit();
+       //find the form next to the clicked button and submit the form.
+    });
+
+    $(document).on('click', '.clickSavedHandleButton', (e) => { //replaces function book()
+
+        $(e.currentTarget).off("mouseenter");
+        $(e.currentTarget).off("mouseleave");
+        $(e.currentTarget).addClass("disabled");
+       $(e.currentTarget).next('form').submit();
+       //find the form next to the clicked button and submit the form.
+    });
+
+</script>
 <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
 <script src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js') }}"></script>
 @include('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale') -->
 
 
-<script>
+<!-- <script>
 
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     });
 
-</script>
+</script> -->
 
-<script type="text/javascript">
+<!-- <script type="text/javascript">
 
 
     
@@ -154,7 +183,7 @@
             $("#item-saved-button-xl").html("<i class=\"fas fa-check\"></i>");
         });
 </script>
-
+ -->
 <!-- <script>
     $(document).ready(function(){
 
