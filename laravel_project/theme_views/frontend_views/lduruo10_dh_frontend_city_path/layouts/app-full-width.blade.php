@@ -103,7 +103,7 @@
 
 <!-- Page Preloder -->
 <div id="preloder">
-    <div class="loader"></div>
+    <div class="javascript.min.js"></div>
 </div>
 
 {{-- nav bar --}}
@@ -120,11 +120,11 @@
 
 <script>
 
-    // jQuery.event.special.touchstart = {
-    //     setup: function( _, ns, handle ){
-    //         this.addEventListener("touchstart", handle, { passive: true });
-    //     }
-    // };
+    jQuery.event.special.touchstart = {
+        setup: function( _, ns, handle ){
+            this.addEventListener("touchstart", handle, { passive: true });
+        }
+    };
 
     $(document).ready(function(){
 

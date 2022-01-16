@@ -81,7 +81,9 @@ Route::middleware(['installed','demo','global_variables'])->group(function () {
     Route::get('/state/{state_slug}/city/{city_slug}', 'PagesController@city')->name('page.city');
 
     Route::get('/listing/{item_slug}', 'PagesController@item')->name('page.item')->middleware('verified');
+    Route::post('/{item_slug}/save', 'PagesController@listingSaveItem')->name('listing.item.save')->middleware('verified');
     Route::get('/listing/{item_slug}/product/{product_slug}', 'PagesController@product')->name('page.product')->middleware('verified');
+
 
     Route::middleware(['auth'])->group(function () {
 

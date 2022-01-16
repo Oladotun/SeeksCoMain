@@ -1,3 +1,14 @@
+@section('styles')
+
+    <!-- @if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP)
+        <link href="{{ asset('frontend/vendor/leaflet/leaflet.css') }}" rel="stylesheet" />
+    @endif -->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+@endsection
 <div class="grid-item .grid-item--width2 col-6 col-md-6 col-lg-3 col-xl-3">
     <div class="card">
         <a href="{{ route('page.item', $item->item_slug) }}">
@@ -5,6 +16,33 @@
            <div class="listing__item__pic__tag">{{ __('frontend.item.featured') }}</div>
             </img>
         </a>
+
+        @guest
+            <a class="btn primary-btn" id="item-save-button-xl" data-toggle="tooltip" title="{{ __('frontend.item.save') }}"><i class="far fa-bookmark"></i></a>
+            <form id="item-save-form-xl" action="{{ route('listing.item.save', ['item_slug' => $item->item_slug]) }}" method="POST" hidden="true">
+                @csrf
+            </form>
+            <!-- <div>{{$item->item_slug}}</div> -->
+        @else
+            @if(Auth::user()->hasSavedItem($item->id))
+                <a class="btn primary-btn primary-btn-warning" id="item-saved-button-xl" data-toggle="tooltip" title="{{ __('frontend.item.saved') }}"><i class="fas fa-check"></i></a>
+                <form id="item-unsave-form-xl" action="{{ route('page.item.unsave', ['item_slug' => $item->item_slug]) }}" method="POST" hidden="true">
+                    @csrf
+                </form>
+            @else
+                <a class="btn primary-btn" id="item-save-button-xl" data-toggle="tooltip" title="{{ __('frontend.item.save') }}"><i class="far fa-bookmark"></i></a>
+                <form id="item-save-form-xl" action="{{ route('listing.item.save', ['item_slug' => $item->item_slug]) }}" method="POST" hidden="true">
+                    @csrf
+                </form>
+
+                <!-- <a class="pl-1" target="_blank" href="{{ route('page.item.save', ['item_slug' => $item->item_slug]) }}">
+                                <i class="fas fa-external-link-alt"></i>
+                                {{ __('page.item.save') }}
+                            </a> -->
+            @endif
+        @endguest
+
+        <a href="tel:{{ $item->item_phone }}" data-toggle="tooltip" title="{{ __('frontend.item.call') }}"><i class="listing__item__home__tag fas fa-phone-alt" ></i></a>
       <div class="card-body">
         <div class="listing__item__text__inside">
             
@@ -77,6 +115,88 @@
       </div>
     </div>
 </div>
+<!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js') }}"></script>
+@include('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale') -->
+
+
+<script>
+
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+
+</script>
+
+<script type="text/javascript">
+
+
+    
+    $('#item-save-button-xl').on('click', function(){
+            $("#item-save-button-xl").addClass("disabled");
+            $("#item-save-form-xl").submit();
+        });
+
+        $('#item-saved-button-xl').on('click', function(){
+            $("#item-saved-button-xl").off("mouseenter");
+            $("#item-saved-button-xl").off("mouseleave");
+            $("#item-saved-button-xl").addClass("disabled");
+            $("#item-unsave-form-xl").submit();
+        });
+
+        $("#item-saved-button-xl").on('mouseenter', function(){
+            $("#item-saved-button-xl").attr("class", "btn primary-btn primary-btn-danger");
+            $("#item-saved-button-xl").html("<i class=\"far fa-trash-alt\"></i>");
+        });
+
+        $("#item-saved-button-xl").on('mouseleave', function(){
+            $("#item-saved-button-xl").attr("class", "btn primary-btn primary-btn-warning");
+            $("#item-saved-button-xl").html("<i class=\"fas fa-check\"></i>");
+        });
+</script>
+
+<!-- <script>
+    $(document).ready(function(){
+
+            "use strict";
+
+            /**
+             * Start initial save button
+             */
+
+             /**
+              * Start initial tooltips
+              */
+            // $('[data-toggle="tooltip"]').tooltip();
+
+
+            // $('#item-save-button-xl').on('click', function(){
+            //     $("#item-save-button-xl").addClass("disabled");
+            //     $("#item-save-form-xl").submit();
+            // });
+
+            // $('#item-saved-button-xl').on('click', function(){
+            //     $("#item-saved-button-xl").off("mouseenter");
+            //     $("#item-saved-button-xl").off("mouseleave");
+            //     $("#item-saved-button-xl").addClass("disabled");
+            //     $("#item-unsave-form-xl").submit();
+            // });
+
+            // $("#item-saved-button-xl").on('mouseenter', function(){
+            //     $("#item-saved-button-xl").attr("class", "btn primary-btn primary-btn-danger");
+            //     $("#item-saved-button-xl").html("<i class=\"far fa-trash-alt\"></i>");
+            // });
+
+            // $("#item-saved-button-xl").on('mouseleave', function(){
+            //     $("#item-saved-button-xl").attr("class", "btn primary-btn primary-btn-warning");
+            //     $("#item-saved-button-xl").html("<i class=\"fas fa-check\"></i>");
+            // });
+            /**
+             * End initial save button
+             */
+
+        });
+</script>  -->   
 <!-- <div class="listing__item listing__item_featured_box">
     <a href="{{ route('page.item', $item->item_slug) }}">
         <div class="listing__item__pic set-bg" data-setbg="{{ !empty($item->item_image_medium) ? Storage::disk('public')->url('item/' . $item->item_image_medium) : asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/placeholder/full_item_feature_image_medium.webp') }}">

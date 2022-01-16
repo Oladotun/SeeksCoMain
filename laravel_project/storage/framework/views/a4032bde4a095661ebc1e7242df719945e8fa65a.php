@@ -1,13 +1,12 @@
 <?php $__env->startSection('styles'); ?>
 
-    <!-- <?php if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP): ?>
-        <link href="<?php echo e(asset('frontend/vendor/leaflet/leaflet.css')); ?>" rel="stylesheet" />
-    <?php endif; ?> -->
+    <link href="<?php echo e(asset('frontend/vendor/leaflet/leaflet.css')); ?>" rel="stylesheet" />
+
+
+    <link rel="stylesheet" href="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/justified-gallery/justifiedGallery.min.css')); ?>" type="text/css">
+    <link rel="stylesheet" href="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/colorbox/colorbox.css')); ?>" type="text/css">
 
     <link href="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.css')); ?>" rel="stylesheet" />
-
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.js"></script>
 
 <?php $__env->stopSection(); ?>
 
@@ -425,6 +424,7 @@ unset($__errorArgs, $__bag); ?>
         Make sure you put this AFTER Leaflet's CSS
         <script src="<?php echo e(asset('frontend/vendor/leaflet/leaflet.js')); ?>"></script>
     <?php endif; ?> -->
+    <script src="<?php echo e(asset('frontend/vendor/leaflet/leaflet.js')); ?>"></script>
     <script src="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js')); ?>"></script>
     <?php echo $__env->make('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -443,6 +443,41 @@ unset($__errorArgs, $__bag); ?>
                 }
             });
         });
+    </script>
+
+    <script>
+
+        $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+        });
+
+    </script>
+
+    <script type="text/javascript">
+
+
+        
+        $('#item-save-button-xl').on('click', function(){
+                $("#item-save-button-xl").addClass("disabled");
+                $("#item-save-form-xl").submit();
+            });
+
+            $('#item-saved-button-xl').on('click', function(){
+                $("#item-saved-button-xl").off("mouseenter");
+                $("#item-saved-button-xl").off("mouseleave");
+                $("#item-saved-button-xl").addClass("disabled");
+                $("#item-unsave-form-xl").submit();
+            });
+
+            $("#item-saved-button-xl").on('mouseenter', function(){
+                $("#item-saved-button-xl").attr("class", "btn primary-btn primary-btn-danger");
+                $("#item-saved-button-xl").html("<i class=\"far fa-trash-alt\"></i>");
+            });
+
+            $("#item-saved-button-xl").on('mouseleave', function(){
+                $("#item-saved-button-xl").attr("class", "btn primary-btn primary-btn-warning");
+                $("#item-saved-button-xl").html("<i class=\"fas fa-check\"></i>");
+            });
     </script>
 
     

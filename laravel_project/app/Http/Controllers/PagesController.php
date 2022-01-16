@@ -4301,6 +4301,57 @@ class PagesController extends Controller
 
     }
 
+    public function listingSaveItem(Request $request, string $item_slug)
+    {
+        $item = Item::where('item_slug', $item_slug)
+            ->where('item_status', Item::ITEM_PUBLISHED)
+            ->first();
+
+        if($item)
+        {
+            if(Auth::check())
+            {
+                $login_user = Auth::user();
+
+                if($login_user->hasSavedItem($item->id))
+                {
+                    \Session::flash('flash_message', __('frontend.item.save-item-error-exist'));
+                    \Session::flash('flash_type', 'danger');
+
+                    return redirect()->route('page.item', $item->item_slug);
+                }
+                else
+                {
+                    $login_user->savedItems()->attach($item->id);
+
+                    // $routehomepage = '{ {route("page.home")}}';
+                    // $url = "Listings saved click to see it <a href='" + {{routehomepage +"'> here </a>";
+                    // $routehomepage = '{ {route("page.home")}}';
+                    $url = "Listings saved";
+                    \Session::flash('flash_message', $url);
+                    // \Session::flash('flash_message', __('frontend.item.save-item-success'));
+                    \Session::flash('flash_type', 'success');
+
+                    //user.items.saved 
+                    $login_user->notify(new SavedBusinessListing($item, $login_user->isAdmin()));
+
+                    return redirect()->route('page.item', $item->item_slug);
+                }
+            }
+            else
+            {
+                // \Session::flash('flash_message', __('frontend.item.save-item-error-login'));
+                // \Session::flash('flash_type', 'danger');
+
+                return redirect()->route('page.item', $item->item_slug);
+            }
+        }
+        else
+        {
+            abort(404);
+        }
+    }
+
     public function saveItem(Request $request, string $item_slug)
     {
         $item = Item::where('item_slug', $item_slug)

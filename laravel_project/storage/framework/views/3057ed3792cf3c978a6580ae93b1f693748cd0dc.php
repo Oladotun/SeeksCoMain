@@ -53,6 +53,20 @@
         font-size: 20px;
     }
 
+
+    .listing__item__home__tag {
+        font-size: 12px;
+        color: #ffffff;
+        background: #64a8f0;
+        font-weight: 600;
+        display: inline-block;
+        padding: 5px 10px 5px 10px;
+        border-radius: 2px;
+        position: absolute;
+        top: 20px; 
+        right: 20px;
+    }
+
     
      body {
         padding-top: 60px;
