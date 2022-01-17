@@ -53,6 +53,11 @@
         font-size: 20px;
     }
 
+    .icon-logo {
+        max-height: .5rem; 
+        max-width: .5rem;
+    }
+
 
     .listing__item__home__tag {
         font-size: 12px;
@@ -114,7 +119,14 @@
     .filter.active {
         left: 0;
     }
+    .card-gallery {
+        max-height: 2rem; 
+        max-width: 2rem;
+    }
     .h5{word-wrap: break-word;}
+    .listing__item__text__inside h5 {
+            font-size: 1rem;
+        }
     @media only screen and (min-width: 1200px) and (max-width: 1399px) {
         /*.listing {padding-top: 30%;}*/
         /*.container-fluid {padding-top: 10%;}*/
@@ -235,11 +247,16 @@
             height: 20rem;
         }
         .listing__item__text__inside h5 {
-            font-size: 0.7rem;
+            font-size: 0.4rem;
         }
 
         .listing__item__text__inside ul li{
             font-size: 0.5rem;
+        }
+
+        .listing__item__text__inside small{
+            font-size: 0.3rem;
+            display:inline-block;
         }
         .listing__item__text__info__left span {
             font-size: 0.5rem;

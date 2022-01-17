@@ -1,3 +1,8 @@
+@section('styles')
+
+    <link rel="stylesheet" href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/justified-gallery/justifiedGallery.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/colorbox/colorbox.css') }}" type="text/css">
+@endsection
 <div class="grid-item .grid-item--width2 col-6 col-md-6 col-lg-3 col-xl-3">
     <div class="card">
         <a href="{{ route('page.item', $item->item_slug) }}">
@@ -32,9 +37,80 @@
 
         <a href="tel:{{ $item->item_phone }}" data-toggle="tooltip" title="{{ __('frontend.item.call') }}"><i class="listing__item__home__tag fas fa-phone-alt" ></i></a>
       <div class="card-body">
+
         <div class="listing__item__text__inside">
             
                 <a href="{{ route('page.item', $item->item_slug) }}">
+                   <h5 class="card-title float-left"> {{ str_limit($item->item_title, 44, '...') }} </h5>
+                   @if($item->item_type == \App\Item::ITEM_TYPE_REGULAR)
+                   <dt  class="float-right" >
+                            <i class="fas fa-map-marker-alt fa-sm"></i>
+                             <small class="break-word font-weight-bold"  >
+                            {{number_format($item->distance_miles, 2, '.', '')}} miles</small> 
+
+                        </dt>
+                     @endif
+                     <div>
+                     <dt  class="float-right" >
+                        @if($item->getCountRating() > 0)
+                        <small>
+                            {{$item->getAverageRating()}} stars
+                       
+                            @if($item->getCountRating() == 1)
+                                {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                            @else
+                                {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                            @endif
+                        </small>
+                        @endif
+                    </dt>
+                    </div>
+
+            
+                </a>
+
+            
+         </div>
+            <!-- @if($item->getCountRating() > 0)
+                <a href="{{ route('page.item', $item->item_slug) }}" style="display:inline-block;">
+                    
+                    <div class="listing__item__rating__star">
+                        <div class="pl-0 rating_stars rating_stars_{{ $item->item_slug }}" data-id="rating_stars_{{ $item->item_slug }}" data-rating="{{ $item->item_average_rating }}"></div>
+                    </div> 
+                    <small>
+                        {{$item->getAverageRating()}}
+                    </small>
+
+                    <small>
+                        @if($item->getCountRating() == 1)
+                            {{ $item->getCountRating() . ' ' . __('review.frontend.review') }}
+                        @else
+                            {{ $item->getCountRating() . ' ' . __('review.frontend.reviews') }}
+                        @endif
+                    </small>
+                </a>
+            @endif -->
+
+            
+
+            <!-- <div class="float-right"> -->
+            @if($item->galleries()->count() > 0)
+                <div class="listing__details__gallery__pic">
+                    @php
+                    $item_galleries = $item->galleries()->take(3)->get();
+                    $i=0;
+                    @endphp
+                    @foreach($item_galleries as $galleries_key => $gallery)
+                        <a href="{{ route('page.item', $item->item_slug) }}">
+                            <img  class="card-gallery" alt="Image" src="{{ empty($gallery->item_image_gallery_thumb_name) ? Storage::disk('public')->url('item/gallery/' . $gallery->item_image_gallery_name) : Storage::disk('public')->url('item/gallery/' . $gallery->item_image_gallery_thumb_name) }}"/>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+            <!-- </div> -->
+        <!-- <div class="listing__item__text__inside"> -->
+            
+                <!-- <a href="{{ route('page.item', $item->item_slug) }}">
                    <h5 class="card-title "> {{ str_limit($item->item_title, 44, '...') }} </h5>
                 </a>
          
@@ -61,14 +137,14 @@
                             {{number_format($item->distance_miles, 2, '.', '')}} miles
                         </a>
 
-                        <!-- {{ $item->item_address_hide == \App\Item::ITEM_ADDR_NOT_HIDE ? $item->item_address . ',' : '' }}
+                         {{ $item->item_address_hide == \App\Item::ITEM_ADDR_NOT_HIDE ? $item->item_address . ',' : '' }}
                         <a href="{{ route('page.city', ['state_slug'=>$item->state->state_slug, 'city_slug'=>$item->city->city_slug]) }}">{{ $item->city->city_name }}</a>,
                         <a href="{{ route('page.state', ['state_slug'=>$item->state->state_slug]) }}">{{ $item->state->state_name }}</a>
-                        {{ $item->item_postal_code }} -->
+                        {{ $item->item_postal_code }} 
                     </li>
                 </ul>
             @endif
-        </div>
+        </div> -->
       </div>
       <div class="card-footer bg-white">
         <!-- <small class="text-muted">Last updated 3 mins ago</small> -->

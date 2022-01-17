@@ -1,3 +1,8 @@
+<?php $__env->startSection('styles'); ?>
+
+    <link rel="stylesheet" href="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/justified-gallery/justifiedGallery.min.css')); ?>" type="text/css">
+    <link rel="stylesheet" href="<?php echo e(asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/colorbox/colorbox.css')); ?>" type="text/css">
+<?php $__env->stopSection(); ?>
 <div class="grid-item .grid-item--width2 col-6 col-md-6 col-lg-3 col-xl-3">
     <div class="card">
         <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
@@ -33,9 +38,85 @@
 
         <a href="tel:<?php echo e($item->item_phone); ?>" data-toggle="tooltip" title="<?php echo e(__('frontend.item.call')); ?>"><i class="listing__item__home__tag fas fa-phone-alt" ></i></a>
       <div class="card-body">
+
         <div class="listing__item__text__inside">
             
                 <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
+                   <h5 class="card-title float-left"> <?php echo e(str_limit($item->item_title, 44, '...')); ?> </h5>
+                   <?php if($item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
+                   <dt  class="float-right" >
+                            <i class="fas fa-map-marker-alt fa-sm"></i>
+                             <small class="break-word font-weight-bold"  >
+                            <?php echo e(number_format($item->distance_miles, 2, '.', '')); ?> miles</small> 
+
+                        </dt>
+                     <?php endif; ?>
+                     <div>
+                     <dt  class="float-right" >
+                        <?php if($item->getCountRating() > 0): ?>
+                        <small>
+                            <?php echo e($item->getAverageRating()); ?> stars
+                       
+                            <?php if($item->getCountRating() == 1): ?>
+                                <?php echo e($item->getCountRating() . ' ' . __('review.frontend.review')); ?>
+
+                            <?php else: ?>
+                                <?php echo e($item->getCountRating() . ' ' . __('review.frontend.reviews')); ?>
+
+                            <?php endif; ?>
+                        </small>
+                        <?php endif; ?>
+                    </dt>
+                    </div>
+
+            
+                </a>
+
+            
+         </div>
+            <!-- <?php if($item->getCountRating() > 0): ?>
+                <a href="<?php echo e(route('page.item', $item->item_slug)); ?>" style="display:inline-block;">
+                    
+                    <div class="listing__item__rating__star">
+                        <div class="pl-0 rating_stars rating_stars_<?php echo e($item->item_slug); ?>" data-id="rating_stars_<?php echo e($item->item_slug); ?>" data-rating="<?php echo e($item->item_average_rating); ?>"></div>
+                    </div> 
+                    <small>
+                        <?php echo e($item->getAverageRating()); ?>
+
+                    </small>
+
+                    <small>
+                        <?php if($item->getCountRating() == 1): ?>
+                            <?php echo e($item->getCountRating() . ' ' . __('review.frontend.review')); ?>
+
+                        <?php else: ?>
+                            <?php echo e($item->getCountRating() . ' ' . __('review.frontend.reviews')); ?>
+
+                        <?php endif; ?>
+                    </small>
+                </a>
+            <?php endif; ?> -->
+
+            
+
+            <!-- <div class="float-right"> -->
+            <?php if($item->galleries()->count() > 0): ?>
+                <div class="listing__details__gallery__pic">
+                    <?php
+                    $item_galleries = $item->galleries()->take(3)->get();
+                    $i=0;
+                    ?>
+                    <?php $__currentLoopData = $item_galleries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $galleries_key => $gallery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
+                            <img  class="card-gallery" alt="Image" src="<?php echo e(empty($gallery->item_image_gallery_thumb_name) ? Storage::disk('public')->url('item/gallery/' . $gallery->item_image_gallery_name) : Storage::disk('public')->url('item/gallery/' . $gallery->item_image_gallery_thumb_name)); ?>"/>
+                        </a>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            <?php endif; ?>
+            <!-- </div> -->
+        <!-- <div class="listing__item__text__inside"> -->
+            
+                <!-- <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
                    <h5 class="card-title "> <?php echo e(str_limit($item->item_title, 44, '...')); ?> </h5>
                 </a>
          
@@ -64,15 +145,15 @@
                             <?php echo e(number_format($item->distance_miles, 2, '.', '')); ?> miles
                         </a>
 
-                        <!-- <?php echo e($item->item_address_hide == \App\Item::ITEM_ADDR_NOT_HIDE ? $item->item_address . ',' : ''); ?>
+                         <?php echo e($item->item_address_hide == \App\Item::ITEM_ADDR_NOT_HIDE ? $item->item_address . ',' : ''); ?>
 
                         <a href="<?php echo e(route('page.city', ['state_slug'=>$item->state->state_slug, 'city_slug'=>$item->city->city_slug])); ?>"><?php echo e($item->city->city_name); ?></a>,
                         <a href="<?php echo e(route('page.state', ['state_slug'=>$item->state->state_slug])); ?>"><?php echo e($item->state->state_name); ?></a>
-                        <?php echo e($item->item_postal_code); ?> -->
+                        <?php echo e($item->item_postal_code); ?> 
                     </li>
                 </ul>
             <?php endif; ?>
-        </div>
+        </div> -->
       </div>
       <div class="card-footer bg-white">
         <!-- <small class="text-muted">Last updated 3 mins ago</small> -->
