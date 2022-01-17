@@ -23,7 +23,7 @@
         
                 </div>
                 <div class="filter__select">
-                    <select class="selectpicker @error('filter_state') is-invalid @enderror" name="filter_state" id="filter_state" data-live-search="true">
+                    <select class="custom-select @error('filter_state') is-invalid @enderror" name="filter_state" id="filter_state" data-live-search="true">
                         <option value="0" {{ empty($filter_state) ? 'selected' : '' }}>{{ __('prefer_country.all-state') }}</option>
                         @foreach($all_states as $all_states_key => $state)
                             @if($state->items_count > 0)
@@ -40,7 +40,7 @@
 
                 </div>
                 <div class="filter__select">
-                    <select class="selectpicker @error('filter_city') is-invalid @enderror" name="filter_city" id="filter_city" data-live-search="true">
+                    <select class="custom-select @error('filter_city') is-invalid @enderror" name="filter_city" id="filter_city" data-live-search="true">
                         <option value="0" {{ empty($filter_city) ? 'selected' : '' }}>{{ __('prefer_country.all-city') }}</option>
                         @foreach($all_cities as $all_cities_key => $city)                      
                             <option value="{{ $city->id}}" {{ $filter_city == $city->city_name ? 'selected' : '' }}>{{ $city->city_name }}</option>
@@ -54,7 +54,7 @@
 
                 </div>
                 <div class="filter__select">
-                    <select class="selectpicker @error('filter_sort_by') is-invalid @enderror" name="filter_sort_by" id="filter_sort_by">
+                    <select class="custom-select @error('filter_sort_by') is-invalid @enderror" name="filter_sort_by" id="filter_sort_by">
                         <option value="{{ \App\Item::ITEMS_SORT_BY_NEWEST_CREATED }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_NEWEST_CREATED ? 'selected' : '' }}>{{ __('listings_filter.sort-by-newest') }}</option>
                         <option value="{{ \App\Item::ITEMS_SORT_BY_OLDEST_CREATED }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_OLDEST_CREATED ? 'selected' : '' }}>{{ __('listings_filter.sort-by-oldest') }}</option>
                         <option value="{{ \App\Item::ITEMS_SORT_BY_HIGHEST_RATING }}" {{ $filter_sort_by == \App\Item::ITEMS_SORT_BY_HIGHEST_RATING ? 'selected' : '' }}>{{ __('listings_filter.sort-by-highest') }}</option>
@@ -69,7 +69,7 @@
                 </div>
                 <div class="filter__tags">
                     <h6>{{ __('backend.category.category') }}</h6>
-                    <select class="selectpicker @error('filter_categories') is-invalid @enderror" multiple data-live-search="true" name="filter_categories[]" id="filter_categories">
+                    <select class="custom-select @error('filter_categories') is-invalid @enderror" multiple data-live-search="true" name="filter_categories[]" id="filter_categories">
 
                          <!-- <option value="0" {{ empty($filter_categories) ? 'selected' : '' }}>{{ __('prefer_country.all-categories') }}</option> -->
                         @foreach($all_printable_categories as $key => $all_printable_category)

@@ -124,11 +124,14 @@
 
 <script>
 
-    jQuery.event.special.touchstart = {
-        setup: function( _, ns, handle ){
-            this.addEventListener("touchstart", handle, { passive: true });
-        }
-    };
+    // jQuery.event.special.touchstart = {
+    //     setup: function( _, ns, handle ){
+    //         this.addEventListener("touchstart", handle, { passive: true });
+    //     }
+    // };
+
+    $.fn.selectpicker.Constructor.BootstrapVersion = '4';
+
 
     $(document).ready(function(){
 

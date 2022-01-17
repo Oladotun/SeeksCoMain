@@ -2,11 +2,11 @@
 
 @section('styles')
 
-    <link href="{{ asset('frontend/vendor/leaflet/leaflet.css') }}" rel="stylesheet" />
+    <!-- <link href="{{ asset('frontend/vendor/leaflet/leaflet.css') }}" rel="stylesheet" /> -->
 
 
-    <link rel="stylesheet" href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/justified-gallery/justifiedGallery.min.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/colorbox/colorbox.css') }}" type="text/css">
+  <!--   <link rel="stylesheet" href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/justified-gallery/justifiedGallery.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/colorbox/colorbox.css') }}" type="text/css"> -->
 
     <link href="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.css') }}" rel="stylesheet" />
 
@@ -356,11 +356,14 @@
    <!--  @if($site_global_settings->setting_site_map == \App\Setting::SITE_MAP_OPEN_STREET_MAP)
         Make sure you put this AFTER Leaflet's CSS
         <script src="{{ asset('frontend/vendor/leaflet/leaflet.js') }}"></script>
+
+
     @endif -->
-    <script src="{{ asset('frontend/vendor/leaflet/leaflet.js') }}"></script>
+
+    
     <script src="{{ asset('theme_assets/frontend_assets/lduruo10_dh_frontend_city_path/vendor/bootstrap-select/bootstrap-select.min.js') }}"></script>
     @include('frontend_views.lduruo10_dh_frontend_city_path.partials.bootstrap-select-locale')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jscroll/2.4.1/jquery.jscroll.min.js"></script>
 
     <script type="text/javascript">
@@ -425,6 +428,8 @@
             /**
              * Start get user lat & lng location
              */
+
+
             function success(position) {
                 const latitude  = position.coords.latitude;
                 const longitude = position.coords.longitude;

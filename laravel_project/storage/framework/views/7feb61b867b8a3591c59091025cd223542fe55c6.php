@@ -37,7 +37,7 @@ unset($__errorArgs, $__bag); ?>
         
                 </div>
                 <div class="filter__select">
-                    <select class="selectpicker <?php $__errorArgs = ['filter_state'];
+                    <select class="custom-select <?php $__errorArgs = ['filter_state'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -68,7 +68,7 @@ unset($__errorArgs, $__bag); ?>
 
                 </div>
                 <div class="filter__select">
-                    <select class="selectpicker <?php $__errorArgs = ['filter_city'];
+                    <select class="custom-select <?php $__errorArgs = ['filter_city'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -96,7 +96,7 @@ unset($__errorArgs, $__bag); ?>
 
                 </div>
                 <div class="filter__select">
-                    <select class="selectpicker <?php $__errorArgs = ['filter_sort_by'];
+                    <select class="custom-select <?php $__errorArgs = ['filter_sort_by'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -125,7 +125,7 @@ unset($__errorArgs, $__bag); ?>
                 </div>
                 <div class="filter__tags">
                     <h6><?php echo e(__('backend.category.category')); ?></h6>
-                    <select class="selectpicker <?php $__errorArgs = ['filter_categories'];
+                    <select class="custom-select <?php $__errorArgs = ['filter_categories'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }

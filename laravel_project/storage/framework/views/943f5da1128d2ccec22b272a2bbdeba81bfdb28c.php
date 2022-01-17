@@ -35,7 +35,7 @@ unset($__errorArgs, $__bag); ?>
                 </div>
                 
                 <div class="filter__select">
-                    <select class="selectpicker <?php $__errorArgs = ['filter_city'];
+                    <select class="custom-select mb-3 <?php $__errorArgs = ['filter_city'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -63,7 +63,7 @@ unset($__errorArgs, $__bag); ?>
 
                 </div>
                 <div class="filter__select">
-                    <select class="selectpicker <?php $__errorArgs = ['filter_state'];
+                    <select class="custom-select <?php $__errorArgs = ['filter_state'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -94,7 +94,7 @@ unset($__errorArgs, $__bag); ?>
 
                 </div>
                 <div class="filter__select">
-                    <select class="selectpicker <?php $__errorArgs = ['filter_sort_by'];
+                    <select class="custom-select <?php $__errorArgs = ['filter_sort_by'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -123,14 +123,14 @@ unset($__errorArgs, $__bag); ?>
                 </div>
                 <div class="filter__tags">
                     <h6><?php echo e(__('backend.category.category')); ?></h6>
-                    <select class="selectpicker <?php $__errorArgs = ['filter_categories'];
+                    <select class="custom-select <?php $__errorArgs = ['filter_categories'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" multiple data-live-search="true" name="filter_categories[]" id="filter_categories">
+unset($__errorArgs, $__bag); ?>"  data-live-search="true" name="filter_categories[]" id="filter_categories" multiple>
 
                          <!-- <option value="0" <?php echo e(empty($filter_categories) ? 'selected' : ''); ?>><?php echo e(__('prefer_country.all-categories')); ?></option> -->
                         <?php $__currentLoopData = $all_printable_categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $all_printable_category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
