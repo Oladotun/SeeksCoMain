@@ -125,7 +125,7 @@
     }
     .h5{word-wrap: break-word;}
     .listing__item__text__inside h5 {
-            font-size: 1rem;
+            font-size: 0.77rem;
         }
     @media  only screen and (min-width: 1200px) and (max-width: 1399px) {
         /*.listing {padding-top: 30%;}*/

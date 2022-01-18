@@ -39,45 +39,22 @@
         <?php endif; ?>
 
         <a href="tel:<?php echo e($item->item_phone); ?>" data-toggle="tooltip" title="<?php echo e(__('frontend.item.call')); ?>"><i class="listing__item__home__tag fas fa-phone-alt" ></i></a>
-      <div class="card-body" style="flex-direction: row;">
-        <div class="listing__item__text__inside">
+      <div class="card-body" >
+        <div class="d-flex align-items-center listing__item__text__inside">
             
-                <a href="<?php echo e(route('page.item', $item->item_slug)); ?>">
-                   <h5 class="card-title float-left"> <?php echo e(str_limit($item->item_title, 44, '...')); ?> </h5>
-                   <?php if($item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
-                   <dt  class="float-right" >
-                            <i class="fas fa-map-marker-alt fa-sm"></i>
-                             <small class="break-word font-weight-bold"  >
-                            <?php echo e(number_format($item->distance_miles, 2, '.', '')); ?> miles</small> 
+                
+           <h5 class="card-title flex-fill"> <a href="<?php echo e(route('page.item', $item->item_slug)); ?>"><?php echo e(str_limit($item->item_title, 44, '...')); ?></a> </h5>
+           <?php if($item->item_type == \App\Item::ITEM_TYPE_REGULAR): ?>
+           <dt  class="flex-fill" style="display: inline-block;">
+                    <i class="fas fa-map-marker-alt fa-sm"></i>
+                     <small class="break-word font-weight-bold"  >
+                    <?php echo e(number_format($item->distance_miles, 2, '.', '')); ?> miles</small> 
 
-                        </dt>
-                     <?php endif; ?>
-                     <div>
-                        <dt  class="float-right" >
-                        <?php if($item->getCountRating() > 0): ?>
-                        <small>
-                            <?php echo e($item->getAverageRating()); ?> stars
-                        </small>
-
-                        <small>
-                            <?php if($item->getCountRating() == 1): ?>
-                                <?php echo e($item->getCountRating() . ' ' . __('review.frontend.review')); ?>
-
-                            <?php else: ?>
-                                <?php echo e($item->getCountRating() . ' ' . __('review.frontend.reviews')); ?>
-
-                            <?php endif; ?>
-                        </small>
-                        <?php endif; ?>
-                    </dt>
+                </dt>
+             <?php endif; ?>
+             
+                
                          
-                     </div>
-                     
-
-            
-                </a>
-
-            
          </div>
             <!-- <?php if($item->getCountRating() > 0): ?>
                 <a href="<?php echo e(route('page.item', $item->item_slug)); ?>" style="display:inline-block;">
@@ -104,11 +81,11 @@
 
             
 
-            <!-- <div class="float-right"> -->
+            <div class="d-flex align-items-center listing__item__text__inside">
             <?php if($item->galleries()->count() > 0): ?>
-                <div class="listing__details__gallery__pic">
+                <div class="listing__details__gallery__pic flex-fill" style="display: inline-block;">
                     <?php
-                    $item_galleries = $item->galleries()->get();
+                    $item_galleries = $item->galleries()->take(3)->get();
                     $i=0;
                     ?>
                     <?php $__currentLoopData = $item_galleries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $galleries_key => $gallery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -118,9 +95,27 @@
                          
                     
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                     <?php if($item->galleries()->count() > 3): ?>
+                        <small class="break-word font-weight-bold flex-fill" style="display: inline-block;"><a href="<?php echo e(route('page.item', $item->item_slug)); ?>">+more</a></small>
+                     <?php endif; ?>
                 </div>
             <?php endif; ?>
-            <!-- </div> -->
+
+            <dt  class="flex-fill"  >
+                <?php if($item->getCountRating() > 0): ?>
+                <small class="break-word font-weight-bold flex-fill" style="display: inline-block;">
+                    <?php echo e($item->getAverageRating()); ?> stars
+                
+                    <?php if($item->getCountRating() == 1): ?>
+                        <?php echo e($item->getCountRating()); ?> review
+                    <?php else: ?>
+                        <?php echo e($item->getCountRating()); ?> reviews
+                    <?php endif; ?>
+                </small>
+                <?php endif; ?>
+            </dt>
+            </div>
         
       </div>
       <div class="card-footer bg-white">
